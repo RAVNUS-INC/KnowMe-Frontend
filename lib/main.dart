@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
 import 'package:knowme_frontend/feature/posts/views/PostListScreen.dart';
 // import 'package:knowme_frontend/lib/binding/init_binding.dart';
 void main() {
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.blue,
       ),
       // initialBinding: InitBinding(), // GetX 바인딩 사용
-      home: PostListScreen(), // ← 여가 시작 화면! 지민이가 home으로 바꿔야 함
+      home: const PostListScreen(), // ← 여가 시작 화면! 지민이가 home으로 바꿔야 함
     );
   }
 }

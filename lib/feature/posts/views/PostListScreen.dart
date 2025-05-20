@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
 import 'package:knowme_frontend/feature/posts/models/contest_model.dart';
-import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
+// import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
 import 'package:knowme_frontend/feature/posts/widgets/PostGrid.dart';
 
 class PostListScreen extends StatefulWidget {
@@ -17,43 +18,17 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
   late TabController _tabController;
   final PageController _pageController = PageController();
 
-  // 각 탭별 필터 상태 관리
-  // 채용 필터
-  String? selectedJob;
-  String? selectedExperience;
-  String? selectedLocation;
-  String? selectedEducation;
-
-  // 인턴 필터
-  String? selectedInternJob;
-  String? selectedPeriod;
-  String? selectedInternLocation;
-  String? selectedInternEducation;
-
-  // 대외활동 필터
-  String? selectedField;
-  String? selectedOrganization;
-  String? selectedActivityLocation;
-  String? selectedHost;
-
-  // 교육/강연 필터
-  String? selectedEduField;
-  String? selectedEduPeriod;
-  String? selectedEduLocation;
-  String? selectedOnOffline;
-
-  // 공모전 필터
-  String? selectedContestField;
-  String? selectedTarget;
-  String? selectedOrganizer;
-  String? selectedBenefit;
-
-  final PostsController _postsController = PostsController();
+  // GetX Controller 인스턴스화
+  final PostController _postsController = Get.put(PostController());
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: tabTitles.length, vsync: this, initialIndex: 4); // 공모전 탭 초기 선택
+    _tabController = TabController(
+      length: tabTitles.length,
+      vsync: this,
+      initialIndex: _postsController.currentTabIndex.value,
+    );
 
     // TabBar와 PageView 연결
     _tabController.addListener(() {
@@ -63,6 +38,8 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
+        // GetX Controller에 현재 탭 인덱스 업데이트
+        _postsController.changeTab(_tabController.index);
       }
     });
   }
@@ -90,43 +67,17 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (index) {
-                setState(() {
-                  _tabController.animateTo(index);
-                });
+                _tabController.animateTo(index);
+                // GetX Controller에 현재 탭 인덱스 업데이트
+                _postsController.changeTab(index);
               },
               itemCount: tabTitles.length,
               itemBuilder: (context, index) {
-                // Controller를 통해 필터링된 포스트 목록 가져오기
-                List<Contest> filteredContests = _postsController.getFilteredContentsByTabIndex(
-                  index,
-                  // 채용 필터
-                  selectedJob: selectedJob,
-                  selectedExperience: selectedExperience,
-                  selectedLocation: selectedLocation,
-                  selectedEducation: selectedEducation,
-                  // 인턴 필터
-                  selectedInternJob: selectedInternJob,
-                  selectedPeriod: selectedPeriod,
-                  selectedInternLocation: selectedInternLocation,
-                  selectedInternEducation: selectedInternEducation,
-                  // 대외활동 필터
-                  selectedField: selectedField,
-                  selectedOrganization: selectedOrganization,
-                  selectedActivityLocation: selectedActivityLocation,
-                  selectedHost: selectedHost,
-                  // 교육/강연 필터
-                  selectedEduField: selectedEduField,
-                  selectedEduPeriod: selectedEduPeriod,
-                  selectedEduLocation: selectedEduLocation,
-                  selectedOnOffline: selectedOnOffline,
-                  // 공모전 필터
-                  selectedContestField: selectedContestField,
-                  selectedTarget: selectedTarget,
-                  selectedOrganizer: selectedOrganizer,
-                  selectedBenefit: selectedBenefit,
-                );
-
-                return PostGrid(contests: filteredContests);
+                // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
+                return Obx(() {
+                  List<Contest> filteredContests = _postsController.getFilteredContentsByTabIndex(index);
+                  return PostGrid(contests: filteredContests);
+                });
               },
             ),
           ),
@@ -179,264 +130,156 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
     // 현재 활성화된 탭 인덱스에 따라 필터 버튼 생성
     List<Widget> filterButtons = [];
 
-    switch (_tabController.index) {
-      case 0: // 채용
-        filterButtons = [
-          _buildFilterButton('직무', selectedJob, (value) {
-            setState(() => selectedJob = value);
-          }),
-          _buildFilterButton('신입~5년', selectedExperience, (value) {
-            setState(() => selectedExperience = value);
-          }),
-          _buildFilterButton('서울 전체', selectedLocation, (value) {
-            setState(() => selectedLocation = value);
-          }),
-          _buildFilterButton('학력', selectedEducation, (value) {
-            setState(() => selectedEducation = value);
-          }),
-        ];
-        break;
+    return Obx(() {
+      switch (_postsController.currentTabIndex.value) {
+        case 0: // 채용
+          filterButtons = [
+            _buildFilterButton('직무', _postsController.selectedJob.value),
+            _buildFilterButton('신입~5년', _postsController.selectedExperience.value),
+            _buildFilterButton('서울 전체', _postsController.selectedLocation.value),
+            _buildFilterButton('학력', _postsController.selectedEducation.value),
+          ];
+          break;
 
-      case 1: // 인턴
-        filterButtons = [
-          _buildFilterButton('직무', selectedInternJob, (value) {
-            setState(() => selectedInternJob = value);
-          }),
-          _buildFilterButton('기간', selectedPeriod, (value) {
-            setState(() => selectedPeriod = value);
-          }),
-          _buildFilterButton('지역', selectedInternLocation, (value) {
-            setState(() => selectedInternLocation = value);
-          }),
-          _buildFilterButton('학력', selectedInternEducation, (value) {
-            setState(() => selectedInternEducation = value);
-          }),
-        ];
-        break;
+        case 1: // 인턴
+          filterButtons = [
+            _buildFilterButton('직무', _postsController.selectedInternJob.value),
+            _buildFilterButton('기간', _postsController.selectedPeriod.value),
+            _buildFilterButton('지역', _postsController.selectedInternLocation.value),
+            _buildFilterButton('학력', _postsController.selectedInternEducation.value),
+          ];
+          break;
 
-      case 2: // 대외활동
-        filterButtons = [
-          _buildFilterButton('분야', selectedField, (value) {
-            setState(() => selectedField = value);
-          }),
-          _buildFilterButton('기관', selectedOrganization, (value) {
-            setState(() => selectedOrganization = value);
-          }),
-          _buildFilterButton('지역', selectedActivityLocation, (value) {
-            setState(() => selectedActivityLocation = value);
-          }),
-          _buildFilterButton('주최기관', selectedHost, (value) {
-            setState(() => selectedHost = value);
-          }),
-        ];
-        break;
+        case 2: // 대외활동
+          filterButtons = [
+            _buildFilterButton('분야', _postsController.selectedField.value),
+            _buildFilterButton('기관', _postsController.selectedOrganization.value),
+            _buildFilterButton('지역', _postsController.selectedActivityLocation.value),
+            _buildFilterButton('주최기관', _postsController.selectedHost.value),
+          ];
+          break;
 
-      case 3: // 교육/강연
-        filterButtons = [
-          _buildFilterButton('분야', selectedEduField, (value) {
-            setState(() => selectedEduField = value);
-          }),
-          _buildFilterButton('기간', selectedEduPeriod, (value) {
-            setState(() => selectedEduPeriod = value);
-          }),
-          _buildFilterButton('지역', selectedEduLocation, (value) {
-            setState(() => selectedEduLocation = value);
-          }),
-          _buildFilterButton('온/오프라인', selectedOnOffline, (value) {
-            setState(() => selectedOnOffline = value);
-          }),
-        ];
-        break;
+        case 3: // 교육/강연
+          filterButtons = [
+            _buildFilterButton('분야', _postsController.selectedEduField.value),
+            _buildFilterButton('기간', _postsController.selectedEduPeriod.value),
+            _buildFilterButton('지역', _postsController.selectedEduLocation.value),
+            _buildFilterButton('온/오프라인', _postsController.selectedOnOffline.value),
+          ];
+          break;
 
-      case 4: // 공모전
-      default:
-        filterButtons = [
-          _buildFilterButton('분야', selectedContestField, (value) {
-            setState(() => selectedContestField = value);
-          }),
-          _buildFilterButton('대상', selectedTarget, (value) {
-            setState(() => selectedTarget = value);
-          }),
-          _buildFilterButton('주최기관', selectedOrganizer, (value) {
-            setState(() => selectedOrganizer = value);
-          }),
-          _buildFilterButton('혜택', selectedBenefit, (value) {
-            setState(() => selectedBenefit = value);
-          }),
-        ];
-        break;
-    }
+        case 4: // 공모전
+        default:
+          filterButtons = [
+            _buildFilterButton('분야', _postsController.selectedContestField.value),
+            _buildFilterButton('대상', _postsController.selectedTarget.value),
+            _buildFilterButton('주최기관', _postsController.selectedOrganizer.value),
+            _buildFilterButton('혜택', _postsController.selectedBenefit.value),
+          ];
+          break;
+      }
 
-    return Container(
-      height: 50, // filter button row
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 0),
-      child: Row(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: filterButtons.map((button) {
-                  final index = filterButtons.indexOf(button);
-                  return Row(
-                    children: [
-                      button,
-                      if (index < filterButtons.length - 1)
-                        const SizedBox(width: 8),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {
-              // 현재 탭에 따라 필터 초기화
-              setState(() {
-                switch (_tabController.index) {
-                  case 0: // 채용
-                    selectedJob = null;
-                    selectedExperience = null;
-                    selectedLocation = null;
-                    selectedEducation = null;
-                    break;
-                  case 1: // 인턴
-                    selectedInternJob = null;
-                    selectedPeriod = null;
-                    selectedInternLocation = null;
-                    selectedInternEducation = null;
-                    break;
-                  case 2: // 대외활동
-                    selectedField = null;
-                    selectedOrganization = null;
-                    selectedActivityLocation = null;
-                    selectedHost = null;
-                    break;
-                  case 3: // 교육/강연
-                    selectedEduField = null;
-                    selectedEduPeriod = null;
-                    selectedEduLocation = null;
-                    selectedOnOffline = null;
-                    break;
-                  case 4: // 공모전
-                    selectedContestField = null;
-                    selectedTarget = null;
-                    selectedOrganizer = null;
-                    selectedBenefit = null;
-                    break;
-                }
-              });
-              // 팝업 메뉴 표시
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                    alignment: Alignment.topRight,
-                    insetPadding: const EdgeInsets.only(top: 140, right: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      width: 50,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildSortOption(
-                            icon: 'assets/icons/Group.svg',
-                            title: '추천순',
-                            onTap: () {
-                              Navigator.pop(context);
-                              // 인기순으로 정렬 로직 구현
-                            },
-                          ),
-                          Divider(height: 1, thickness: 1, color: Colors.grey[200]),
-                          _buildSortOption(
-                            icon: 'assets/icons/recent.svg',
-                            title: '최신 등록순',
-                            onTap: () {
-                              Navigator.pop(context);
-                              // 최신순으로 정렬 로직 구현
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-            child: Container(
-              height: 33,
-              padding: const EdgeInsets.all(8),
-              decoration: ShapeDecoration(
-                color: const Color(0xFFF5F5F5),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    width: 1,
-                    color: Color(0xFFDEE3E7),
-                  ),
-                  borderRadius: BorderRadius.circular(8),
+      return Container(
+        height: 50, // filter button row
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 0),
+        child: Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: filterButtons.map((button) {
+                    final index = filterButtons.indexOf(button);
+                    return Row(
+                      children: [
+                        button,
+                        if (index < filterButtons.length - 1)
+                          const SizedBox(width: 8),
+                      ],
+                    );
+                  }).toList(),
                 ),
               ),
-              child: SvgPicture.asset(
-                'assets/icons/array.svg',
-                width: 24,
-                height: 24,
-              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // 정렬 옵션 아이템 위젯
-  Widget _buildSortOption({
-    required String icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: 105, // Figma width: 105.dp
-        height: 32, // Figma height: 32.dp
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6), // Figma padding
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              icon,
-              width: 20,
-              height: 20,
-              color: const Color(0xFF454C53),
-            ),
-            const SizedBox(width: 4), // Figma spacedBy(4.dp)
-            Text(
-              title,
-              style: const TextStyle(
-                color: Color(0xFF454C53),
-                fontSize: 14, // 14 포인트
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w500,
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                // 현재 탭의 모든 필터 초기화
+                _postsController.resetFilters();
+
+                // 팝업 메뉴 표시
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      alignment: Alignment.topRight,
+                      insetPadding: const EdgeInsets.only(top: 140, right: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        width: 50,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildSortOption(
+                              icon: 'assets/icons/Group.svg',
+                              title: '추천순',
+                              onTap: () {
+                                Navigator.pop(context);
+                                // 인기순으로 정렬 로직 구현
+                              },
+                            ),
+                            Divider(height: 1, thickness: 1, color: Colors.grey[200]),
+                            _buildSortOption(
+                              icon: 'assets/icons/recent.svg',
+                              title: '최신 등록순',
+                              onTap: () {
+                                Navigator.pop(context);
+                                // 최신순으로 정렬 로직 구현
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Container(
+                height: 33,
+                padding: const EdgeInsets.all(8),
+                decoration: ShapeDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(
+                      width: 1,
+                      color: Color(0xFFDEE3E7),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: SvgPicture.asset(
+                  'assets/icons/array.svg',
+                  width: 24,
+                  height: 24,
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+    });
   }
 
-  Widget _buildFilterButton(String text, String? selectedValue, Function(String?) onTap) {
+  // 수정된 _buildFilterButton - 이제 controller를 통해 값 업데이트
+  Widget _buildFilterButton(String text, String? selectedValue) {
     final bool isSelected = selectedValue != null;
 
     return GestureDetector(
@@ -451,7 +294,8 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           ),
         );
 
-        onTap(result);
+        // Controller를 통해 필터 값 업데이트
+        _postsController.updateFilter(text, result);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -475,6 +319,47 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             fontWeight: FontWeight.w500,
             letterSpacing: -0.56,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSortOption({
+    required String icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 105, // Figma width: 105.dp
+        height: 32, // Figma height: 32.dp
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6), // Figma padding
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              icon,
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF454C53),
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 4), // Figma spacedBy(4.dp)
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFF454C53),
+                fontSize: 14, // 14 포인트
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -648,3 +533,4 @@ class FilterDialog extends StatelessWidget {
     );
   }
 }
+

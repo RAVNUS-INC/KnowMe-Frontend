@@ -14,6 +14,7 @@
 
 // import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
 import 'package:get/get.dart';
+// import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
 
 class InitBinding extends Bindings {
   @override

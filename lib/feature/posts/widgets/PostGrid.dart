@@ -37,12 +37,12 @@ class PostGrid extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return SizedBox(
+    return const SizedBox(
       height: 300,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.search_off, size: 64, color: Color(0xFFB7C4D4)),
             SizedBox(height: 16),
             Text(
