@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../models/contest_model.dart';
-import 'package:knowme_frontend/feature/posts/repositories/PostRepository.dart';
+import 'package:knowme_frontend/feature/posts/repositories/post_repositories.dart';
 
 class PostController extends GetxController {
   final PostRepository repository = PostRepository();

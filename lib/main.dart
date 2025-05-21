@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_frontend/feature/posts/views/PostListScreen.dart';
+import 'package:knowme_frontend/feature/posts/views/post_list_screen.dart';
 // import 'package:knowme_frontend/lib/binding/init_binding.dart';
 void main() {
   runApp(const MyApp());

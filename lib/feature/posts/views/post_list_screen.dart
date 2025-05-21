@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
+import 'package:knowme_frontend/feature/posts/controllers/post_controller.dart';
 import 'package:knowme_frontend/feature/posts/models/contest_model.dart';
 // import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
-import 'package:knowme_frontend/feature/posts/widgets/PostGrid.dart';
+import 'package:knowme_frontend/feature/posts/widgets/post_grid.dart';
 
 class PostListScreen extends StatefulWidget {
   const PostListScreen({Key? key}) : super(key: key);
@@ -19,7 +19,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
   final PageController _pageController = PageController();
 
   // GetX Controller 인스턴스화
-  final PostController _postsController = Get.put(PostController());
+  final PostController _postController = Get.put(PostController());
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
     _tabController = TabController(
       length: tabTitles.length,
       vsync: this,
-      initialIndex: _postsController.currentTabIndex.value,
+      initialIndex: _postController.currentTabIndex.value,
     );
 
     // TabBar와 PageView 연결
@@ -39,7 +39,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           curve: Curves.easeInOut,
         );
         // GetX Controller에 현재 탭 인덱스 업데이트
-        _postsController.changeTab(_tabController.index);
+        _postController.changeTab(_tabController.index);
       }
     });
   }
@@ -69,13 +69,13 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
               onPageChanged: (index) {
                 _tabController.animateTo(index);
                 // GetX Controller에 현재 탭 인덱스 업데이트
-                _postsController.changeTab(index);
+                _postController.changeTab(index);
               },
               itemCount: tabTitles.length,
               itemBuilder: (context, index) {
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
-                  List<Contest> filteredContests = _postsController.getFilteredContentsByTabIndex(index);
+                  List<Contest> filteredContests = _postController.getFilteredContentsByTabIndex(index);
                   return PostGrid(contests: filteredContests);
                 });
               },
@@ -131,46 +131,46 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
     List<Widget> filterButtons = [];
 
     return Obx(() {
-      switch (_postsController.currentTabIndex.value) {
+      switch (_postController.currentTabIndex.value) {
         case 0: // 채용
           filterButtons = [
-            _buildFilterButton('직무', _postsController.selectedJob.value),
-            _buildFilterButton('신입~5년', _postsController.selectedExperience.value),
-            _buildFilterButton('서울 전체', _postsController.selectedLocation.value),
-            _buildFilterButton('학력', _postsController.selectedEducation.value),
+            _buildFilterButton('직무', _postController.selectedJob.value),
+            _buildFilterButton('신입~5년', _postController.selectedExperience.value),
+            _buildFilterButton('서울 전체', _postController.selectedLocation.value),
+            _buildFilterButton('학력', _postController.selectedEducation.value),
           ];
           break;
         case 1: // 인턴
           filterButtons = [
-            _buildFilterButton('직무', _postsController.selectedInternJob.value),
-            _buildFilterButton('기간', _postsController.selectedPeriod.value),
-            _buildFilterButton('지역', _postsController.selectedInternLocation.value),
-            _buildFilterButton('학력', _postsController.selectedInternEducation.value),
+            _buildFilterButton('직무', _postController.selectedInternJob.value),
+            _buildFilterButton('기간', _postController.selectedPeriod.value),
+            _buildFilterButton('지역', _postController.selectedInternLocation.value),
+            _buildFilterButton('학력', _postController.selectedInternEducation.value),
           ];
           break;
         case 2: // 대외활동
           filterButtons = [
-            _buildFilterButton('분야', _postsController.selectedField.value),
-            _buildFilterButton('기관', _postsController.selectedOrganization.value),
-            _buildFilterButton('지역', _postsController.selectedActivityLocation.value),
-            _buildFilterButton('주최기관', _postsController.selectedHost.value),
+            _buildFilterButton('분야', _postController.selectedField.value),
+            _buildFilterButton('기관', _postController.selectedOrganization.value),
+            _buildFilterButton('지역', _postController.selectedActivityLocation.value),
+            _buildFilterButton('주최기관', _postController.selectedHost.value),
           ];
           break;
         case 3: // 교육/강연
           filterButtons = [
-            _buildFilterButton('분야', _postsController.selectedEduField.value),
-            _buildFilterButton('기간', _postsController.selectedEduPeriod.value),
-            _buildFilterButton('지역', _postsController.selectedEduLocation.value),
-            _buildFilterButton('온/오프라인', _postsController.selectedOnOffline.value),
+            _buildFilterButton('분야', _postController.selectedEduField.value),
+            _buildFilterButton('기간', _postController.selectedEduPeriod.value),
+            _buildFilterButton('지역', _postController.selectedEduLocation.value),
+            _buildFilterButton('온/오프라인', _postController.selectedOnOffline.value),
           ];
           break;
         case 4: // 공모전
         default:
           filterButtons = [
-            _buildFilterButton('분야', _postsController.selectedContestField.value),
-            _buildFilterButton('대상', _postsController.selectedTarget.value),
-            _buildFilterButton('주최기관', _postsController.selectedOrganizer.value),
-            _buildFilterButton('혜택', _postsController.selectedBenefit.value),
+            _buildFilterButton('분야', _postController.selectedContestField.value),
+            _buildFilterButton('대상', _postController.selectedTarget.value),
+            _buildFilterButton('주최기관', _postController.selectedOrganizer.value),
+            _buildFilterButton('혜택', _postController.selectedBenefit.value),
           ];
           break;
       }
@@ -210,7 +210,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
               child: GestureDetector(
                 onTap: () {
                   // 현재 탭의 모든 필터 초기화
-                  _postsController.resetFilters();
+                  _postController.resetFilters();
 
                   // 팝업 메뉴 표시
                   showDialog(
@@ -298,7 +298,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
         );
 
         // Controller를 통해 필터 값 업데이트
-        _postsController.updateFilter(text, result);
+        _postController.updateFilter(text, result);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

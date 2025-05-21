@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:knowme_frontend/feature/posts/models/contest_model.dart';
-import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
+import 'package:knowme_frontend/feature/posts/views/post_detail_screen.dart';
 
 class PostGrid extends StatelessWidget {
   final List<Contest> contests;
