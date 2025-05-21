@@ -140,7 +140,6 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             _buildFilterButton('학력', _postsController.selectedEducation.value),
           ];
           break;
-
         case 1: // 인턴
           filterButtons = [
             _buildFilterButton('직무', _postsController.selectedInternJob.value),
@@ -149,7 +148,6 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             _buildFilterButton('학력', _postsController.selectedInternEducation.value),
           ];
           break;
-
         case 2: // 대외활동
           filterButtons = [
             _buildFilterButton('분야', _postsController.selectedField.value),
@@ -158,7 +156,6 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             _buildFilterButton('주최기관', _postsController.selectedHost.value),
           ];
           break;
-
         case 3: // 교육/강연
           filterButtons = [
             _buildFilterButton('분야', _postsController.selectedEduField.value),
@@ -167,7 +164,6 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             _buildFilterButton('온/오프라인', _postsController.selectedOnOffline.value),
           ];
           break;
-
         case 4: // 공모전
         default:
           filterButtons = [
@@ -181,45 +177,52 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
 
       return Container(
         height: 50, // filter button row
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 0),
         child: Row(
           children: [
+            const SizedBox(width: 16), // 왼쪽 여백
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: filterButtons.map((button) {
-                    final index = filterButtons.indexOf(button);
-                    return Row(
-                      children: [
-                        button,
-                        if (index < filterButtons.length - 1)
-                          const SizedBox(width: 8),
-                      ],
-                    );
-                  }).toList(),
+              child: Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // 필요한 만큼만 차지
+                      children: filterButtons.map((button) {
+                        final index = filterButtons.indexOf(button);
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            button,
+                            if (index < filterButtons.length - 1)
+                              const SizedBox(width: 8),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ),
             ),
-
             const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
-                // 현재 탭의 모든 필터 초기화
-                _postsController.resetFilters();
+            Padding(
+              padding: const EdgeInsets.only(right: 16), // 오른쪽 여백
+              child: GestureDetector(
+                onTap: () {
+                  // 현재 탭의 모든 필터 초기화
+                  _postsController.resetFilters();
 
-                // 팝업 메뉴 표시
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      alignment: Alignment.topRight,
-                      insetPadding: const EdgeInsets.only(top: 140, right: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: 50,
+                  // 팝업 메뉴 표시
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        alignment: Alignment.topRight,
+                        insetPadding: const EdgeInsets.only(top: 140, right: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -271,7 +274,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
                   height: 24,
                 ),
               ),
-            ),
+              )  ),
           ],
         ),
       );
@@ -533,4 +536,5 @@ class FilterDialog extends StatelessWidget {
     );
   }
 }
+
 
