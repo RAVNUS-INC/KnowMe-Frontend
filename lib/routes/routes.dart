@@ -36,6 +36,10 @@ class AppRoutes {
 
   static final routes = [
     GetPage(
+      name: '/',
+      page: () => MyHomePage(title: 'Know Me'),
+    ),
+    GetPage(
       name: login,
       page: () => const LoginPage(),
       transition: Transition.fadeIn,
