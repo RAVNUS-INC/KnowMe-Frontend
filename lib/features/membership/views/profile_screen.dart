@@ -182,11 +182,11 @@ class ProfileScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.white.withOpacity(0.0), // 완전 투명 (또는 흰색)
-                  Colors.white.withOpacity(0.0), // 중간까지 흰색/투명
+                  Colors.white.withValues(), // 완전 투명 (또는 흰색)
+                  Colors.white.withValues(), // 중간까지 흰색/투명
                   const Color(0xFFE8F2FF)
-                      .withOpacity(0.7), // 아주 연한 파란색 (hex 값은 이미지 참고)
-                  const Color(0xFFBFDFFF).withOpacity(0.9),
+                      .withValues(), // 아주 연한 파란색 (hex 값은 이미지 참고)
+                  const Color(0xFFBFDFFF).withValues(),
                 ],
               ),
             ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:knowme/shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 확인해서 맞춰줘!
+import 'package:knowme_frontend/shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 확인해서 맞춰줘!
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});

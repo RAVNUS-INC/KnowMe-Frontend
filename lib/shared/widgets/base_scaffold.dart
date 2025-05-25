@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme/routes/routes.dart'; // ✅ AppRoutes 사용
+import 'package:knowme_frontend/routes/routes.dart'; // ✅ AppRoutes 사용
 
 class BaseScaffold extends StatelessWidget {
   final Widget body;
