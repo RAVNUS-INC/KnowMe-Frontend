@@ -49,7 +49,7 @@ class AppRoutes {
       name: AppRoutes.testHome,
       page: () => const TestHome(),
       transition: Transition.fadeIn,
-    ),
+    ), */
     GetPage(
       name: signupFirst,
       page: () => const SignupFirstPage(),

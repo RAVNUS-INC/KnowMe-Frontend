@@ -1,4 +1,4 @@
-/* import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'routes/routes.dart';
 import 'package:get/get.dart';
 
@@ -38,4 +38,4 @@ class TestHome extends StatelessWidget {
       ),
     );
   }
-} */
+}
