@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # knowme_frontend
+=======
+# know_me
+>>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
 
 A new Flutter project.
 

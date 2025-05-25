@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "knowme_frontend",
     "short_name": "knowme_frontend",
+=======
+    "name": "know_me",
+    "short_name": "know_me",
+>>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
