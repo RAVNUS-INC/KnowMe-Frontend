@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:knowme_frontend/main.dart';
+import 'package:knowme_frontend/main.dart'; // MyApp 클래스가 정의된 파일 임포트
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

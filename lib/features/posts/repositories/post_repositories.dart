@@ -1,4 +1,4 @@
-import 'package:knowme_frontend/feature/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contest_model.dart';
 
 class PostRepository {
   // 채용 관련 더미 데이터
