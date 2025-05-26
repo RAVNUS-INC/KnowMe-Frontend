@@ -25,7 +25,12 @@ jobs:
         run: mkdir -p ~/.pub-cache
 
       - name: Add Flutter to PATH
-        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+        run: echo "$HOME/opt/flutter/bin" >> $GITHUB_PATH
+
+      - name: Debug Flutter Installation
+        run: |
+          which flutter
+          flutter doctor -v
 
       - name: Debug PATH and Flutter
         run: |
