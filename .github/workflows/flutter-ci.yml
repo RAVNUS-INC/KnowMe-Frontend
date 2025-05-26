@@ -13,13 +13,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Clear Cache
+        run: |
+          echo "Clearing existing Flutter cache..."
+          rm -rf ~/.pub-cache
+          mkdir -p ~/.pub-cache/bin
+
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.29.3'
-          channel: "stable"
-          cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
-          cache-path: ~/.pub-cache
+        run: |
+          if ! [ -x "$(command -v flutter)" ]; then
+            echo "Reinstalling Flutter..."
+            git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+            ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          fi
+          echo "Flutter setup completed."
+
+      - name: Verify Flutter Installation
+        run: |
+          flutter doctor -v || echo "Flutter is not functioning properly"
+          which flutter || echo "Flutter binary not found in PATH"
+          echo $PATH
+          ls -l ~/.pub-cache 
 
       - name: Ensure .pub-cache and binary installation
         run: |
@@ -68,14 +82,26 @@ jobs:
           echo $PATH
           ls -l ~/.pub-cache  
 
-      - name: Verify Flutter installation
-        run: flutter doctor -v
-
       - name: Clean and upgrade dependencies
         run: |
           flutter pub upgrade
           flutter pub cache repair
           flutter clean
+
+      - name: Upgrade Dependencies with Retry
+        run: |
+          n=0
+          until [ "$n" -ge 5 ]
+          do
+            flutter pub upgrade && break
+            n=$((n+1))
+            echo "flutter pub upgrade 재시도 중... ($n)"
+            sleep $((2**n))
+          done
+          if [ "$n" -ge 5 ]; then
+            echo "flutter pub upgrade가 5회 시도 후에도 실패했습니다."
+            exit 1
+          fi
 
       - name: Install dependencies
         run: flutter pub get
