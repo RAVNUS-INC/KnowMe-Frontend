@@ -17,109 +17,39 @@ jobs:
         with:
           channel: 'stable'
 
-      # 1. Flutter 설치/환경/캐시 셋업
-      - name: Setup Flutter Cache and Environment
-        run: |
-          echo "Setting up Flutter environment..."
-          export PUB_CACHE="$HOME/.pub-cache"
-          mkdir -p $PUB_CACHE/bin
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
-          ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
-          export PATH="$PUB_CACHE/bin:$PATH"
-          if ! flutter doctor -v; then
-            echo "Flutter setup failed"; exit 1
-          fi
-
+      # (Optional) 환경 점검 - Flutter 및 PATH
       - name: Debug Environment
         run: |
           echo "Debugging environment..."
           echo "PATH: $PATH"
           which flutter || echo "Flutter binary not found in PATH"
+          flutter --version
           ls -la $HOME/.pub-cache
 
-      # 2. 의존성 업그레이드(재시도 포함, 캐시도 같이 정리)
-      - name: Upgrade Dependencies with Retry
-        run: |
-          echo "Upgrading dependencies..."
-          PUB_CACHE="$HOME/.pub-cache"
-          PATH="$PUB_CACHE/bin:$PATH"
-          export PUB_CACHE PATH
-
-          echo "Clearing existing cache and resetting..."
-          rm -rf $PUB_CACHE || { echo "Failed to clear PUB_CACHE"; exit 1; }
-          mkdir -p $PUB_CACHE/bin
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter || { echo "Failed to clone Flutter"; exit 1; }
-          ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
-
-          echo "Validating Flutter setup..."
-          if ! flutter doctor -v; then
-            echo "Flutter setup failed"; exit 1
-          fi
-
-          echo "Attempting to upgrade dependencies..."
-          attempts=0
-          max_attempts=10
-          while [ $attempts -lt $max_attempts ]; do
-            if flutter pub upgrade --force; then
-              echo "Dependencies upgraded successfully."
-              break
-            else
-              attempts=$((attempts + 1))
-              echo "Retrying flutter pub upgrade... (attempt $attempts)"
-              rm -rf $PUB_CACHE || echo "Failed to clear PUB_CACHE during retry"
-              sleep 5
-            fi
-          done
-
-          if [ $attempts -eq $max_attempts ]; then
-            echo "flutter pub upgrade failed after $max_attempts attempts."
-            exit 1
-          fi
-
-      # 3. 의존성 설치 (pub get)
+      # 의존성 설치/업그레이드
       - name: Install dependencies
         run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
           flutter pub get
+          flutter pub upgrade --force
 
-      # 4. 캐시·링크·환경 검증
-      - name: Verify Cache and Links
-        run: |
-          echo "Verifying cache integrity..."
-          ls -la ~/.pub-cache
-          ls -la ~/.pub-cache/bin
-          ls -la ~/.pub-cache/flutter/bin
-          which flutter
-
-      # 5. 클린 빌드
-      - name: Clean build
-        run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          flutter clean
-
-      # 6. 포맷 검사
+      # 포맷 검사
       - name: Verify formatting
-        run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          dart format --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
 
-      # 7. 코드 분석
+      # 코드 분석
       - name: Analyze project source
-        run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          flutter analyze
+        run: flutter analyze
 
-      # 8. 테스트 실행
+      # 테스트 실행
       - name: Run tests
         run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
           if [ -d "test" ]; then
             flutter test;
           else
             echo "No tests directory found, skipping tests.";
           fi
 
-      # 9. 디버그 (실패시만)
+      # 디버깅 (실패시만)
       - name: Debug (If needed)
         if: ${{ failure() }}
         run: |
@@ -138,13 +68,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.29.3"
           channel: "stable"
-          cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
-          cache-path: ~/.pub-cache
 
       - name: Install dependencies
         run: flutter pub get
