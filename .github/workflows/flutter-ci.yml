@@ -19,6 +19,34 @@ jobs:
           rm -rf ~/.pub-cache
           mkdir -p ~/.pub-cache/bin
 
+      - name: Clear and Setup Flutter Cache
+        run: |
+          echo "Clearing and setting up Flutter cache..."
+          rm -rf ~/.pub-cache/flutter
+          rm -rf ~/.pub-cache/bin
+          mkdir -p ~/.pub-cache/bin
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          echo "PATH: $PATH"
+          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+
+      - name: Upgrade Dependencies with Retry
+        run: |
+          echo "Upgrading dependencies with retry logic..."
+          n=0
+          until [ "$n" -ge 5 ]
+          do
+          flutter pub upgrade && break
+          n=$((n+1))
+          echo "Retrying flutter pub upgrade... attempt ($n)"
+          sleep $((2**n))
+          done
+          if [ "$n" -ge 5 ]; then
+          echo "flutter pub upgrade failed after 5 attempts."
+          exit 1
+          fi
+
       - name: Setup Flutter
         run: |
           echo "Reinstalling Flutter..."
