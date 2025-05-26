@@ -24,9 +24,6 @@ jobs:
       - name: Ensure .pub-cache directory exists
         run: mkdir -p ~/.pub-cache
 
-      - name: Add Flutter to PATH
-        run: echo "$HOME/opt/flutter/bin" >> $GITHUB_PATH
-
       - name: Debug Flutter Installation
         run: |
           which flutter
