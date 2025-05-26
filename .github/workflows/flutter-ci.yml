@@ -13,16 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Clear Cache
+      # 1. Flutter 설치/환경/캐시 셋업
+      - name: Setup Flutter Cache and Environment
         run: |
-          echo "Clearing existing Flutter cache..."
-          rm -rf ~/.pub-cache
-          export PUB_CACHE="$HOME/.pub-cache"
-          mkdir -p $PUB_CACHE/bin
-
-      - name: Clear and Setup Flutter Cache
-        run: |
-          echo "Clearing and setting up Flutter cache..."
+          echo "Setting up Flutter environment..."
           rm -rf ~/.pub-cache
           export PUB_CACHE="$HOME/.pub-cache"
           mkdir -p $PUB_CACHE/bin
@@ -30,150 +24,82 @@ jobs:
           ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
           export PATH="$PUB_CACHE/bin:$PATH"
           echo "PATH: $PATH"
-          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+          if ! flutter doctor -v; then
+            echo "Flutter setup failed"; exit 1;
+          fi
 
+      # 2. 의존성 업그레이드(재시도 포함, 캐시도 같이 정리)
       - name: Upgrade Dependencies with Retry
         run: |
-          echo "Upgrading dependencies with retry logic..."
-          n=0
-          until [ "$n" -ge 5 ]
-          do
-            flutter pub upgrade --force && break
-            n=$((n+1))
-            echo "Retrying flutter pub upgrade... attempt ($n)"
-            sleep $((2**n))
+          echo "Upgrading dependencies..."
+          for i in {1..5}; do
+            if flutter pub upgrade --force; then
+              break
+            else
+              echo "Retrying flutter pub upgrade... attempt $i"
+              rm -rf ~/.pub-cache  # Ensure a clean cache for each attempt
+              sleep $((2**i))
+            fi
           done
-          if [ "$n" -ge 5 ]; then
+          if [ "$?" -ne 0 ]; then
             echo "flutter pub upgrade failed after 5 attempts."
             exit 1
           fi
 
-      - name: Setup Flutter Environment
+      # 3. 의존성 설치 (pub get)
+      - name: Install dependencies
         run: |
-          echo "Setting up Flutter environment..."
-          rm -rf ~/.pub-cache/flutter
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
           export PATH="$HOME/.pub-cache/bin:$PATH"
-          echo "PATH: $PATH"
-          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+          flutter pub get
 
-      - name: Setup Flutter
+      # 4. 캐시·링크·환경 검증
+      - name: Verify Cache and Links
         run: |
-          echo "Reinstalling Flutter..."
-          rm -rf ~/.pub-cache/flutter
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
-          echo "Adding Flutter to PATH for current session..."
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          echo "PATH: $PATH"
-          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
-          echo "Flutter setup completed and verified."
-
-      - name: Verify Flutter Installation
-        run: |
-          source ~/.bashrc
-          which flutter || { echo "Flutter binary not found in PATH"; exit 1; }
-          flutter doctor -v || { echo "Flutter is not functioning properly"; exit 1; }
-          echo "Flutter installation verified."
-
-      - name: Ensure .pub-cache and binary installation
-        run: |
-          mkdir -p ~/.pub-cache/bin
-          if [ ! -d "~/.pub-cache/flutter/.git" ]; then
-            echo "Installing Flutter manually..."
-            rm -rf ~/.pub-cache/flutter
-            git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-            ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
-          else
-            echo "Flutter is already installed."
-          fi
-          echo "Flutter binary setup completed."
-
-      - name: Ensure .pub-cache directory exists
-        run: mkdir -p ~/.pub-cache
-
-      - name: Ensure Flutter Binary is Available
-        run: |
-          if [ ! -f ~/.pub-cache/bin/flutter ]; then
-            echo "Flutter binary missing, attempting to reinstall..."
-            flutter doctor -v || echo "Flutter is not functioning properly"
-          else
-            echo "Flutter binary found."
-          fi  
-
-      - name: Verify Cache Integrity
-        run: |
-          echo "Verifying Flutter cache integrity..."
-          flutter pub cache repair || echo "Cache repair failed"
-
-      - name: Debug Flutter Installation and PATH
-        run: |
-          echo "Checking Flutter installation..."
-          which flutter || echo "Flutter binary not found in PATH"
-          echo $PATH
-          ls -l ~/.pub-cache
-          if [ -f ~/.pub-cache/bin/flutter ]; then
-            echo "Flutter binary found in cache"
-          else
-            echo "Flutter binary not found in cache"
-            exit 1
-          fi
-          flutter doctor -v || echo "Flutter is not functioning as expected"
-
-      - name: Debug PATH and Flutter Setup
-        run: |
-          echo "Debugging PATH and Flutter setup..."
-          export PATH="$HOME/.pub-cache/flutter/bin:$PATH"
-          echo "PATH: $PATH"
+          echo "Verifying cache integrity..."
+          ls -la ~/.pub-cache
           ls -la ~/.pub-cache/bin
           ls -la ~/.pub-cache/flutter/bin
+          which flutter
 
-      - name: Debug PATH and Flutter Binary
+      # 5. 클린 빌드
+      - name: Clean build
         run: |
-          echo "Verifying Flutter binary in PATH..."
-          which flutter || { echo "Flutter binary not found"; exit 1; }
-          echo "PATH: $PATH"
-          flutter doctor -v    
-
-      - name: Clean and upgrade dependencies
-        run: |
-          flutter pub upgrade
-          flutter pub cache repair
+          export PATH="$HOME/.pub-cache/bin:$PATH"
           flutter clean
 
-      - name: Upgrade Dependencies with Retry
-        run: |
-          echo "Upgrading dependencies with retry logic..."
-          n=0
-          until [ "$n" -ge 5 ]
-          do
-            flutter pub get && flutter pub upgrade && break
-            n=$((n+1))
-            echo "Retrying flutter pub upgrade... attempt ($n)"
-            sleep $((2**n))
-          done
-          if [ "$n" -ge 5 ]; then
-            echo "flutter pub upgrade failed after 5 attempts."
-            exit 1
-          fi
-
-      - name: Install dependencies
-        run: flutter pub get
-
+      # 6. 포맷 검사
       - name: Verify formatting
-        run: dart format --set-exit-if-changed .
+        run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          dart format --set-exit-if-changed .
 
+      # 7. 코드 분석
       - name: Analyze project source
-        run: flutter analyze
+        run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          flutter analyze
 
+      # 8. 테스트 실행
       - name: Run tests
         run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
           if [ -d "test" ]; then
             flutter test;
           else
             echo "No tests directory found, skipping tests.";
           fi
+
+      # 9. 디버그 (실패시만)
+      - name: Debug (If needed)
+        if: ${{ failure() }}
+        run: |
+          echo "DEBUG INFO"
+          which flutter || echo "Flutter binary not found in PATH"
+          echo $PATH
+          flutter doctor -v
+          ls -la ~/.pub-cache
+          ls -la ~/.pub-cache/bin
+          ls -la ~/.pub-cache/flutter/bin
 
   build_android:
     name: Build Android APK
