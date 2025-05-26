@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
-import 'package:knowme_frontend/features/ai_analysis/controllers/previous_result_controller.dart';
+import 'package:knowme_new_2/shared/widgets/base_scaffold.dart';
+import 'package:knowme_new_2/features/ai_analysis/controllers/previous_result_controller.dart';
 
 class AiAnalysisResultPreviousScreen extends StatelessWidget {
   const AiAnalysisResultPreviousScreen({super.key});

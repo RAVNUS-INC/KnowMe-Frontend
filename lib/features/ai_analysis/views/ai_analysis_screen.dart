@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/features/ai_analysis/controllers/ai_analysis_controller.dart';
+import 'package:knowme_new_2/features/ai_analysis/controllers/ai_analysis_controller.dart';
 
 class AiAnalysisScreen extends StatefulWidget {
   const AiAnalysisScreen({super.key});

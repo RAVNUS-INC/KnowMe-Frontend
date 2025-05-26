@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
+import 'package:knowme_new_2/shared/widgets/base_scaffold.dart';
 
 const double _side = 20;
 

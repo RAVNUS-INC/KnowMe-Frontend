@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
-import 'package:knowme_frontend/features/ai_analysis/controllers/ai_analysis_result_controller.dart';
+import 'package:knowme_new_2/shared/widgets/base_scaffold.dart';
+import 'package:knowme_new_2/features/ai_analysis/controllers/ai_analysis_result_controller.dart';
 
 // 추후 하드코딩된 텍스트들은 mvc구조에 맞게 데이터로 대체 예정
 class AiAnalysisResultScreen extends StatelessWidget {
