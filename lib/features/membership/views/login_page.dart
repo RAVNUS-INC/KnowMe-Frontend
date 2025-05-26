@@ -8,11 +8,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LoginModel model = LoginModel();
-    // 컨트롤러에 모델만 전달하고 텍스트 컨트롤러는 제거
-    final LoginController controller = Get.put(LoginController(
-      model: model,
-    ));
+    // 매번 새로운 컨트롤러 생성 (GetX가 자동으로 관리)
+    final controller = Get.put(LoginController(model: LoginModel()));
 
     void dismissKeyboard() {
       FocusScope.of(context).unfocus();
@@ -45,52 +42,65 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Obx(() => TextField(
-                        controller: controller.passwordController,
-                        obscureText: controller.obscureText.value,
-                        decoration: _inputDecoration('비밀번호').copyWith(
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              controller.obscureText.value
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () =>
-                                controller.togglePasswordVisibility(),
-                          ),
+                    controller: controller.passwordController,
+                    obscureText: controller.obscureText.value,
+                    decoration: _inputDecoration('비밀번호').copyWith(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          controller.obscureText.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
                         ),
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => dismissKeyboard(),
-                      )),
+                        onPressed: () =>
+                            controller.togglePasswordVisibility(),
+                      ),
+                    ),
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => dismissKeyboard(),
+                  )),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Obx(() => Checkbox(
-                            value: controller.rememberAccount.value,
-                            onChanged: controller.toggleRememberAccount,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                          )),
+                        value: controller.rememberAccount.value,
+                        onChanged: controller.toggleRememberAccount,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        materialTapTargetSize:
+                        MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                      )),
                       const Text('로그인 상태 저장', style: TextStyle(fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
+                  Obx(() => SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => controller.handleLogin(),
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : () => controller.handleLogin(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: controller.isLoading.value
+                            ? Colors.grey[400]
+                            : Colors.blue,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      child: const Text(
+                      child: controller.isLoading.value
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Text(
                         '로그인',
                         style: TextStyle(
                           color: Colors.white,
@@ -99,7 +109,7 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -7,7 +7,7 @@ import '../models/signup_model.dart';
 class LoginController extends GetxController {
   final LoginModel model;
 
-  // TextEditingController를 컨트롤러에서 생성 및 관리
+  // TextEditingController - dispose 하지 않음
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -23,33 +23,21 @@ class LoginController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // 초기값 설정 (필요한 경우)
+    // 초기값 설정
     if (model.userId.isNotEmpty) {
       idController.text = model.userId;
     }
     if (model.password.isNotEmpty) {
       passwordController.text = model.password;
     }
-
-    // 리스너 추가
-    idController.addListener(() {
-      model.userId = idController.text;
-    });
-
-    passwordController.addListener(() {
-      model.password = passwordController.text;
-    });
-
     rememberAccount.value = model.rememberAccount;
   }
 
-  @override
-  void onClose() {
-    // 컨트롤러 해제
-    idController.dispose();
-    passwordController.dispose();
-    super.onClose();
-  }
+  // onClose 완전히 제거 - dispose 안함
+  // @override
+  // void onClose() {
+  //   super.onClose();
+  // }
 
   void togglePasswordVisibility() {
     obscureText.value = !obscureText.value;
@@ -80,7 +68,7 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     try {
-      // API 호출 시뮬레이션 (실제로는 서버 통신)
+      // API 호출 시뮬레이션
       await Future.delayed(const Duration(milliseconds: 800));
 
       // 테스트 계정 검증
@@ -88,6 +76,9 @@ class LoginController extends GetxController {
 
       if (isValidLogin) {
         // 로그인 성공
+        model.userId = userId;
+        model.password = password;
+
         Get.snackbar(
           '로그인 성공',
           '환영합니다, ${SignupModel.testUserId}님!',
@@ -128,23 +119,19 @@ class LoginController extends GetxController {
 
   // 테스트 사용자 검증 메서드
   bool _validateTestUser(String userId, String password) {
-    // SignupModel의 테스트 데이터와 비교
-    return userId.toLowerCase() == SignupModel.testUserId.toLowerCase() &&
+    return userId == SignupModel.testUserId &&
         password == SignupModel.testPassword;
   }
 
   void handleRegister() {
-    // 회원가입 화면으로 이동
     Get.toNamed('/signup/first');
   }
 
   void handleForgotPassword() {
-    // 아이디/비밀번호 찾기 화면으로 이동
     Get.toNamed('/find-id-passwd');
   }
 
   void handleSocialLogin(String provider) {
-    // 소셜 로그인 처리 로직
     Get.snackbar(
       '소셜 로그인',
       '$provider 로그인은 현재 개발 중입니다.',
