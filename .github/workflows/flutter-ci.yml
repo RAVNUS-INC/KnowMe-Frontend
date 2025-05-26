@@ -16,10 +16,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-            flutter-version: '3.29.3'
-            channel: "stable"
-            cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
-            cache-path: ~/.pub-cache
+          flutter-version: '3.29.3'
+          channel: "stable"
+          cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
+          cache-path: ~/.pub-cache
+
+      - name: Ensure .pub-cache directory exists
+        run: mkdir -p ~/.pub-cache
 
       - name: Add Flutter to PATH
         run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
@@ -31,7 +34,6 @@ jobs:
 
       - name: Verify Flutter installation
         run: flutter doctor -v
-
 
       - name: Clean and upgrade dependencies
         run: |
