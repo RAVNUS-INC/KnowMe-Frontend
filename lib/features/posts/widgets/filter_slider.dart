@@ -1,14 +1,13 @@
-// filter_slider.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:knowme_frontend/features/posts/presenters/filter_presenter.dart';
+import 'package:knowme_frontend/features/posts/controllers/filter_controller.dart'; // FilterPresenter 대신 FilterController 임포트
 
 class FilterRangeSlider extends StatelessWidget {
   final String title;
   final int tabIndex;
   final RangeValues currentRangeValues;
   final ValueChanged<RangeValues> onChanged;
-  final FilterPresenter presenter;
+  final FilterController controller; // FilterPresenter 대신 FilterController 사용
 
   const FilterRangeSlider({
     super.key,
@@ -16,12 +15,12 @@ class FilterRangeSlider extends StatelessWidget {
     required this.tabIndex,
     required this.currentRangeValues,
     required this.onChanged,
-    required this.presenter,
+    required this.controller, // 속성 이름 변경
   });
 
   @override
   Widget build(BuildContext context) {
-    final config = presenter.getSliderConfig(tabIndex);
+    final config = controller.getSliderConfig(tabIndex); // presenter -> controller
 
     return Container(
       width: double.infinity,
@@ -51,11 +50,11 @@ class FilterRangeSlider extends StatelessWidget {
                       max: config.max,
                       divisions: config.divisions,
                       labels: RangeLabels(
-                        presenter.formatSliderLabel(currentRangeValues.start, tabIndex),
-                        presenter.formatSliderLabel(currentRangeValues.end, tabIndex),
+                        controller.formatSliderLabel(currentRangeValues.start, tabIndex), // presenter -> controller
+                        controller.formatSliderLabel(currentRangeValues.end, tabIndex), // presenter -> controller
                       ),
                       onChanged: (values) {
-                        onChanged(presenter.adjustSliderValues(values, config, currentRangeValues));
+                        onChanged(controller.adjustSliderValues(values, config, currentRangeValues)); // presenter -> controller
                       },
                     ),
                   ),

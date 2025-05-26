@@ -1,7 +1,8 @@
-// Flutter UI, GetX 상태관리 패키지, 프레젠터 및 위젯 불러오기
+// Flutter UI, GetX 상태관리 패키지, 필터 컨트롤러, 서비스 및 위젯 불러오기
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/features/posts/presenters/filter_presenter.dart';
+import 'package:knowme_frontend/features/posts/controllers/filter_controller.dart';
+import 'package:knowme_frontend/features/posts/services/filter_options_service.dart';
 
 import '../widgets/filter_apply_button.dart'; // 필터 적용 버튼
 import '../widgets/filter_dropdown.dart'; // 드롭다운 위젯
@@ -27,39 +28,34 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  late FilterPresenter _presenter; // Presenter 인스턴스
+  late FilterController _filterController; // FilterController 사용
+  late FilterOptionsService _optionsService; // 옵션 서비스 사용
   RangeValues _currentRangeValues = const RangeValues(0, 5); // 슬라이더 초기값
 
   String? _selectedEducation; // 선택된 학력
   String? _selectedJob; // 선택된 직무
   String? _selectedLocation; // 선택된 지역
   String? _selectedPeriod; // 선택된 기간
-  // 단일 선택 필터 - 바텀시트에서는 사용하지 않고 presenter가 직접 관리하도록 함
-  String? _selectedOnOffline;
-  String? _selectedHost;
-  String? _selectedTarget;
-  String? _selectedBenefit;
-
+  
   @override
   void initState() {
     super.initState();
-    _presenter = Get.find<FilterPresenter>(); // Presenter 인스턴스를 DI로 주입
+    _filterController = Get.find<FilterController>();
+    _optionsService = Get.find<FilterOptionsService>();
     _initializeValues(); // 초기 필터값 설정
   }
 
-  // 초기 필터 상태를 Presenter로부터 불러와 설정
+  // 초기 필터 상태를 FilterController로부터 불러와 설정
   void _initializeValues() {
-    final filterValues = _presenter.getFilterValues(widget.tabIndex);
+    final filterValues = _filterController.getFilterValues(widget.tabIndex);
     setState(() {
       _selectedJob = filterValues.job;
       _selectedLocation = filterValues.location;
-      _selectedEducation = filterValues.education; // 단일 선택 교육은 그대로 유지
+      _selectedEducation = filterValues.education;
       _selectedPeriod = filterValues.period;
       
-      // 다중 선택 필터는 presenter에 이미 저장된 상태로 유지됨
-
       _currentRangeValues =
-          _presenter.getSliderValues(widget.tabIndex); // 슬라이더 값 설정
+          _filterController.getSliderValues(widget.tabIndex);
     });
   }
 
@@ -71,24 +67,22 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       _selectedEducation = null;
       _selectedPeriod = null;
       
-      // 슬라이더 초기값 설정
-      final config = _presenter.getSliderConfig(widget.tabIndex);
+      final config = _filterController.getSliderConfig(widget.tabIndex);
       _currentRangeValues =
           RangeValues(config.min, config.min + (config.max - config.min) / 4);
     });
-    _presenter.resetFiltersForTab(widget.tabIndex); // Presenter에 필터 초기화 알림
+    _filterController.resetFiltersForTab(widget.tabIndex);
   }
 
   // 현재 선택된 필터 값 적용
   void _applyFilters() {
-    _presenter.applyFilters(
+    _filterController.applyFilters(
       tabIndex: widget.tabIndex,
-      job: _selectedJob, // 선택된 직무, 경력, 분야
-      location: _selectedLocation, // 선택된 지역
-      education: _selectedEducation, // 학력
-      period: _selectedPeriod, // 선택된 기간, 경력
-      rangeValues: _currentRangeValues, // 슬라이더 값
-      // 다중 선택 필터들은 presenter가 직접 관리하므로 전달하지 않음
+      job: _selectedJob,
+      location: _selectedLocation,
+      education: _selectedEducation,
+      period: _selectedPeriod,
+      rangeValues: _currentRangeValues,
     );
   }
 
@@ -173,7 +167,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             }),
             // 상단 헤더 (제목, 리셋 버튼, 닫기 버튼 포함)
             FilterHeader(
-              title: _presenter.getTabTitle(widget.tabIndex),
+              title: _filterController.getTabTitle(widget.tabIndex),
               onReset: _resetFilters,
               onClose: () => Navigator.pop(context),
             ),
@@ -191,30 +185,30 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 10),
           FilterDropdown(
             title: '직무',
-            options: _presenter.getJobOptions(0),
+            options: _optionsService.getJobOptions(0),
             selectedValue: _selectedJob,
-            onTap: () => _selectValue('직무', _presenter.getJobOptions(0)),
+            onTap: () => _selectValue('직무', _optionsService.getJobOptions(0)),
           ),
           FilterRangeSlider(
             title: '경력',
             tabIndex: 0,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterDropdown(
             title: '지역',
-            options: _presenter.getLocationOptions(0),
+            options: _optionsService.getLocationOptions(0),
             selectedValue: _selectedLocation,
-            onTap: () => _selectValue('지역', _presenter.getLocationOptions(0)),
+            onTap: () => _selectValue('지역', _optionsService.getLocationOptions(0)),
           ),
           // 학력 필터를 다중 선택 필터로 변경
           FilterTagSelector(
             title: '학력',
-            options: _presenter.getEducationOptions(),
+            options: _optionsService.getEducationOptions(),
             selected: null,
             tabIndex: 0,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
         ];
       case 1:
@@ -222,30 +216,30 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 10),
           FilterDropdown(
             title: '직무',
-            options: _presenter.getJobOptions(1),
+            options: _optionsService.getJobOptions(1),
             selectedValue: _selectedJob,
-            onTap: () => _selectValue('직무', _presenter.getJobOptions(1)),
+            onTap: () => _selectValue('직무', _optionsService.getJobOptions(1)),
           ),
           FilterRangeSlider(
             title: '경력',
             tabIndex: 1,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterDropdown(
             title: '지역',
-            options: _presenter.getLocationOptions(1),
+            options: _optionsService.getLocationOptions(1),
             selectedValue: _selectedLocation,
-            onTap: () => _selectValue('지역', _presenter.getLocationOptions(1)),
+            onTap: () => _selectValue('지역', _optionsService.getLocationOptions(1)),
           ),
           // 학력 필터를 다중 선택 필터로 변경
           FilterTagSelector(
             title: '학력',
-            options: _presenter.getEducationOptions(),
+            options: _optionsService.getEducationOptions(),
             selected: null,
             tabIndex: 1,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
         ];
       case 2:
@@ -253,30 +247,30 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 10),
           FilterDropdown(
             title: '분야',
-            options: _presenter.getFieldOptions(2),
+            options: _optionsService.getFieldOptions(2),
             selectedValue: _selectedJob,
-            onTap: () => _selectValue('분야', _presenter.getFieldOptions(2)),
+            onTap: () => _selectValue('분야', _optionsService.getFieldOptions(2)),
           ),
           FilterRangeSlider(
             title: '기간',
             tabIndex: 2,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterDropdown(
             title: '지역',
-            options: _presenter.getLocationOptions(2),
+            options: _optionsService.getLocationOptions(2),
             selectedValue: _selectedLocation,
-            onTap: () => _selectValue('지역', _presenter.getLocationOptions(2)),
+            onTap: () => _selectValue('지역', _optionsService.getLocationOptions(2)),
           ),
-          // 다중 선택 필터 - 프레젠터를 직접 사용
+          // 다중 선택 필터
           FilterTagSelector(
             title: '주최기관',
-            options: _presenter.getOrganizerOptions(2),
-            selected: null, // 더이상 단일 값을 사용하지 않음
+            options: _optionsService.getOrganizerOptions(2),
+            selected: null,
             tabIndex: 2,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
         ];
       case 3:
@@ -284,30 +278,30 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 10),
           FilterDropdown(
             title: '분야',
-            options: _presenter.getFieldOptions(3),
+            options: _optionsService.getFieldOptions(3),
             selectedValue: _selectedJob,
-            onTap: () => _selectValue('분야', _presenter.getFieldOptions(3)),
+            onTap: () => _selectValue('분야', _optionsService.getFieldOptions(3)),
           ),
           FilterRangeSlider(
             title: '기간',
             tabIndex: 3,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterDropdown(
             title: '지역',
-            options: _presenter.getLocationOptions(3),
+            options: _optionsService.getLocationOptions(3),
             selectedValue: _selectedLocation,
-            onTap: () => _selectValue('지역', _presenter.getLocationOptions(3)),
+            onTap: () => _selectValue('지역', _optionsService.getLocationOptions(3)),
           ),
-          // 다중 선택 필터 - 프레젠터를 직접 사용
+          // 다중 선택 필터
           FilterTagSelector(
             title: '온/오프라인',
-            options: _presenter.getOnOfflineOptions(),
-            selected: null, // 더이상 단일 값을 사용하지 않음
+            options: _optionsService.getOnOfflineOptions(),
+            selected: null,
             tabIndex: 3,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
         ];
       default:
@@ -315,31 +309,31 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           const SizedBox(height: 10),
           FilterDropdown(
             title: '분야',
-            options: _presenter.getFieldOptions(4),
+            options: _optionsService.getFieldOptions(4),
             selectedValue: _selectedJob,
-            onTap: () => _selectValue('분야', _presenter.getFieldOptions(4)),
+            onTap: () => _selectValue('분야', _optionsService.getFieldOptions(4)),
           ),
-          // 다중 선택 필터 - 프레젠터를 직접 사용
+          // 다중 선택 필터
           FilterTagSelector(
             title: '대상',
-            options: _presenter.getTargetOptions(),
-            selected: null, // 더이상 단일 값을 사용하지 않음
+            options: _optionsService.getTargetOptions(),
+            selected: null,
             tabIndex: 4, 
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterTagSelector(
             title: '주최기관',
-            options: _presenter.getOrganizerOptions(4),
-            selected: null, // 더이상 단일 값을 사용하지 않음
+            options: _optionsService.getOrganizerOptions(4),
+            selected: null,
             tabIndex: 4,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
           FilterTagSelector(
             title: '혜택',
-            options: _presenter.getBenefitOptions(),
-            selected: null, // 더이상 단일 값을 사용하지 않음
+            options: _optionsService.getBenefitOptions(),
+            selected: null,
             tabIndex: 4,
-            presenter: _presenter,
+            controller: _filterController, // presenter → controller 변경
           ),
         ];
     }
