@@ -21,11 +21,13 @@ jobs:
 
       - name: Setup Flutter
         run: |
-          if ! [ -x "$(command -v flutter)" ]; then
-            echo "Reinstalling Flutter..."
-            git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-            ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          if [ -d ~/.pub-cache/flutter ]; then
+            echo "Flutter directory already exists. Removing it to ensure a clean installation."
+            rm -rf ~/.pub-cache/flutter
           fi
+          echo "Reinstalling Flutter..."
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
           echo "Flutter setup completed."
 
       - name: Verify Flutter Installation
@@ -38,12 +40,15 @@ jobs:
       - name: Ensure .pub-cache and binary installation
         run: |
           mkdir -p ~/.pub-cache/bin
-          if ! [ -x "$(command -v flutter)" ]; then
-          echo "Installing Flutter manually..."
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-          ln -s ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          if [ ! -d "~/.pub-cache/flutter/.git" ]; then
+            echo "Installing Flutter manually..."
+            rm -rf ~/.pub-cache/flutter
+            git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+            ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          else
+            echo "Flutter is already installed."
           fi
-          echo "Flutter binary setup completed"
+          echo "Flutter binary setup completed."
 
       - name: Ensure .pub-cache directory exists
         run: mkdir -p ~/.pub-cache
