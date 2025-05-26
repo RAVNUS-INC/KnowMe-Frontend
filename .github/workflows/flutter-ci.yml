@@ -17,30 +17,30 @@ jobs:
         with:
           channel: 'stable'
 
-      # (Optional) 환경 점검 - Flutter 및 PATH
-      - name: Debug Environment
-        run: |
-          echo "Debugging environment..."
-          echo "PATH: $PATH"
-          which flutter || echo "Flutter binary not found in PATH"
-          flutter --version
-          ls -la $HOME/.pub-cache
-
-      # 의존성 설치/업그레이드
+      # 1. 의존성 설치 (여기서 pub-cache 폴더 생성)
       - name: Install dependencies
         run: |
           flutter pub get
           flutter pub upgrade --force
 
-      # 포맷 검사
+      # 2. 캐시/Flutter 바이너리/경로 진단 (이제 폴더가 반드시 생성됨)
+      - name: Verify Cache and Links
+        run: |
+          echo "Verifying cache integrity..."
+          ls -la ~/.pub-cache
+          ls -la ~/.pub-cache/bin
+          ls -la ~/.pub-cache/flutter/bin
+          which flutter
+
+      # 3. 포맷 검사
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
 
-      # 코드 분석
+      # 4. 코드 분석
       - name: Analyze project source
         run: flutter analyze
 
-      # 테스트 실행
+      # 5. 테스트 실행
       - name: Run tests
         run: |
           if [ -d "test" ]; then
@@ -49,7 +49,7 @@ jobs:
             echo "No tests directory found, skipping tests.";
           fi
 
-      # 디버깅 (실패시만)
+      # 6. 디버깅 (실패시만)
       - name: Debug (If needed)
         if: ${{ failure() }}
         run: |
