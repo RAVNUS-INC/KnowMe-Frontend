@@ -1,21 +1,66 @@
-name: Flutter CI
+name: Setup Flutter
 
 on:
-  pull_request:
-    branches: [main, develop, "feature/*"]   # 필요한 PR 대상 브랜치 다 추가
   push:
-    branches: [main, develop, "feature/*"]
+    branches: [main, "feature/*"]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build:
+  analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.1'
           channel: 'stable'
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test
-      - run: flutter build apk --release
+
+      # 의존성 설치 (충돌 시 에러 발생)
+      - name: Install dependencies
+        run: |
+          flutter pub get
+
+      # 포맷 검사
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed .
+
+      # 코드 분석
+      - name: Analyze project source
+        run: flutter analyze
+
+      # 테스트 실행
+      - name: Run tests
+        run: |
+          if [ -d "test" ]; then
+            flutter test;
+          else
+            echo "No tests directory found, skipping tests.";
+          fi
+
+      # 디버깅 (실패시만)
+      - name: Debug (If needed)
+        if: ${{ failure() }}
+        run: |
+          echo "DEBUG INFO"
+          which flutter || echo "Flutter binary not found in PATH"
+          echo $PATH
+          flutter doctor -v
+
+  build_android:
+    name: Build Android APK
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.29.3"
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
