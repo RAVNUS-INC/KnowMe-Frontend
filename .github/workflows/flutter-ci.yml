@@ -17,17 +17,18 @@ jobs:
         run: |
           echo "Clearing existing Flutter cache..."
           rm -rf ~/.pub-cache
-          mkdir -p ~/.pub-cache/bin
+          export PUB_CACHE="$HOME/.pub-cache"
+          mkdir -p $PUB_CACHE/bin
 
       - name: Clear and Setup Flutter Cache
         run: |
           echo "Clearing and setting up Flutter cache..."
-          rm -rf ~/.pub-cache/flutter
-          rm -rf ~/.pub-cache/bin
-          mkdir -p ~/.pub-cache/bin
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
-          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
-          export PATH="$HOME/.pub-cache/bin:$PATH"
+          rm -rf ~/.pub-cache
+          export PUB_CACHE="$HOME/.pub-cache"
+          mkdir -p $PUB_CACHE/bin
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
+          ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
+          export PATH="$PUB_CACHE/bin:$PATH"
           echo "PATH: $PATH"
           flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
 
@@ -37,14 +38,14 @@ jobs:
           n=0
           until [ "$n" -ge 5 ]
           do
-          flutter pub upgrade && break
-          n=$((n+1))
-          echo "Retrying flutter pub upgrade... attempt ($n)"
-          sleep $((2**n))
+            flutter pub upgrade --force && break
+            n=$((n+1))
+            echo "Retrying flutter pub upgrade... attempt ($n)"
+            sleep $((2**n))
           done
           if [ "$n" -ge 5 ]; then
-          echo "flutter pub upgrade failed after 5 attempts."
-          exit 1
+            echo "flutter pub upgrade failed after 5 attempts."
+            exit 1
           fi
 
       - name: Setup Flutter Environment
@@ -104,7 +105,6 @@ jobs:
       - name: Verify Cache Integrity
         run: |
           echo "Verifying Flutter cache integrity..."
-          ls -la ~/.pub-cache/bin
           flutter pub cache repair || echo "Cache repair failed"
 
       - name: Debug Flutter Installation and PATH
