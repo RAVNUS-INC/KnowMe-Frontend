@@ -108,18 +108,18 @@ class FilterRowWidget extends StatelessWidget {
         filterButtons = [
           const SizedBox(height: 10),
           _buildFilterButton('직무', postController.selectedJob.value, defaultText: '직무'),
-          _buildFilterButton('경력', postController.selectedExperience.value, defaultText: '신입~5년'),
-          _buildFilterButton('지역', postController.selectedLocation.value, defaultText: '서울 전체'),
-          _buildFilterButton('학력', postController.selectedEducation.value, defaultText: '학력'),
+          _buildFilterButton('경력', postController.selectedExperience.value, defaultText: '경력'),
+          _buildFilterButton('지역', postController.selectedLocation.value, defaultText: '지역'),
+          _buildMultiSelectFilterButton('학력', postController.multiSelectJobEducation, defaultText: '학력'),
         ];
         break;
       case 1: // 인턴
         filterButtons = [
           const SizedBox(height: 10),
           _buildFilterButton('직무', postController.selectedInternJob.value, defaultText: '직무'),
-          _buildFilterButton('기간', postController.selectedPeriod.value, defaultText: '경력'),
+          _buildFilterButton('기간', postController.selectedPeriod.value, defaultText: '기간'),
           _buildFilterButton('지역', postController.selectedInternLocation.value, defaultText: '지역'),
-          _buildFilterButton('학력', postController.selectedInternEducation.value, defaultText: '학력'),
+          _buildMultiSelectFilterButton('학력', postController.multiSelectInternEducation, defaultText: '학력'),
         ];
         break;
       case 2: // 대외활동
@@ -128,7 +128,7 @@ class FilterRowWidget extends StatelessWidget {
           _buildFilterButton('분야', postController.selectedField.value, defaultText: '분야'),
           _buildFilterButton('기간', postController.selectedActivityPeriod.value, defaultText: '기간'),
           _buildFilterButton('지역', postController.selectedActivityLocation.value, defaultText: '지역'),
-          _buildFilterButton('주최기관', postController.selectedHost.value, defaultText: '주최기관'),
+          _buildMultiSelectFilterButton('주최기관', postController.multiSelectHost, defaultText: '주최기관'),
         ];
         break;
       case 3: // 교육/강연
@@ -137,7 +137,7 @@ class FilterRowWidget extends StatelessWidget {
           _buildFilterButton('분야', postController.selectedEduField.value, defaultText: '분야'),
           _buildFilterButton('기간', postController.selectedEduPeriod.value, defaultText: '기간'),
           _buildFilterButton('지역', postController.selectedEduLocation.value, defaultText: '지역'),
-          _buildFilterButton('온/오프라인', postController.selectedOnOffline.value, defaultText: '온/오프라인'),
+          _buildMultiSelectFilterButton('온/오프라인', postController.multiSelectOnOffline, defaultText: '온/오프라인'),
         ];
         break;
       case 4: // 공모전
@@ -145,9 +145,9 @@ class FilterRowWidget extends StatelessWidget {
         filterButtons = [
           const SizedBox(height: 10),
           _buildFilterButton('분야', postController.selectedContestField.value, defaultText: '분야'),
-          _buildFilterButton('대상', postController.selectedTarget.value, defaultText: '대상'),
-          _buildFilterButton('주최기관', postController.selectedOrganizer.value, defaultText: '주최기관'),
-          _buildFilterButton('혜택', postController.selectedBenefit.value, defaultText: '혜택'),
+          _buildMultiSelectFilterButton('대상', postController.multiSelectTarget, defaultText: '대상'),
+          _buildMultiSelectFilterButton('주최기관', postController.multiSelectOrganizer, defaultText: '주최기관'),
+          _buildMultiSelectFilterButton('혜택', postController.multiSelectBenefit, defaultText: '혜택'),
         ];
         break;
     }
@@ -155,10 +155,7 @@ class FilterRowWidget extends StatelessWidget {
     return filterButtons;
   }
 
-  /// 필터 버튼 위젯 생성
-  /// @param filterType 필터 유형 (바텀시트 타이틀로 전달됨)
-  /// @param selectedValue 선택된 필터 값 (null이면 defaultText 표시)
-  /// @param defaultText 선택된 값이 없을 때 표시할 기본 텍스트
+  /// 일반 필터 버튼 위젯 생성 (단일 선택)
   Widget _buildFilterButton(String filterType, String? selectedValue, {required String defaultText}) {
     final bool isSelected = selectedValue != null;
     
@@ -176,6 +173,60 @@ class FilterRowWidget extends StatelessWidget {
             title: filterType, // 필터 유형 전달
             selectedValue: selectedValue,
             tabIndex: tabController.index,
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: ShapeDecoration(
+          color: isSelected ? const Color(0xFF89C1EF) : const Color(0xFFF5F5F5),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              width: 1,
+              color: isSelected ? const Color(0xFF89C1EF) : const Color(0xFFDEE3E7),
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          displayText,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: isSelected ? Colors.white : const Color(0xFF454C53),
+            fontSize: 14,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.56,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 다중 선택 필터 버튼 위젯 생성
+  Widget _buildMultiSelectFilterButton(String filterType, RxList<String> selectedValues, {required String defaultText}) {
+    // 선택된 값이 있는지 확인
+    final bool isSelected = selectedValues.isNotEmpty;
+    
+    // 다중 선택의 경우, 선택된 항목 수를 표시 (예: "학력 (3)")
+    String displayText = isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
+    
+    // 선택된 값이 하나인 경우, 해당 값을 직접 표시
+    if (selectedValues.length == 1) {
+      displayText = selectedValues.first;
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        // 바텀 시트 표시 (다중 선택 필터)
+        await showModalBottomSheet<void>(
+          context: Get.context!,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => FilterBottomSheet(
+            title: filterType,
+            tabIndex: tabController.index,
+            selectedValue: null, // 다중 선택은 별도의 상태로 관리
           ),
         );
       },

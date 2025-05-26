@@ -50,7 +50,10 @@ class FilterRangeSlider extends StatelessWidget {
                         controller.formatSliderLabel(currentRangeValues.end, tabIndex),
                       ),
                       onChanged: (values) {
-                        onChanged(controller.adjustSliderValues(values, config, currentRangeValues));
+                        // 슬라이더 값이 변경될 때 즉시 반영
+                        final adjustedValues = controller.adjustSliderValues(
+                          values, config, currentRangeValues);
+                        onChanged(adjustedValues);
                       },
                     ),
                   ),

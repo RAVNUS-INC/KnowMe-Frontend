@@ -6,20 +6,20 @@ class Contest {
   final String dateRange;
   final String location;
   final String field;
-  final String? additionalInfo;
-  final String? target;
-  final String? benefit;
+  final String benefit;
+  final String target;
+  final String? additionalInfo; // 추가 정보만 nullable
 
   Contest({
     required this.id,
     required this.title,
     required this.organization,
-    required this.imageUrl,
+    required this.imageUrl, 
     required this.dateRange,
     required this.location,
     required this.field,
+    required this.benefit,
+    required this.target,
     this.additionalInfo,
-    this.target,
-    this.benefit,
   });
 }

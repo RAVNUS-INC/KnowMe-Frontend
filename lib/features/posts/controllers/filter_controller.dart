@@ -7,6 +7,14 @@ import 'package:knowme_frontend/features/posts/models/filter_model.dart';
 class FilterController extends GetxController {
   final PostController _postController = Get.find<PostController>();
 
+  // View의 UI 상태를 위한 반응형 변수들
+  final RxString selectedFilter = ''.obs;
+  final Rx<RangeValues> currentRangeValues = const RangeValues(0, 5).obs;
+  final RxString selectedJob = ''.obs;
+  final RxString selectedLocation = ''.obs;
+  final RxString selectedEducation = ''.obs;
+  final RxString selectedPeriod = ''.obs;
+
   // 슬라이더 설정 가져오기
   SliderConfig getSliderConfig(int tabIndex) {
     switch (tabIndex) {
@@ -72,14 +80,14 @@ class FilterController extends GetxController {
           experience: _postController.selectedExperience.value,
           location: _postController.selectedLocation.value,
           education: _postController.selectedEducation.value,
-          educationList: _postController.multiSelectJobEducation.toList(), // 채용 탭 전용 학력 리스트 사용
+          educationList: _postController.multiSelectJobEducation.toList(),
         );
       case 1: // 인턴
         return FilterValues(
           job: _postController.selectedInternJob.value,
           location: _postController.selectedInternLocation.value,
           education: _postController.selectedInternEducation.value,
-          educationList: _postController.multiSelectInternEducation.toList(), // 인턴 탭 전용 학력 리스트 사용
+          educationList: _postController.multiSelectInternEducation.toList(),
           period: _postController.selectedPeriod.value,
         );
       case 2: // 대외활동
@@ -105,6 +113,16 @@ class FilterController extends GetxController {
           benefit: _postController.multiSelectBenefit.toList(),
         );
     }
+  }
+
+  // View에서 사용할 초기값을 설정하는 메소드 (View에서 옮겨옴)
+  void initializeFilterValues(int tabIndex) {
+    final filterValues = getFilterValues(tabIndex);
+    selectedJob.value = filterValues.job ?? '';
+    selectedLocation.value = filterValues.location ?? '';
+    selectedEducation.value = filterValues.education ?? '';
+    selectedPeriod.value = filterValues.period ?? '';
+    currentRangeValues.value = getSliderValues(tabIndex);
   }
 
   // 슬라이더 값 가져오기
@@ -202,7 +220,6 @@ class FilterController extends GetxController {
         } else if (value == 24) {
           return '2년';
         } else {
-          // 중간값을 개월 단위로 표시 (소수점 제거)
           return '${value.round()}개월';
         }
       case 3: // 교육/강연
@@ -217,11 +234,9 @@ class FilterController extends GetxController {
         } else if (value == 180) {
           return '6개월';
         } else {
-          // 중간값 처리 - 일 단위로 표시하거나 개월 단위로 표시
           if (value < 30) {
             return '${value.round()}일';
           } else {
-            // 개월 수를 계산하고 정수로 표시
             int months = (value / 30).round();
             return '${months}개월';
           }
@@ -235,20 +250,15 @@ class FilterController extends GetxController {
   RangeValues adjustSliderValues(RangeValues values, SliderConfig config, RangeValues currentValues) {
     double min = config.min;
     double max = config.max;
-    double stepSize = (max - min) / 4; // 4 divisions = 5 steps
+    double stepSize = (max - min) / 4;
 
-    // 움직임을 stepSize(max*1/4) 단위로 조정
     double adjustedStart = ((values.start - min) / stepSize).round() * stepSize + min;
     double adjustedEnd = ((values.end - min) / stepSize).round() * stepSize + min;
 
-    // 시작과 끝이 같아지지 않도록 (최소 한 단위 이상 차이 유지)
     if (adjustedStart == adjustedEnd) {
-      // 오른쪽(end) 썸을 이동한 경우
       if (values.end != currentValues.end) {
-        // 오른쪽 값을 한 단계 올림 (max를 초과하지 않도록)
         adjustedEnd = (adjustedEnd + stepSize > max) ? max : adjustedEnd + stepSize;
       } else {
-        // 왼쪽 값을 한 단계 내림 (min 미만이 되지 않도록)
         adjustedStart = (adjustedStart - stepSize < min) ? min : adjustedStart - stepSize;
       }
     }
@@ -256,46 +266,65 @@ class FilterController extends GetxController {
     return RangeValues(adjustedStart, adjustedEnd);
   }
 
+  // 필터 초기화 메서드 - View에서 옮겨온 필터 초기화 기능
+  void resetFilters(int tabIndex) {
+    selectedJob.value = '';
+    selectedLocation.value = '';
+    selectedEducation.value = '';
+    selectedPeriod.value = '';
+    
+    final config = getSliderConfig(tabIndex);
+    currentRangeValues.value = RangeValues(config.min, config.min + (config.max - config.min) / 4);
+    
+    resetFiltersForTab(tabIndex);
+  }
+
   // 탭별 필터 초기화 메서드
   void resetFiltersForTab(int tabIndex) {
     switch (tabIndex) {
-      case 0: // 채용
+      case 0:
         _postController.selectedJob.value = null;
         _postController.selectedExperience.value = null;
         _postController.selectedLocation.value = null;
-        _postController.multiSelectJobEducation.clear(); // 채용 탭 학력 다중 선택 초기화
+        _postController.selectedEducation.value = null;
+        _postController.multiSelectJobEducation.clear();
         break;
-      case 1: // 인턴
+      case 1:
         _postController.selectedInternJob.value = null;
         _postController.selectedPeriod.value = null;
         _postController.selectedInternLocation.value = null;
-        _postController.multiSelectInternEducation.clear(); // 인턴 탭 학력 다중 선택 초기화
+        _postController.selectedInternEducation.value = null;
+        _postController.multiSelectInternEducation.clear();
         break;
-      case 2: // 대외활동
+      case 2:
         _postController.selectedField.value = null;
         _postController.selectedActivityPeriod.value = null;
         _postController.selectedActivityLocation.value = null;
+        _postController.selectedHost.value = null;
         _postController.multiSelectHost.clear();
         break;
-      case 3: // 교육/강연
+      case 3:
         _postController.selectedEduField.value = null;
         _postController.selectedEduPeriod.value = null;
         _postController.selectedEduLocation.value = null;
+        _postController.selectedOnOffline.value = null;
         _postController.multiSelectOnOffline.clear();
         break;
-      case 4: // 공모전
+      case 4:
         _postController.selectedContestField.value = null;
+        _postController.selectedTarget.value = null;
+        _postController.selectedOrganizer.value = null;
+        _postController.selectedBenefit.value = null;
         _postController.multiSelectTarget.clear();
         _postController.multiSelectOrganizer.clear();
         _postController.multiSelectBenefit.clear();
         break;
     }
-    
-    // 필터 초기화 후 데이터 갱신
+
     _postController.loadContests();
   }
 
-  // 필터 적용 메서드
+  // 필터 적용 메서드 - View에서 옮겨온 업데이트 기능
   void applyFilters({
     required int tabIndex,
     required RangeValues rangeValues,
@@ -310,24 +339,19 @@ class FilterController extends GetxController {
     String? onOffline,
     String? experience,
   }) {
-    // 만약 모든 필터가 null이면 필터가 초기화된 상태로 간주
     bool isReset = job == null && location == null && education == null && period == null;
 
     if (isReset) {
-      // 모든 필터가 초기화된 상태면 Controller의 값들도 모두 초기화
       resetFiltersForTab(tabIndex);
       return;
     }
 
-    // 그렇지 않으면 기존 로직대로 진행
     switch (tabIndex) {
-      case 0: // 채용
-      // 직무 필터 적용
+      case 0:
         if (job != null) {
           _postController.selectedJob.value = job;
         }
 
-        // 경력 필터 적용 - 슬라이더 값에 따라 경력 범위 문자열로 변환
         String? experienceValue;
         if (rangeValues.start == 0 && rangeValues.end == 0) {
           experienceValue = '신입';
@@ -342,23 +366,20 @@ class FilterController extends GetxController {
         }
         _postController.selectedExperience.value = experienceValue;
 
-        // 지역 필터 적용
         if (location != null) {
           _postController.selectedLocation.value = location;
         }
 
-        // 학력 필터 적용
         if (education != null) {
           _postController.selectedEducation.value = education;
         }
         break;
 
-      case 1: // 인턴
+      case 1:
         if (job != null) {
           _postController.selectedInternJob.value = job;
         }
 
-        // 기간 필터 적용 - 레인지 슬라이더 값을 사용
         String? periodValue;
         if (rangeValues.end <= 1) {
           periodValue = '1개월 이하';
@@ -373,23 +394,20 @@ class FilterController extends GetxController {
         }
         _postController.selectedPeriod.value = periodValue;
 
-        // 지역 필터 적용
         if (location != null) {
           _postController.selectedInternLocation.value = location;
         }
 
-        // 학력 필터 적용
         if (education != null) {
           _postController.selectedInternEducation.value = education;
         }
         break;
 
-      case 2: // 대외활동
+      case 2:
         if (job != null) {
           _postController.selectedField.value = job;
         }
 
-        // 기간 필터 적용 - 인턴과 동일한 슬라이더 값 사용
         String? activityPeriodValue;
         if (rangeValues.end <= 1) {
           activityPeriodValue = '1개월 이하';
@@ -404,18 +422,16 @@ class FilterController extends GetxController {
         }
         _postController.selectedActivityPeriod.value = activityPeriodValue;
 
-        // 지역 필터 적용
         if (location != null) {
           _postController.selectedActivityLocation.value = location;
         }
         break;
 
-      case 3: // 교육/강연
+      case 3:
         if (job != null) {
           _postController.selectedEduField.value = job;
         }
 
-        // 기간 필터 적용
         String? eduPeriodValue;
         if (rangeValues.end <= 1) {
           eduPeriodValue = '1일';
@@ -430,35 +446,157 @@ class FilterController extends GetxController {
         }
         _postController.selectedEduPeriod.value = eduPeriodValue;
 
-        // 지역 필터 적용
         if (location != null) {
           _postController.selectedEduLocation.value = location;
         }
         break;
 
-      case 4: // 공모전
+      case 4:
       default:
         if (job != null) {
           _postController.selectedContestField.value = job;
         }
         break;
     }
-    
-    // 필터 적용 후 데이터 갱신
+
     _postController.loadContests();
+  }
+
+  // 선택한 필터 값 업데이트 (View에서 옮겨옴)
+  void updateFilterValue(int tabIndex, String title, String value) {
+    switch (tabIndex) {
+      case 0: 
+        updateJobFilter(title, value);
+        break;
+      case 1: 
+        updateInternFilter(title, value);
+        break;
+      case 2: 
+        updateActivityFilter(title, value);
+        break;
+      case 3: 
+        updateEducationFilter(title, value);
+        break;
+      case 4: 
+        updateContestFilter(title, value);
+        break;
+    }
+    
+    _postController.loadContests();
+  }
+  
+  // 채용 탭 필터 업데이트 (View에서 옮겨옴)
+  void updateJobFilter(String title, String value) {
+    switch (title) {
+      case '직무':
+        _postController.selectedJob.value = value;
+        selectedJob.value = value;
+        break;
+      case '지역':
+        _postController.selectedLocation.value = value;
+        selectedLocation.value = value;
+        break;
+      case '학력':
+        _postController.selectedEducation.value = value;
+        selectedEducation.value = value;
+        break;
+    }
+  }
+  
+  // 인턴 탭 필터 업데이트 (View에서 옮겨옴)
+  void updateInternFilter(String title, String value) {
+    switch (title) {
+      case '직무':
+        _postController.selectedInternJob.value = value;
+        selectedJob.value = value;
+        break;
+      case '지역':
+        _postController.selectedInternLocation.value = value;
+        selectedLocation.value = value;
+        break; 
+      case '기간':
+        _postController.selectedPeriod.value = value;
+        selectedPeriod.value = value;
+        break;
+      case '학력':
+        _postController.selectedInternEducation.value = value;
+        selectedEducation.value = value;
+        break;
+    }
+  }
+  
+  // 대외활동 탭 필터 업데이트 (View에서 옮겨옴)
+  void updateActivityFilter(String title, String value) {
+    switch (title) {
+      case '분야':
+        _postController.selectedField.value = value;
+        selectedJob.value = value;
+        break;
+      case '지역':
+        _postController.selectedActivityLocation.value = value;
+        selectedLocation.value = value;
+        break;
+      case '기간':
+        _postController.selectedActivityPeriod.value = value;
+        selectedPeriod.value = value;
+        break;
+      case '주최기관':
+        _postController.selectedHost.value = value;
+        break;
+    }
+  }
+  
+  // 교육/강연 탭 필터 업데이트 (View에서 옮겨옴)
+  void updateEducationFilter(String title, String value) {
+    switch (title) {
+      case '분야':
+        _postController.selectedEduField.value = value;
+        selectedJob.value = value;
+        break;
+      case '지역':
+        _postController.selectedEduLocation.value = value;
+        selectedLocation.value = value;
+        break;
+      case '기간':
+        _postController.selectedEduPeriod.value = value;
+        selectedPeriod.value = value;
+        break;
+      case '온/오프라인':
+        _postController.selectedOnOffline.value = value;
+        break;
+    }
+  }
+  
+  // 공모전 탭 필터 업데이트 (View에서 옮겨옴)
+  void updateContestFilter(String title, String value) {
+    switch (title) {
+      case '분야':
+        _postController.selectedContestField.value = value;
+        selectedJob.value = value;
+        break;
+      case '대상':
+        _postController.selectedTarget.value = value;
+        break;
+      case '주최기관':
+        _postController.selectedOrganizer.value = value;
+        break;
+      case '혜택':
+        _postController.selectedBenefit.value = value;
+        break;
+    }
   }
 
   // 멀티 셀렉트 필터 값 업데이트
   void updateMultiSelectValue(int tabIndex, String filterType, String option, bool isSelected) {
     switch (filterType) {
       case '학력':
-        if (tabIndex == 0) { // 채용 탭의 학력
+        if (tabIndex == 0) { 
           if (isSelected) {
             _postController.multiSelectJobEducation.remove(option);
           } else {
             _postController.multiSelectJobEducation.add(option);
           }
-        } else if (tabIndex == 1) { // 인턴 탭의 학력
+        } else if (tabIndex == 1) { 
           if (isSelected) {
             _postController.multiSelectInternEducation.remove(option);
           } else {
@@ -504,7 +642,6 @@ class FilterController extends GetxController {
         break;
     }
     
-    // 필터 변경 시 즉시 리스트 업데이트
     _postController.loadContests();
   }
 
@@ -512,9 +649,9 @@ class FilterController extends GetxController {
   bool isOptionSelected(int tabIndex, String filterType, String option) {
     switch (filterType) {
       case '학력':
-        if (tabIndex == 0) { // 채용 탭의 학력
+        if (tabIndex == 0) { 
           return _postController.multiSelectJobEducation.contains(option);
-        } else if (tabIndex == 1) { // 인턴 탭의 학력
+        } else if (tabIndex == 1) { 
           return _postController.multiSelectInternEducation.contains(option);
         }
         return false;
@@ -534,4 +671,97 @@ class FilterController extends GetxController {
         return false;
     }
   }
+
+  // 슬라이더 필터링 적용 (View에서 옮겨옴)
+  void applyRangeSliderFilter(int tabIndex, RangeValues values) {
+    switch (tabIndex) {
+      case 0:
+        applyJobExperienceFilter(values);
+        break;
+      case 1:
+        applyInternPeriodFilter(values);
+        break;
+      case 2:
+        applyActivityPeriodFilter(values);
+        break;
+      case 3:
+        applyEducationPeriodFilter(values);
+        break;
+    }
+    
+    _postController.loadContests();
+  }
+  
+  // 채용 탭 경력 필터 적용 (View에서 옮겨옴)
+  void applyJobExperienceFilter(RangeValues values) {
+    String? experienceValue;
+    if (values.start == 0 && values.end == 0) {
+      experienceValue = '신입';
+    } else if (values.start == 0 && values.end <= 5) {
+      experienceValue = '5년 이하';
+    } else if (values.start >= 5 && values.end <= 10) {
+      experienceValue = '5~10년';
+    } else if (values.start >= 10 && values.end <= 15) {
+      experienceValue = '10~15년';
+    } else if (values.start >= 15) {
+      experienceValue = '15년 이상';
+    }
+    _postController.selectedExperience.value = experienceValue;
+    currentRangeValues.value = values;
+  }
+  
+  // 인턴 탭 기간 필터 적용 (View에서 옮겨옴)
+  void applyInternPeriodFilter(RangeValues values) {
+    String? periodValue;
+    if (values.end <= 1) {
+      periodValue = '1개월 이하';
+    } else if (values.end <= 6) {
+      periodValue = '1~6개월';
+    } else if (values.end <= 12) {
+      periodValue = '6개월~1년';
+    } else if (values.end <= 18) {
+      periodValue = '1~1.5년';
+    } else {
+      periodValue = '1.5년 이상';
+    }
+    _postController.selectedPeriod.value = periodValue;
+    currentRangeValues.value = values;
+  }
+  
+  // 대외활동 탭 기간 필터 적용 (View에서 옮겨옴)
+  void applyActivityPeriodFilter(RangeValues values) {
+    String? activityPeriodValue;
+    if (values.end <= 1) {
+      activityPeriodValue = '1개월 이하';
+    } else if (values.end <= 6) {
+      activityPeriodValue = '1~6개월';
+    } else if (values.end <= 12) {
+      activityPeriodValue = '6개월~1년';
+    } else if (values.end <= 18) {
+      activityPeriodValue = '1~1.5년';
+    } else {
+      activityPeriodValue = '1.5년 이상';
+    }
+    _postController.selectedActivityPeriod.value = activityPeriodValue;
+    currentRangeValues.value = values;
+  }
+  
+  // 교육/강연 탭 기간 필터 적용 (View에서 옮겨옴)
+  void applyEducationPeriodFilter(RangeValues values) {
+    String? eduPeriodValue;
+    if (values.end <= 1) {
+      eduPeriodValue = '1일';
+    } else if (values.end <= 30) {
+      eduPeriodValue = '1일~1개월';
+    } else if (values.end <= 60) {
+      eduPeriodValue = '1~2개월';
+    } else if (values.end <= 120) {
+      eduPeriodValue = '2~4개월';
+    } else {
+      eduPeriodValue = '4~6개월';
+    }
+    _postController.selectedEduPeriod.value = eduPeriodValue;
+    currentRangeValues.value = values;
+  }
+
 }
