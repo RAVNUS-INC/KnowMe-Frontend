@@ -29,7 +29,7 @@ jobs:
           export PATH="$PUB_CACHE/bin:$PATH"
           echo "PATH: $PATH"
           if ! flutter doctor -v; then
-            echo "Flutter setup failed"; exit 1;
+            echo "Flutter setup failed"; exit 1
           fi
 
       # 2. 의존성 업그레이드(재시도 포함, 캐시도 같이 정리)
@@ -39,20 +39,17 @@ jobs:
           export PUB_CACHE="$HOME/.pub-cache"
           export PATH="$PUB_CACHE/bin:$PATH"
           export FLUTTER_ROOT="$PUB_CACHE/flutter"
-
-          # Ensure Flutter is set up only once
+            
           if [ ! -d "$FLUTTER_ROOT" ]; then
             echo "Setting up Flutter..."
             mkdir -p $PUB_CACHE/bin
             git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
             ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
           fi
-
-          # Validate Flutter setup
+            
           echo "Validating Flutter setup..."
           flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
-
-          # Retry upgrading dependencies
+            
           for i in {1..10}; do
             echo "Attempt $i: Running flutter pub upgrade..."
             if flutter pub upgrade --force; then
@@ -61,11 +58,10 @@ jobs:
             else
               echo "Retrying flutter pub upgrade... (attempt $i)"
               flutter pub cache repair
-              sleep $((2**i))
+              sleep $((2**i)) || true # Prevent exit on sleep errors
             fi
           done
-
-          # Exit with error if all retries fail
+            
           if [ "$?" -ne 0 ]; then
             echo "flutter pub upgrade failed after 10 attempts."
             exit 1
