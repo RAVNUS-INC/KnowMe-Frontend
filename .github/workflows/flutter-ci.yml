@@ -32,6 +32,13 @@ jobs:
             echo "Flutter setup failed"; exit 1
           fi
 
+      - name: Debug Environment
+        run: |
+          echo "Debugging environment..."
+          echo "PATH: $PATH"
+          which flutter || echo "Flutter binary not found in PATH"
+          ls -la $HOME/.pub-cache
+
       # 2. 의존성 업그레이드(재시도 포함, 캐시도 같이 정리)
       - name: Upgrade Dependencies with Retry
         run: |
@@ -39,29 +46,34 @@ jobs:
           export PUB_CACHE="$HOME/.pub-cache"
           export PATH="$PUB_CACHE/bin:$PATH"
           export FLUTTER_ROOT="$PUB_CACHE/flutter"
-            
+          echo "PATH: $PATH"
+          which flutter || { echo "Flutter binary not found in PATH"; exit 1; }
+          flutter doctor -v
+          
           if [ ! -d "$FLUTTER_ROOT" ]; then
             echo "Setting up Flutter..."
             mkdir -p $PUB_CACHE/bin
             git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
             ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
           fi
-            
+          
           echo "Validating Flutter setup..."
           flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
-            
+          
+          rm -rf $PUB_CACHE/hosted
+          flutter pub cache repair
+          
           for i in {1..10}; do
             echo "Attempt $i: Running flutter pub upgrade..."
             if flutter pub upgrade --force; then
-              echo "Dependencies upgraded successfully."
+                echo "Dependencies upgraded successfully."
               break
             else
               echo "Retrying flutter pub upgrade... (attempt $i)"
-              flutter pub cache repair
               sleep $((2**i)) || true # Prevent exit on sleep errors
             fi
           done
-            
+          
           if [ "$?" -ne 0 ]; then
             echo "flutter pub upgrade failed after 10 attempts."
             exit 1
