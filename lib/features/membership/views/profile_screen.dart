@@ -36,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   child: CircleAvatar(
                     radius: 58,
-                    backgroundImage: AssetImage('images/silhouette.png'),
+                    backgroundImage: AssetImage('assets/images/silhouette.png'),
                   ),
                 ),
                 const SizedBox(height: 12),

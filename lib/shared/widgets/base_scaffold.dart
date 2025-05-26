@@ -93,7 +93,7 @@ class BaseScaffold extends StatelessWidget {
                 _AppIconButton(
                   activeIcon == 'user'
                       ? 'assets/images/useron.png'
-                      : 'assets/images/user.png',
+                      : 'assets/images/User.png',
                   onTap: () {
                     Get.toNamed(AppRoutes.profile);
                     debugPrint('Profile tapped');
