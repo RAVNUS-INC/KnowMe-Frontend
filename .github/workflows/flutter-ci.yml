@@ -28,14 +28,17 @@ jobs:
           echo "Reinstalling Flutter..."
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
           ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          echo "Adding Flutter to PATH..."
+          echo 'export PATH=$PATH:~/.pub-cache/bin' >> ~/.bashrc
+          source ~/.bashrc
           echo "Flutter setup completed."
 
       - name: Verify Flutter Installation
         run: |
-          flutter doctor -v || echo "Flutter is not functioning properly"
-          which flutter || echo "Flutter binary not found in PATH"
-          echo $PATH
-          ls -l ~/.pub-cache 
+          source ~/.bashrc
+          which flutter || { echo "Flutter binary not found in PATH"; exit 1; }
+          flutter doctor -v || { echo "Flutter is not functioning properly"; exit 1; }
+          echo "Flutter installation verified."
 
       - name: Ensure .pub-cache and binary installation
         run: |
@@ -82,10 +85,13 @@ jobs:
           fi
           flutter doctor -v || echo "Flutter is not functioning as expected"
 
-      - name: Debug PATH and Flutter
+      - name: Debug PATH and Flutter Setup
         run: |
-          echo $PATH
-          ls -l ~/.pub-cache  
+          echo "Debugging PATH and Flutter setup..."
+          export PATH="$HOME/.pub-cache/flutter/bin:$PATH"
+          echo "PATH: $PATH"
+          ls -la ~/.pub-cache/bin
+          ls -la ~/.pub-cache/flutter/bin
 
       - name: Clean and upgrade dependencies
         run: |
