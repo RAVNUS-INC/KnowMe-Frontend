@@ -1,0 +1,81 @@
+name: Daily Scrum Notification
+
+on:
+  schedule:
+    # 한국 시간 오전 10시에 실행 (UTC 기준 새벽 1시)
+    # 분 시 일 월 요일
+    - cron: "0 1 * * *"
+  # 수동 실행을 위한 옵션 (Actions 탭에서 직접 실행 가능)
+  workflow_dispatch:
+
+jobs:
+  notify_discord:
+    runs-on: ubuntu-latest
+    # 리포지토리 권한 설정 (이슈, PR 읽기)
+    permissions:
+      issues: read
+      pull-requests: read
+    steps:
+      - name: Checkout repository # 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Fetch Open Issues # 열려있는 이슈 목록 가져오기 (최대 30개)
+        id: issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # gh cli를 사용하여 json 형태로 이슈 목록 가져오기
+          issue_list=$(gh issue list --state open --limit 30 --json number,title,url)
+          # 결과가 비어있지 않으면 포맷팅, 비어있으면 "없음" 메시지 설정
+          if [[ "$(echo "$issue_list" | jq '. | length')" -gt 0 ]]; then
+            formatted_issues=$(echo "$issue_list" | jq -r '.[] | "- (#\(.number)) \(.title) - <\(.url)>"')
+          else
+            formatted_issues="- 열려있는 이슈가 없습니다."
+          fi
+          # 멀티라인 문자열을 위해 EOF 사용 및 환경 변수 설정
+          echo "ISSUE_LIST<<EOF" >> $GITHUB_ENV
+          echo "$formatted_issues" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Fetch Open PRs # 열려있는 PR 목록 가져오기 (최대 30개)
+        id: prs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # gh cli를 사용하여 json 형태로 PR 목록 가져오기
+          pr_list=$(gh pr list --state open --limit 30 --json number,title,url)
+          # 결과가 비어있지 않으면 포맷팅, 비어있으면 "없음" 메시지 설정
+          if [[ "$(echo "$pr_list" | jq '. | length')" -gt 0 ]]; then
+            formatted_prs=$(echo "$pr_list" | jq -r '.[] | "- (#\(.number)) \(.title) - <\(.url)>"')
+          else
+            formatted_prs="- 열려있는 PR이 없습니다."
+          fi
+          # 멀티라인 문자열을 위해 EOF 사용 및 환경 변수 설정
+          echo "PR_LIST<<EOF" >> $GITHUB_ENV
+          echo "$formatted_prs" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Get Current Date
+        id: date
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Send Notification to Discord # Discord로 알림 보내기
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "☀️ ${{ env.TODAY }} 데일리 스크럼 안내 ☀️"
+          description: |
+            **⏰ 오늘 오전 데일리 스크럼 시간입니다!**
+
+            **현재 열려있는 이슈:**
+            ${{ env.ISSUE_LIST }}
+
+            **현재 열려있는 Pull Requests:**
+            ${{ env.PR_LIST }}
+
+            잠시 하던 일을 멈추고 각자 진행 상황과 이슈를 공유해주세요! 😊
+          color: 0x5865F2
+          username: Daily Scrum Bot - Frontend
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          nodetail: true
+          nofooter: true

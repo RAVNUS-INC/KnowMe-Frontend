@@ -1,0 +1,29 @@
+name: Discord 이슈 알림
+
+on:
+  issues:
+    types: [opened]
+
+  workflow_dispatch:
+
+jobs:
+  discord-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: 디스코드 알림 전송
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "🆕 새 이슈가 생성되었습니다! 📢"
+          description: |
+            👤 **작성자:** ${{ github.event.issue.user.login }}
+            🔖 **제목:** ${{ github.event.issue.title }}
+          color: 0xFF5733
+          url: ${{ github.event.issue.html_url }}
+          username: GitHub Issue Bot - Frontend
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          nodetail: true
+          nofooter: true
