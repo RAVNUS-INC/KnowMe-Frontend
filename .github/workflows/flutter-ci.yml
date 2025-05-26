@@ -47,6 +47,16 @@ jobs:
           exit 1
           fi
 
+      - name: Setup Flutter Environment
+        run: |
+          echo "Setting up Flutter environment..."
+          rm -rf ~/.pub-cache/flutter
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+          ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          echo "PATH: $PATH"
+          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+
       - name: Setup Flutter
         run: |
           echo "Reinstalling Flutter..."
@@ -134,16 +144,17 @@ jobs:
 
       - name: Upgrade Dependencies with Retry
         run: |
+          echo "Upgrading dependencies with retry logic..."
           n=0
           until [ "$n" -ge 5 ]
           do
-            flutter pub upgrade && break
+            flutter pub get && flutter pub upgrade && break
             n=$((n+1))
-            echo "flutter pub upgrade 재시도 중... ($n)"
+            echo "Retrying flutter pub upgrade... attempt ($n)"
             sleep $((2**n))
           done
           if [ "$n" -ge 5 ]; then
-            echo "flutter pub upgrade가 5회 시도 후에도 실패했습니다."
+            echo "flutter pub upgrade failed after 5 attempts."
             exit 1
           fi
 
