@@ -63,21 +63,23 @@ class FilterPresenter extends GetxController {
     }
   }
 
-  // 현재 필터 값 가져오기
+  // 현재 필터 값 가져오기 (FilterValues 모델 개선 반영)
   FilterValues getFilterValues(int tabIndex) {
     switch (tabIndex) {
       case 0: // 채용
         return FilterValues(
           job: _postController.selectedJob.value,
-          experience: _postController.selectedExperience.value, // 추가(경력)
+          experience: _postController.selectedExperience.value,
           location: _postController.selectedLocation.value,
           education: _postController.selectedEducation.value,
+          educationList: _postController.multiSelectEducation.toList(),
         );
       case 1: // 인턴
         return FilterValues(
           job: _postController.selectedInternJob.value,
           location: _postController.selectedInternLocation.value,
           education: _postController.selectedInternEducation.value,
+          educationList: _postController.multiSelectEducation.toList(),
           period: _postController.selectedPeriod.value,
         );
       case 2: // 대외활동
@@ -85,12 +87,12 @@ class FilterPresenter extends GetxController {
           job: _postController.selectedField.value,
           location: _postController.selectedActivityLocation.value,
           period: _postController.selectedActivityPeriod.value,
-          host: _postController.selectedHost.value, // 추가(주최기관)
+          host: _postController.multiSelectHost.toList(),
         );
       case 3: // 교육/강연
         return FilterValues(
           job: _postController.selectedEduField.value,
-          onOffline: _postController.selectedOnOffline.value, // 추가(온/오프라인)
+          onOffline: _postController.multiSelectOnOffline.toList(),
           location: _postController.selectedEduLocation.value,
           period: _postController.selectedEduPeriod.value,
         );
@@ -98,9 +100,9 @@ class FilterPresenter extends GetxController {
       default:
         return FilterValues(
           job: _postController.selectedContestField.value,
-          target: _postController.selectedTarget.value, // 추가(대상)
-          organizer: _postController.selectedOrganizer.value, // 추가(주최기관)
-          benefit: _postController.selectedBenefit.value, // 추가(혜택)
+          target: _postController.multiSelectTarget.toList(),
+          organizer: _postController.multiSelectOrganizer.toList(),
+          benefit: _postController.multiSelectBenefit.toList(),
         );
     }
   }
@@ -274,18 +276,23 @@ class FilterPresenter extends GetxController {
         _postController.selectedActivityPeriod.value = null;
         _postController.selectedActivityLocation.value = null;
         _postController.selectedHost.value = null;
+        _postController.multiSelectHost.clear(); // 다중 선택 필터 초기화
         break;
       case 3: // 교육/강연
         _postController.selectedEduField.value = null;
         _postController.selectedEduPeriod.value = null;
         _postController.selectedEduLocation.value = null;
         _postController.selectedOnOffline.value = null;
+        _postController.multiSelectOnOffline.clear(); // 다중 선택 필터 초기화
         break;
       case 4: // 공모전
         _postController.selectedContestField.value = null;
         _postController.selectedTarget.value = null;
         _postController.selectedOrganizer.value = null;
         _postController.selectedBenefit.value = null;
+        _postController.multiSelectTarget.clear(); // 다중 선택 필터 초기화
+        _postController.multiSelectOrganizer.clear(); // 다중 선택 필터 초기화
+        _postController.multiSelectBenefit.clear(); // 다중 선택 필터 초기화
         break;
     }
   }
@@ -298,7 +305,6 @@ class FilterPresenter extends GetxController {
     String? location,
     String? education,
     String? period,
-    // 추가 필터들 (원래 없었음)
     String? organization,
     String? host,
     String? target,
@@ -350,7 +356,6 @@ class FilterPresenter extends GetxController {
         break;
 
       case 1: // 인턴
-      // 직무 필터 적용
         if (job != null) {
           _postController.selectedInternJob.value = job;
         }
@@ -382,7 +387,6 @@ class FilterPresenter extends GetxController {
         break;
 
       case 2: // 대외활동
-      // 분야 필터 적용
         if (job != null) {
           _postController.selectedField.value = job;
         }
@@ -409,7 +413,6 @@ class FilterPresenter extends GetxController {
         break;
 
       case 3: // 교육/강연
-      // 분야 필터 적용
         if (job != null) {
           _postController.selectedEduField.value = job;
         }
@@ -437,7 +440,6 @@ class FilterPresenter extends GetxController {
 
       case 4: // 공모전
       default:
-      // 분야 필터 적용
         if (job != null) {
           _postController.selectedContestField.value = job;
         }
@@ -445,36 +447,86 @@ class FilterPresenter extends GetxController {
     }
   }
 
-  // 멀티 셀렉트 필터 값 업데이트
+  // 멀티 셀렉트 필터 값 업데이트 (다중 선택 지원)
   void updateMultiSelectValue(int tabIndex, String filterType, String option, bool isSelected) {
     switch (filterType) {
       case '대상':
-        _postController.selectedTarget.value = isSelected ? null : option;
+        if (isSelected) {
+          _postController.multiSelectTarget.remove(option);
+        } else {
+          _postController.multiSelectTarget.add(option);
+        }
         break;
       case '주최기관':
         if (tabIndex == 4) {
-          _postController.selectedOrganizer.value = isSelected ? null : option;
+          if (isSelected) {
+            _postController.multiSelectOrganizer.remove(option);
+          } else {
+            _postController.multiSelectOrganizer.add(option);
+          }
         } else {
-          _postController.selectedHost.value = isSelected ? null : option;
+          if (isSelected) {
+            _postController.multiSelectHost.remove(option);
+          } else {
+            _postController.multiSelectHost.add(option);
+          }
         }
         break;
       case '혜택':
-        _postController.selectedBenefit.value = isSelected ? null : option;
+        if (isSelected) {
+          _postController.multiSelectBenefit.remove(option);
+        } else {
+          _postController.multiSelectBenefit.add(option);
+        }
         break;
+      case '온/오프라인':
+        if (isSelected) {
+          _postController.multiSelectOnOffline.remove(option);
+        } else {
+          _postController.multiSelectOnOffline.add(option);
+        }
+        break;
+      case '학력':
+        if (isSelected) {
+          _postController.multiSelectEducation.remove(option);
+        } else {
+          _postController.multiSelectEducation.add(option);
+        }
+        break;
+    }
+    
+    // 필터 변경 시 즉시 리스트 업데이트
+    _postController.loadContests();
+  }
+
+  // 옵션이 선택되었는지 확인
+  bool isOptionSelected(int tabIndex, String filterType, String option) {
+    switch (filterType) {
+      case '대상':
+        return _postController.multiSelectTarget.contains(option);
+      case '주최기관':
+        if (tabIndex == 4) {
+          return _postController.multiSelectOrganizer.contains(option);
+        } else {
+          return _postController.multiSelectHost.contains(option);
+        }
+      case '혜택':
+        return _postController.multiSelectBenefit.contains(option);
+      case '온/오프라인':
+        return _postController.multiSelectOnOffline.contains(option);
+      case '학력':
+        return _postController.multiSelectEducation.contains(option);
+      default:
+        return false;
     }
   }
 
-  // 온/오프라인 값 업데이트
-  void updateOnOfflineValue(String value) {
-    _postController.selectedOnOffline.value = value;
-  }
-
-  // Get selected values from controller
-  String? getSelectedHost() => _postController.selectedHost.value;
-  String? getSelectedTarget() => _postController.selectedTarget.value;
-  String? getSelectedOrganizer() => _postController.selectedOrganizer.value;
-  String? getSelectedBenefit() => _postController.selectedBenefit.value;
-  String? getSelectedOnOffline() => _postController.selectedOnOffline.value;
+  // Get selected values from controller (리스트 타입으로 반환)
+  List<String> getSelectedHost() => _postController.multiSelectHost.toList();
+  List<String> getSelectedTarget() => _postController.multiSelectTarget.toList();
+  List<String> getSelectedOrganizer() => _postController.multiSelectOrganizer.toList();
+  List<String> getSelectedBenefit() => _postController.multiSelectBenefit.toList();
+  List<String> getSelectedOnOffline() => _postController.multiSelectOnOffline.toList();
 
   // 옵션 리스트 반환 메서드들
   List<String> getJobOptions(int tabIndex) {

@@ -48,6 +48,14 @@ class PostController extends GetxController {
     },
   };
 
+  // 다중 선택 필터용 리스트들 (기존 로직과 별도로 관리)
+  final RxList<String> multiSelectTarget = <String>[].obs;
+  final RxList<String> multiSelectHost = <String>[].obs;
+  final RxList<String> multiSelectOrganizer = <String>[].obs;
+  final RxList<String> multiSelectBenefit = <String>[].obs;  
+  final RxList<String> multiSelectOnOffline = <String>[].obs;
+  final RxList<String> multiSelectEducation = <String>[].obs; // 학력 다중 선택 추가
+
   @override
   void onInit() {
     super.onInit();
@@ -58,6 +66,13 @@ class PostController extends GetxController {
 
   void resetFilters() {
     filtersByTab[currentTabIndex.value]?.forEach((_, value) => value.value = null);
+    // 다중 선택 필터도 초기화
+    multiSelectTarget.clear();
+    multiSelectHost.clear();
+    multiSelectOrganizer.clear();
+    multiSelectBenefit.clear();
+    multiSelectOnOffline.clear();
+    multiSelectEducation.clear(); // 학력 필터 초기화 추가
   }
 
   void updateFilter(String filterType, String? value) {
@@ -88,48 +103,6 @@ class PostController extends GetxController {
   }
 
   // 탭 인덱스에 따라 적절한 필터링 메서드 호출
-  // List<Contest> getFilteredContentsByTabIndex(int tabIndex) {
-  //   switch (tabIndex) {
-  //     case 0: // 채용
-  //       return repository.getJobListings(
-  //         job: selectedJob.value,
-  //         experience: selectedExperience.value,
-  //         location: selectedLocation.value,
-  //         education: selectedEducation.value,
-  //       );
-  //     case 1: // 인턴
-  //       return repository.getInternships(
-  //         job: selectedInternJob.value,
-  //         period: selectedPeriod.value,
-  //         location: selectedInternLocation.value,
-  //         education: selectedInternEducation.value,
-  //       );
-  //     case 2: // 대외활동
-  //       return repository.getActivities(
-  //         field: selectedField.value,
-  //         organization: selectedActivityLocation.value,
-  //         location: selectedActivityLocation.value,
-  //         host: selectedHost.value,
-  //       );
-  //     case 3: // 교육/강연
-  //       return repository.getEducationEvents(
-  //         field: selectedEduField.value,
-  //         period: selectedEduPeriod.value,
-  //         location: selectedEduLocation.value,
-  //         onOffline: selectedOnOffline.value,
-  //       );
-  //     case 4: // 공모전
-  //     default:
-  //       return repository.getFilteredContests(
-  //         field: selectedContestField.value,
-  //         target: selectedTarget.value,
-  //         organizer: selectedOrganizer.value,
-  //         benefit: selectedBenefit.value,
-  //       );
-  //   }
-  // }
-
-  // zip에 있던 거 불러옴
   List<Contest> getFilteredContentsByTabIndex(int tabIndex) {
     final filters = filtersByTab[tabIndex] ?? {};
     final values = filters.map((key, value) => MapEntry(key, value.value));
@@ -140,36 +113,46 @@ class PostController extends GetxController {
           job: values['직무'],
           experience: values['신입~5년'],
           location: values['지역'],
-          education: values['학력'],
+          education: multiSelectEducation.isEmpty ? values['학력'] : 
+              multiSelectEducation.join(', '), // 학력 다중 선택 지원
         );
       case 1:
         return repository.getInternships(
           job: values['직무'],
           period: values['기간'],
           location: values['지역'],
-          education: values['학력'],
+          education: multiSelectEducation.isEmpty ? values['학력'] : 
+              multiSelectEducation.join(', '), // 학력 다중 선택 지원
         );
       case 2:
         return repository.getActivities(
           field: values['분야'],
           organization: values['기관'],
           location: values['지역'],
-          host: values['주최기관'],
+          // 다중 선택 필터는 별도 처리
+          host: multiSelectHost.isEmpty ? values['주최기관'] : 
+              multiSelectHost.join(', '), // 쉼표로 구분하여 문자열로 전달
         );
       case 3:
         return repository.getEducationEvents(
           field: values['분야'],
           period: values['기간'],
           location: values['지역'],
-          onOffline: values['온/오프라인'],
+          // 다중 선택 필터는 별도 처리
+          onOffline: multiSelectOnOffline.isEmpty ? values['온/오프라인'] : 
+              multiSelectOnOffline.join(', '), // 쉼표로 구분하여 문자열로 전달
         );
       case 4:
       default:
         return repository.getFilteredContests(
           field: values['분야'],
-          target: values['대상'],
-          organizer: values['주최기관'],
-          benefit: values['혜택'],
+          // 다중 선택 필터는 별도 처리
+          target: multiSelectTarget.isEmpty ? values['대상'] : 
+              multiSelectTarget.join(', '),
+          organizer: multiSelectOrganizer.isEmpty ? values['주최기관'] : 
+              multiSelectOrganizer.join(', '),
+          benefit: multiSelectBenefit.isEmpty ? values['혜택'] : 
+              multiSelectBenefit.join(', '),
         );
     }
   }
