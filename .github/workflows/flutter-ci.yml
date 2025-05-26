@@ -17,13 +17,17 @@ jobs:
         with:
           channel: 'stable'
 
-      # 1. 의존성 설치 (여기서 pub-cache 폴더 생성)
+      # 1. bin 폴더 강제 생성(필수)
+      - name: Ensure .pub-cache/bin directory exists
+        run: mkdir -p ~/.pub-cache/bin
+
+      # 2. 의존성 설치
       - name: Install dependencies
         run: |
           flutter pub get
           flutter pub upgrade --force
 
-      # 2. 캐시/Flutter 바이너리/경로 진단 (이제 폴더가 반드시 생성됨)
+      # 3. 캐시/Flutter 바이너리/경로 진단
       - name: Verify Cache and Links
         run: |
           echo "Verifying cache integrity..."
@@ -32,15 +36,15 @@ jobs:
           ls -la ~/.pub-cache/flutter/bin
           which flutter
 
-      # 3. 포맷 검사
+      # 4. 포맷 검사
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
 
-      # 4. 코드 분석
+      # 5. 코드 분석
       - name: Analyze project source
         run: flutter analyze
 
-      # 5. 테스트 실행
+      # 6. 테스트 실행
       - name: Run tests
         run: |
           if [ -d "test" ]; then
@@ -49,7 +53,7 @@ jobs:
             echo "No tests directory found, skipping tests.";
           fi
 
-      # 6. 디버깅 (실패시만)
+      # 7. 디버깅 (실패시만)
       - name: Debug (If needed)
         if: ${{ failure() }}
         run: |
@@ -72,6 +76,10 @@ jobs:
         with:
           flutter-version: "3.29.3"
           channel: "stable"
+
+      # bin 폴더 강제 생성 (안정성 위해 빌드에도 반복)
+      - name: Ensure .pub-cache/bin directory exists
+        run: mkdir -p ~/.pub-cache/bin
 
       - name: Install dependencies
         run: flutter pub get
