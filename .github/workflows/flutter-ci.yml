@@ -21,17 +21,15 @@ jobs:
 
       - name: Setup Flutter
         run: |
-          if [ -d ~/.pub-cache/flutter ]; then
-            echo "Flutter directory already exists. Removing it to ensure a clean installation."
-            rm -rf ~/.pub-cache/flutter
-          fi
           echo "Reinstalling Flutter..."
+          rm -rf ~/.pub-cache/flutter
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
           ln -sf ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
-          echo "Adding Flutter to PATH..."
-          echo 'export PATH=$PATH:~/.pub-cache/bin' >> ~/.bashrc
-          source ~/.bashrc
-          echo "Flutter setup completed."
+          echo "Adding Flutter to PATH for current session..."
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          echo "PATH: $PATH"
+          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+          echo "Flutter setup completed and verified."
 
       - name: Verify Flutter Installation
         run: |
@@ -92,6 +90,13 @@ jobs:
           echo "PATH: $PATH"
           ls -la ~/.pub-cache/bin
           ls -la ~/.pub-cache/flutter/bin
+
+      - name: Debug PATH and Flutter Binary
+        run: |
+          echo "Verifying Flutter binary in PATH..."
+          which flutter || { echo "Flutter binary not found"; exit 1; }
+          echo "PATH: $PATH"
+          flutter doctor -v    
 
       - name: Clean and upgrade dependencies
         run: |
