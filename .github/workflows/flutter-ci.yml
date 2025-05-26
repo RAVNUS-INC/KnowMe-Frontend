@@ -45,22 +45,21 @@ jobs:
           echo "Upgrading dependencies..."
           export PUB_CACHE="$HOME/.pub-cache"
           export PATH="$PUB_CACHE/bin:$PATH"
-          export FLUTTER_ROOT="$PUB_CACHE/flutter"
 
-          # Reinitialize cache
+          echo "Clearing existing cache..."
           rm -rf $PUB_CACHE
           mkdir -p $PUB_CACHE/bin
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
           ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
 
-          # Validate Flutter setup
-          flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
+          echo "Validating Flutter setup..."
+          if ! flutter doctor -v; then
+              echo "Flutter setup failed"; exit 1
+          fi
 
-          # Clear old cached packages and repair
-          rm -rf $PUB_CACHE/hosted
-          flutter pub cache repair
+          echo "Repairing the cache..."
+          flutter pub cache repair --force
 
-          # Retry flutter pub upgrade
           for i in {1..5}; do
               echo "Attempt $i: Running flutter pub upgrade..."
               if flutter pub upgrade --force; then
