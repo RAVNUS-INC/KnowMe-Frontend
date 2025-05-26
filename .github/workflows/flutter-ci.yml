@@ -8,7 +8,6 @@ on:
 
 jobs:
   analyze:
-    name: Analyze and Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,34 +16,29 @@ jobs:
         with:
           channel: 'stable'
 
-      # 1. bin 폴더 강제 생성(필수)
-      - name: Ensure .pub-cache/bin directory exists
-        run: mkdir -p ~/.pub-cache/bin
+      # 1. Flutter 바이너리, 환경 확인
+      - name: Debug Environment
+        run: |
+          echo "PATH: $PATH"
+          which flutter
+          flutter --version
+          flutter doctor -v
 
-      # 2. 의존성 설치
+      # 2. 의존성 설치/업그레이드
       - name: Install dependencies
         run: |
           flutter pub get
           flutter pub upgrade --force
 
-      # 3. 캐시/Flutter 바이너리/경로 진단
-      - name: Verify Cache and Links
-        run: |
-          echo "Verifying cache integrity..."
-          ls -la ~/.pub-cache
-          ls -la ~/.pub-cache/bin
-          ls -la ~/.pub-cache/flutter/bin
-          which flutter
-
-      # 4. 포맷 검사
+      # 3. 포맷 검사
       - name: Verify formatting
         run: dart format --set-exit-if-changed .
 
-      # 5. 코드 분석
+      # 4. 코드 분석
       - name: Analyze project source
         run: flutter analyze
 
-      # 6. 테스트 실행
+      # 5. 테스트 실행
       - name: Run tests
         run: |
           if [ -d "test" ]; then
@@ -53,7 +47,7 @@ jobs:
             echo "No tests directory found, skipping tests.";
           fi
 
-      # 7. 디버깅 (실패시만)
+      # 6. 디버깅 (실패시만)
       - name: Debug (If needed)
         if: ${{ failure() }}
         run: |
@@ -61,9 +55,6 @@ jobs:
           which flutter || echo "Flutter binary not found in PATH"
           echo $PATH
           flutter doctor -v
-          ls -la ~/.pub-cache
-          ls -la ~/.pub-cache/bin
-          ls -la ~/.pub-cache/flutter/bin
 
   build_android:
     name: Build Android APK
@@ -76,10 +67,6 @@ jobs:
         with:
           flutter-version: "3.29.3"
           channel: "stable"
-
-      # bin 폴더 강제 생성 (안정성 위해 빌드에도 반복)
-      - name: Ensure .pub-cache/bin directory exists
-        run: mkdir -p ~/.pub-cache/bin
 
       - name: Install dependencies
         run: flutter pub get
