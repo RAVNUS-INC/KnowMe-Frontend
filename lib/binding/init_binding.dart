@@ -12,5 +12,6 @@ class InitBinding extends Bindings {
     
     // Services 등록
     Get.put(FilterOptionsService());
+
   }
 }
