@@ -36,17 +36,26 @@ jobs:
       - name: Upgrade Dependencies with Retry
         run: |
           echo "Upgrading dependencies..."
-          for i in {1..5}; do
+          export PUB_CACHE="$HOME/.pub-cache"
+          export PATH="$PUB_CACHE/bin:$PATH"
+          export FLUTTER_ROOT="$PUB_CACHE/flutter"
+
+          for i in {1..10}; do
             if flutter pub upgrade --force; then
+              echo "Dependencies upgraded successfully."
               break
             else
               echo "Retrying flutter pub upgrade... attempt $i"
-              rm -rf ~/.pub-cache  # Ensure a clean cache for each attempt
+              rm -rf $PUB_CACHE  # Ensure a clean cache for each attempt
+              mkdir -p $PUB_CACHE/bin
+              git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
+              ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
               sleep $((2**i))
             fi
           done
+
           if [ "$?" -ne 0 ]; then
-            echo "flutter pub upgrade failed after 5 attempts."
+            echo "flutter pub upgrade failed after 10 attempts."
             exit 1
           fi
 
