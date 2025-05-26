@@ -21,13 +21,14 @@ jobs:
       - name: Setup Flutter Cache and Environment
         run: |
           echo "Setting up Flutter environment..."
-          rm -rf ~/.pub-cache
           export PUB_CACHE="$HOME/.pub-cache"
+          rm -rf $PUB_CACHE
           mkdir -p $PUB_CACHE/bin
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
           ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
           export PATH="$PUB_CACHE/bin:$PATH"
           echo "PATH: $PATH"
+
           if ! flutter doctor -v; then
             echo "Flutter setup failed"; exit 1
           fi
@@ -46,7 +47,7 @@ jobs:
           export PUB_CACHE="$HOME/.pub-cache"
           export PATH="$PUB_CACHE/bin:$PATH"
 
-          echo "Clearing existing cache..."
+          echo "Clearing existing cache and resetting..."
           rm -rf $PUB_CACHE
           mkdir -p $PUB_CACHE/bin
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
@@ -57,22 +58,19 @@ jobs:
               echo "Flutter setup failed"; exit 1
           fi
 
-          echo "Repairing the cache..."
-          flutter pub cache repair --force
-
-          for i in {1..5}; do
-              echo "Attempt $i: Running flutter pub upgrade..."
+          echo "Attempting to upgrade dependencies..."
+          for i in {1..10}; do
               if flutter pub upgrade --force; then
                   echo "Dependencies upgraded successfully."
                   break
               else
                   echo "Retrying flutter pub upgrade... (attempt $i)"
-                  sleep $((2**i))  # Increase retry backoff time
+                  sleep $((2**i))  # Exponential backoff
               fi
           done
 
-          if [ "$?" -ne 0 ]; then
-              echo "flutter pub upgrade failed after 5 attempts."
+          if [ $? -ne 0 ]; then
+              echo "flutter pub upgrade failed after 10 attempts."
               exit 1
           fi
 
