@@ -205,7 +205,7 @@ class ContestCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            contest.benefit ?? '',
+                            contest.benefit,
                             style: const TextStyle(
                               color: Color(0xFF454C53),
                               fontSize: 10, // Card1의 폰트 크기
@@ -220,7 +220,7 @@ class ContestCard extends StatelessWidget {
                         const SizedBox(width: 4), // spacing: 4 대체
                         Flexible(
                           child: Text(
-                            contest.target ?? '',
+                            contest.target,
                             style: const TextStyle(
                               color: Color(0xFF72787F),
                               fontSize: 10, // Card1의 폰트 크기

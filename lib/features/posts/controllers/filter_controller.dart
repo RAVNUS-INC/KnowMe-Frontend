@@ -233,13 +233,11 @@ class FilterController extends GetxController {
           return '4개월';
         } else if (value == 180) {
           return '6개월';
+        } else if (value < 30) {
+          return '${value.round()}일';
         } else {
-          if (value < 30) {
-            return '${value.round()}일';
-          } else {
-            int months = (value / 30).round();
-            return '${months}개월';
-          }
+          int months = (value / 30).round();
+          return '$months개월';
         }
       default:
         return '${value.round()}';
@@ -710,7 +708,7 @@ class FilterController extends GetxController {
     currentRangeValues.value = values;
   }
   
-  // 인턴 탭 기간 필터 적용 (View에서 옮겨옴)
+  // 인턴 탭 기간 필터 적용 (View에서 옮겨옮)
   void applyInternPeriodFilter(RangeValues values) {
     String? periodValue;
     if (values.end <= 1) {
@@ -728,7 +726,7 @@ class FilterController extends GetxController {
     currentRangeValues.value = values;
   }
   
-  // 대외활동 탭 기간 필터 적용 (View에서 옮겨옴)
+  // 대외활동 탭 기간 필터 적용 (View에서 옮겨옮)
   void applyActivityPeriodFilter(RangeValues values) {
     String? activityPeriodValue;
     if (values.end <= 1) {
@@ -746,7 +744,7 @@ class FilterController extends GetxController {
     currentRangeValues.value = values;
   }
   
-  // 교육/강연 탭 기간 필터 적용 (View에서 옮겨옴)
+  // 교육/강연 탭 기간 필터 적용 (View에서 옮겨옮)
   void applyEducationPeriodFilter(RangeValues values) {
     String? eduPeriodValue;
     if (values.end <= 1) {

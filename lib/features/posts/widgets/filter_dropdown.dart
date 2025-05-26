@@ -42,7 +42,7 @@ class FilterDropdown extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: ShapeDecoration(
-          color: Color(0xFFF5F5F5),
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             side: const BorderSide(
               width: 1,
