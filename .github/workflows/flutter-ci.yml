@@ -22,13 +22,10 @@ jobs:
         run: |
           echo "Setting up Flutter environment..."
           export PUB_CACHE="$HOME/.pub-cache"
-          rm -rf $PUB_CACHE
           mkdir -p $PUB_CACHE/bin
           git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
           ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
           export PATH="$PUB_CACHE/bin:$PATH"
-          echo "PATH: $PATH"
-
           if ! flutter doctor -v; then
             echo "Flutter setup failed"; exit 1
           fi
@@ -44,34 +41,39 @@ jobs:
       - name: Upgrade Dependencies with Retry
         run: |
           echo "Upgrading dependencies..."
-          export PUB_CACHE="$HOME/.pub-cache"
-          export PATH="$PUB_CACHE/bin:$PATH"
+          PUB_CACHE="$HOME/.pub-cache"
+          PATH="$PUB_CACHE/bin:$PATH"
+          export PUB_CACHE PATH
 
           echo "Clearing existing cache and resetting..."
-          rm -rf $PUB_CACHE
+          rm -rf $PUB_CACHE || { echo "Failed to clear PUB_CACHE"; exit 1; }
           mkdir -p $PUB_CACHE/bin
-          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter || { echo "Failed to clone Flutter"; exit 1; }
           ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
 
           echo "Validating Flutter setup..."
           if ! flutter doctor -v; then
-              echo "Flutter setup failed"; exit 1
+            echo "Flutter setup failed"; exit 1
           fi
 
           echo "Attempting to upgrade dependencies..."
-          for i in {1..10}; do
-              if flutter pub upgrade --force; then
-                  echo "Dependencies upgraded successfully."
-                  break
-              else
-                  echo "Retrying flutter pub upgrade... (attempt $i)"
-                  sleep $((2**i))  # Exponential backoff
-              fi
+          attempts=0
+          max_attempts=10
+          while [ $attempts -lt $max_attempts ]; do
+            if flutter pub upgrade --force; then
+              echo "Dependencies upgraded successfully."
+              break
+            else
+              attempts=$((attempts + 1))
+              echo "Retrying flutter pub upgrade... (attempt $attempts)"
+              rm -rf $PUB_CACHE || echo "Failed to clear PUB_CACHE during retry"
+              sleep 5
+            fi
           done
 
-          if [ $? -ne 0 ]; then
-              echo "flutter pub upgrade failed after 10 attempts."
-              exit 1
+          if [ $attempts -eq $max_attempts ]; then
+            echo "flutter pub upgrade failed after $max_attempts attempts."
+            exit 1
           fi
 
       # 3. 의존성 설치 (pub get)
