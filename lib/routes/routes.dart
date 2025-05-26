@@ -104,9 +104,5 @@ class AppRoutes {
       page: () => const ActivityScreen(),
       transition: Transition.fadeIn,
     ),
-    GetPage(
-      name: '/',
-      page: () => MyHomePage(title: 'Know Me'),
-    ),
   ];
 }

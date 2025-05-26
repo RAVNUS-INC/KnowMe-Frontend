@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'routes/routes.dart';
 import 'package:get/get.dart';
+import 'not_found_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +17,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       getPages: AppRoutes.routes,
       initialRoute: '/', // 아래 '/' 경로로 시작
+      onUnknownRoute: (settings) => GetPageRoute(
+        page: () => NotFoundPage(),
+        settings: settings,
+      ),
     );
   }
 }
