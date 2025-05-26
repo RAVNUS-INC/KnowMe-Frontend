@@ -1,19 +1,7 @@
-<<<<<<< HEAD
-# Miscellaneous
-*.class
-=======
-<<<<<<< HEAD
-# Do not remove or rename entries in this file, only add new ones
-# See https://github.com/flutter/flutter/issues/128635 for more context.
 
 # Miscellaneous
 *.class
 *.lock
-=======
-# Miscellaneous
-*.class
->>>>>>> upstream/main
->>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
 *.log
 *.pyc
 *.swp
@@ -26,15 +14,6 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-=======
-.buildlog/
-.history
-.svn/
-<<<<<<< HEAD
-=======
-migrate_working_dir/
->>>>>>> upstream/main
->>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
 
 # IntelliJ related
 *.iml
@@ -42,13 +21,6 @@ migrate_working_dir/
 *.iws
 .idea/
 
-<<<<<<< HEAD
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-=======
-<<<<<<< HEAD
 # Visual Studio Code related
 .classpath
 .project
@@ -189,27 +161,12 @@ app.*.symbols
 .python-version
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
-=======
 # VS Code related
 .vscode/
->>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
 
 # Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-<<<<<<< HEAD
 /build/
-=======
-build/
->>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
 
-# Symbolication related
-app.*.symbols
 
 # Obfuscation related
 app.*.map.json
@@ -218,8 +175,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-<<<<<<< HEAD
-=======
 
 # 프로젝트별 무시 항목
 /android/
@@ -232,5 +187,3 @@ app.*.map.json
 analysis_options.yaml
 pubspec.lock
 README.md
->>>>>>> upstream/main
->>>>>>> 4349781a9c2621038d4e892358c904858ff9fd4e
