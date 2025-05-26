@@ -24,10 +24,19 @@ jobs:
       - name: Ensure .pub-cache directory exists
         run: mkdir -p ~/.pub-cache
 
-      - name: Debug Flutter Installation
+      - name: Debug Flutter Installation and PATH
         run: |
-          which flutter
-          flutter doctor -v
+          echo "Checking Flutter installation..."
+          which flutter || echo "Flutter binary not found in PATH"
+          echo $PATH
+          ls -l ~/.pub-cache
+          if [ -f ~/.pub-cache/bin/flutter ]; then
+            echo "Flutter binary found in cache"
+          else
+            echo "Flutter binary not found in cache"
+            exit 1
+          fi
+          flutter doctor -v || echo "Flutter is not functioning as expected"
 
       - name: Debug PATH and Flutter
         run: |
