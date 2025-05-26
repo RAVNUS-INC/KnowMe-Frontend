@@ -57,17 +57,36 @@ class FilterRowWidget extends StatelessWidget {
                   // 현재 탭의 모든 필터 초기화
                   postController.resetFilters();
 
+                  // 정렬 옵션 버튼의 위치 계산을 위한 RenderBox 가져오기
+                  final RenderBox button = context.findRenderObject() as RenderBox;
+                  final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                  final buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
+
                   // 팝업 메뉴 표시
                   showDialog(
                     context: context,
+                    barrierColor: Colors.transparent,
                     builder: (BuildContext context) {
-                      return Dialog(
-                        alignment: Alignment.topRight,
-                        insetPadding: const EdgeInsets.only(top: 140, right: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const SortOptionsMenu(),
+                      return Stack(
+                        children: [
+                          Positioned(
+                            top: buttonPosition.dy + 50, // FilterRowWidget 바로 아래 위치
+                            right: 12, // 오른쪽 여백 12 유지
+                            child: SizedBox(
+                              width: 120, // 가로 길이 105로 고정
+                              child: Dialog(
+                                alignment: Alignment.topRight,
+                                insetPadding: EdgeInsets.zero,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const SortOptionsMenu(),
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   );
@@ -265,6 +284,7 @@ class SortOptionsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 105, // 정확한 너비 지정
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -304,9 +324,15 @@ class SortOptionsMenu extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 105,
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        width: 105, // Figma에서 지정한 너비
+        height: 32, // 각 옵션의 높이
+        padding: const EdgeInsets.all(6),
+        decoration: ShapeDecoration(
+          color: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -321,14 +347,15 @@ class SortOptionsMenu extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 4), // spacing: 4 대체
             Text(
               title,
               style: const TextStyle(
                 color: Color(0xFF454C53),
-                fontSize: 14,
+                fontSize: 12, // Figma 디자인에 맞게 폰트 크기 조정
                 fontFamily: 'Pretendard',
                 fontWeight: FontWeight.w500,
+                letterSpacing: -0.48,
               ),
             ),
           ],
