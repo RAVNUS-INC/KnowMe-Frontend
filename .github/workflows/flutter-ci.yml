@@ -46,37 +46,35 @@ jobs:
           export PUB_CACHE="$HOME/.pub-cache"
           export PATH="$PUB_CACHE/bin:$PATH"
           export FLUTTER_ROOT="$PUB_CACHE/flutter"
-          echo "PATH: $PATH"
-          which flutter || { echo "Flutter binary not found in PATH"; exit 1; }
-          flutter doctor -v
-          
-          if [ ! -d "$FLUTTER_ROOT" ]; then
-            echo "Setting up Flutter..."
-            mkdir -p $PUB_CACHE/bin
-            git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
-            ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
-          fi
-          
-          echo "Validating Flutter setup..."
+
+          # Reinitialize cache
+          rm -rf $PUB_CACHE
+          mkdir -p $PUB_CACHE/bin
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git $PUB_CACHE/flutter
+          ln -sf $PUB_CACHE/flutter/bin/flutter $PUB_CACHE/bin/flutter
+
+          # Validate Flutter setup
           flutter doctor -v || { echo "Flutter setup failed"; exit 1; }
-          
+
+          # Clear old cached packages and repair
           rm -rf $PUB_CACHE/hosted
           flutter pub cache repair
-          
-          for i in {1..10}; do
-            echo "Attempt $i: Running flutter pub upgrade..."
-            if flutter pub upgrade --force; then
-                echo "Dependencies upgraded successfully."
-              break
-            else
-              echo "Retrying flutter pub upgrade... (attempt $i)"
-              sleep $((2**i)) || true # Prevent exit on sleep errors
-            fi
+
+          # Retry flutter pub upgrade
+          for i in {1..5}; do
+              echo "Attempt $i: Running flutter pub upgrade..."
+              if flutter pub upgrade --force; then
+                  echo "Dependencies upgraded successfully."
+                  break
+              else
+                  echo "Retrying flutter pub upgrade... (attempt $i)"
+                  sleep $((2**i))
+              fi
           done
-          
+
           if [ "$?" -ne 0 ]; then
-            echo "flutter pub upgrade failed after 10 attempts."
-            exit 1
+              echo "flutter pub upgrade failed after 5 attempts."
+              exit 1
           fi
 
       # 3. 의존성 설치 (pub get)
