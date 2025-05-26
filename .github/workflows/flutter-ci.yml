@@ -21,8 +21,33 @@ jobs:
           cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
           cache-path: ~/.pub-cache
 
+      - name: Ensure .pub-cache and binary installation
+        run: |
+          mkdir -p ~/.pub-cache/bin
+          if ! [ -x "$(command -v flutter)" ]; then
+          echo "Installing Flutter manually..."
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git ~/.pub-cache/flutter
+          ln -s ~/.pub-cache/flutter/bin/flutter ~/.pub-cache/bin/flutter
+          fi
+          echo "Flutter binary setup completed"
+
       - name: Ensure .pub-cache directory exists
         run: mkdir -p ~/.pub-cache
+
+      - name: Ensure Flutter Binary is Available
+        run: |
+          if [ ! -f ~/.pub-cache/bin/flutter ]; then
+            echo "Flutter binary missing, attempting to reinstall..."
+            flutter doctor -v || echo "Flutter is not functioning properly"
+          else
+            echo "Flutter binary found."
+          fi  
+
+      - name: Verify Cache Integrity
+        run: |
+          echo "Verifying Flutter cache integrity..."
+          ls -la ~/.pub-cache/bin
+          flutter pub cache repair || echo "Cache repair failed"
 
       - name: Debug Flutter Installation and PATH
         run: |
