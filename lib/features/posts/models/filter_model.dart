@@ -1,5 +1,4 @@
-
-/// 슬라이더 설정을 위한 모델 클래스
+// 슬라이더 설정을 위한 모델
 class SliderConfig {
   final double min;
   final double max;
@@ -7,7 +6,7 @@ class SliderConfig {
   final List<double> steps;
   final String startLabel;
   final String endLabel;
-  final bool isMonth;
+  final bool isMonth; // 개월 단위 여부
 
   SliderConfig({
     required this.min,
@@ -20,27 +19,29 @@ class SliderConfig {
   });
 }
 
-/// 필터 선택 값을 저장하는 모델 클래스
+// 필터 값들을 담는 모델
 class FilterValues {
-  final String? job;
-  final String? location;
-  final String? education;
-  final String? period;
-  final String? organization;
-  final String? host;
-  final String? target;
-  final String? benefit;
-  final String? onOffline;
-  
+  final String? job; // 직무 또는 분야
+  final String? experience; // 경력 (채용)
+  final String? location; // 지역
+  final String? education; // 학력
+  final String? period; // 기간 (인턴, 대외활동, 교육/강연)
+  final String? host; // 주최기관 (대외활동)
+  final String? onOffline; // 온/오프라인 (교육/강연)
+  final String? target; // 대상 (공모전)
+  final String? organizer; // 주최기관 (공모전)
+  final String? benefit; // 혜택 (공모전)
+
   FilterValues({
     this.job,
+    this.experience,
     this.location,
     this.education,
     this.period,
-    this.organization,
     this.host,
-    this.target,
-    this.benefit,
     this.onOffline,
+    this.target,
+    this.organizer,
+    this.benefit,
   });
 }

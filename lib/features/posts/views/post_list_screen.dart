@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
 import 'package:knowme_frontend/features/posts/models/contest_model.dart';
-// import 'package:knowme_frontend/feature/posts/views/PostDetailScreen.dart';
+// import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/views/post_bottom_sheet.dart'; // FilterDialog 참조를 위해 새로운 import 추가
 
@@ -135,6 +135,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
       switch (_postController.currentTabIndex.value) {
         case 0: // 채용
           filterButtons = [
+            const SizedBox(height: 10),
             _buildFilterButton('직무', _postController.selectedJob.value),
             _buildFilterButton('신입~5년', _postController.selectedExperience.value),
             _buildFilterButton('서울 전체', _postController.selectedLocation.value),
@@ -143,14 +144,16 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           break;
         case 1: // 인턴
           filterButtons = [
+            const SizedBox(height: 10),
             _buildFilterButton('직무', _postController.selectedInternJob.value),
-            _buildFilterButton('기간', _postController.selectedPeriod.value),
+            _buildFilterButton('경력', _postController.selectedPeriod.value),
             _buildFilterButton('지역', _postController.selectedInternLocation.value),
             _buildFilterButton('학력', _postController.selectedInternEducation.value),
           ];
           break;
         case 2: // 대외활동
           filterButtons = [
+            const SizedBox(height: 10),
             _buildFilterButton('분야', _postController.selectedField.value),
             _buildFilterButton('기간', _postController.selectedActivityPeriod.value),
             _buildFilterButton('지역', _postController.selectedActivityLocation.value),
@@ -159,6 +162,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           break;
         case 3: // 교육/강연
           filterButtons = [
+            const SizedBox(height: 10),
             _buildFilterButton('분야', _postController.selectedEduField.value),
             _buildFilterButton('기간', _postController.selectedEduPeriod.value),
             _buildFilterButton('지역', _postController.selectedEduLocation.value),
@@ -168,6 +172,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
         case 4: // 공모전
         default:
           filterButtons = [
+            const SizedBox(height: 10),
             _buildFilterButton('분야', _postController.selectedContestField.value),
             _buildFilterButton('대상', _postController.selectedTarget.value),
             _buildFilterButton('주최기관', _postController.selectedOrganizer.value),

@@ -14,12 +14,14 @@
 
 // import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
 import 'package:get/get.dart';
-// import 'package:knowme_frontend/feature/posts/controllers/PostController.dart';
+import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
+import 'package:knowme_frontend/features/posts/presenters/filter_presenter.dart';
 
 class InitBinding extends Bindings {
   @override
   void dependencies() {
-    // Get.put(PostController(), permanent: true);
+    Get.put(PostController(), permanent: true);
+    Get.put(FilterPresenter(), permanent: true);
   }
 
   static additionalBinding() { // 추가적인 바인딩이 필요하다면 여기에 추가

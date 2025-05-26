@@ -13,25 +13,27 @@ class PostGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 48) / 2; // 좌우 패딩 16*2 + 카드 간 간격 16 = 48
+    final cardWidth = (screenWidth - 64) / 2; // 좌우 마진 8*2 + 내부 패딩 16*2 + 카드 간 간격 16 = 64
 
-    return SingleChildScrollView(
-      child: Container(
-        width: screenWidth,
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
-        child: contests.isEmpty
-            ? _buildEmptyState()
-            : Wrap(
-                spacing: 16, // 가로 간격
-                runSpacing: 16, // 세로 간격
-                alignment: WrapAlignment.spaceBetween,
-                children: contests.map((contest) =>
-                  ContestCard(
-                    contest: contest,
-                    width: cardWidth,
-                  )
-                ).toList(),
-              ),
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
+          child: contests.isEmpty
+              ? _buildEmptyState()
+              : Wrap(
+                  spacing: 16, // 가로 간격
+                  runSpacing: 16, // 세로 간격
+                  alignment: WrapAlignment.spaceBetween,
+                  children: contests
+                      .map((contest) => ContestCard(
+                            contest: contest,
+                            width: cardWidth,
+                          ))
+                      .toList(),
+                ),
+        ),
       ),
     );
   }
@@ -68,7 +70,7 @@ class ContestCard extends StatelessWidget {
   const ContestCard({
     Key? key,
     required this.contest,
-    this.width = 164,
+    this.width = 164, // 기본값을 Card1의 너비와 유사하게 설정 (실제로는 PostGrid에서 계산된 값 사용)
   }) : super(key: key);
 
   @override
@@ -81,8 +83,8 @@ class ContestCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: width,
-        height: 232,
+        width: width, // PostGrid에서 계산된 동적 너비 사용
+        height: 232, // Card1과 동일한 높이
         clipBehavior: Clip.antiAlias,
         decoration: ShapeDecoration(
           color: const Color(0xFFF5F5F5),
@@ -98,53 +100,66 @@ class ContestCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // 이미지 부분
+            // 이미지 및 북마크 영역 (상단)
             Positioned(
               left: 0,
               top: 0,
               child: Container(
                 width: width,
                 height: 164,
+                clipBehavior: Clip.antiAlias, // Card1의 구조 반영
+                decoration: const BoxDecoration(), // Card1의 구조 반영
                 child: Stack(
                   children: [
                     // 이미지
-                    Container(
-                      width: width,
-                      height: 164,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(contest.imageUrl),
-                          fit: BoxFit.cover,
+                    Positioned( // Card1의 구조 반영
+                      left: 0,
+                      top: 0,
+                      child: Container(
+                        width: width,
+                        height: 164,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(contest.imageUrl.isNotEmpty ? contest.imageUrl : "https://placehold.co/600x400?text=No+Image"), // URL이 비어있을 경우 플레이스홀더
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
                     // 그라데이션 오버레이
-                    Container(
-                      width: width,
-                      height: 164,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment(0.50, 1.00),
-                          end: Alignment(0.50, -0.00),
-                          colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
+                    Positioned( // Card1의 구조 반영
+                      left: 0,
+                      top: 0,
+                      child: Container(
+                        width: width,
+                        height: 164,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment(0.50, 1.00),
+                            end: Alignment(0.50, -0.00),
+                            colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
+                          ),
                         ),
                       ),
                     ),
-                    // 북마크 버튼
+                    // 북마크 버튼 (기존 IconButton 유지 및 스타일 적용)
                     Positioned(
-                      right: 4,
+                      right: 4, // Card1은 left: 136, 기존 코드는 right: 4. 동적 너비에는 right가 더 적합.
                       top: 7,
                       child: Container(
                         width: 24,
                         height: 24,
-                        decoration: const ShapeDecoration(
-                          shape: CircleBorder(),
+                        decoration: ShapeDecoration(
+                          color: Colors.black.withOpacity(0.3), // 배경 추가하여 아이콘 가시성 확보
+                          shape: const CircleBorder(),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+                          icon: const Icon(Icons.bookmark_border, color: Colors.white, size: 16), // 아이콘 크기 조정
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          onPressed: () {},
+                          onPressed: () {
+                            // 북마크 기능
+                          },
                         ),
                       ),
                     ),
@@ -152,7 +167,7 @@ class ContestCard extends StatelessWidget {
                 ),
               ),
             ),
-            // 컨텐츠 설명 부분
+            // 텍스트 컨텐츠 영역 (하단)
             Positioned(
               left: 0,
               top: 164,
@@ -164,46 +179,57 @@ class ContestCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  // spacing: 2, -> SizedBox로 대체
                   children: [
                     SizedBox(
-                      width: width - 16, // 패딩 고려
+                      width: width - 16, // 좌우 패딩 8*2 제외
                       child: Text(
                         contest.title,
                         style: const TextStyle(
                           color: Color(0xFF454C53),
-                          fontSize: 17, // 17로 변경
+                          fontSize: 14, // Card1의 폰트 크기
                           fontFamily: 'Pretendard',
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.56,
-                          height: 1.2,
                         ),
-                        maxLines: 2,
+                        maxLines: 2, // 제목이 길 경우 2줄로 제한
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 2), // spacing: 2 대체
                     Row(
                       mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      // spacing: 4, -> SizedBox로 대체
                       children: [
-                        Text(
-                          contest.benefit,
-                          style: const TextStyle(
-                            color: Color(0xFF454C53),
-                            fontSize: 12, // 12로 변경
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: -0.40,
+                        Flexible(
+                          child: Text(
+                            contest.benefit ?? '',
+                            style: const TextStyle(
+                              color: Color(0xFF454C53),
+                              fontSize: 10, // Card1의 폰트 크기
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: -0.40,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          contest.target,
-                          style: const TextStyle(
-                            color: Color(0xFF72787F),
-                            fontSize: 12, // 12로 변경
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: -0.40,
+                        const SizedBox(width: 4), // spacing: 4 대체
+                        Flexible(
+                          child: Text(
+                            contest.target ?? '',
+                            style: const TextStyle(
+                              color: Color(0xFF72787F),
+                              fontSize: 10, // Card1의 폰트 크기
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: -0.40,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

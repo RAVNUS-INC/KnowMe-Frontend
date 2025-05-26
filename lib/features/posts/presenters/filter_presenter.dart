@@ -69,6 +69,7 @@ class FilterPresenter extends GetxController {
       case 0: // 채용
         return FilterValues(
           job: _postController.selectedJob.value,
+          experience: _postController.selectedExperience.value, // 추가(경력)
           location: _postController.selectedLocation.value,
           education: _postController.selectedEducation.value,
         );
@@ -84,10 +85,12 @@ class FilterPresenter extends GetxController {
           job: _postController.selectedField.value,
           location: _postController.selectedActivityLocation.value,
           period: _postController.selectedActivityPeriod.value,
+          host: _postController.selectedHost.value, // 추가(주최기관)
         );
       case 3: // 교육/강연
         return FilterValues(
           job: _postController.selectedEduField.value,
+          onOffline: _postController.selectedOnOffline.value, // 추가(온/오프라인)
           location: _postController.selectedEduLocation.value,
           period: _postController.selectedEduPeriod.value,
         );
@@ -95,6 +98,9 @@ class FilterPresenter extends GetxController {
       default:
         return FilterValues(
           job: _postController.selectedContestField.value,
+          target: _postController.selectedTarget.value, // 추가(대상)
+          organizer: _postController.selectedOrganizer.value, // 추가(주최기관)
+          benefit: _postController.selectedBenefit.value, // 추가(혜택)
         );
     }
   }
@@ -105,19 +111,19 @@ class FilterPresenter extends GetxController {
     double min = config.min;
     double max = config.max;
     double stepSize = (max - min) / 4; // 4 divisions = 5 steps
-    
+
     switch (tabIndex) {
       case 0: // 채용
         if (_postController.selectedExperience.value != null) {
           final exp = _postController.selectedExperience.value!;
           if (exp == '신입') {
-            return RangeValues(0, 0);
+            return const RangeValues(0, 0);
           } else if (exp == '5년 이하') {
-            return RangeValues(0, 5);
+            return const RangeValues(0, 5);
           } else if (exp == '5~10년') {
-            return RangeValues(5, 10);
+            return const RangeValues(5, 10);
           } else if (exp == '10~15년') {
-            return RangeValues(10, 15);
+            return const RangeValues(10, 15);
           } else if (exp == '15년 이상') {
             return RangeValues(15, max);
           }
@@ -127,13 +133,13 @@ class FilterPresenter extends GetxController {
         if (_postController.selectedPeriod.value != null) {
           final period = _postController.selectedPeriod.value!;
           if (period == '1개월 이하') {
-            return RangeValues(1, 1);
+            return const RangeValues(1, 1);
           } else if (period == '1~6개월') {
-            return RangeValues(1, 6);
+            return const RangeValues(1, 6);
           } else if (period == '6개월~1년') {
-            return RangeValues(6, 12);
+            return const RangeValues(6, 12);
           } else if (period == '1~1.5년') {
-            return RangeValues(12, 18);
+            return const RangeValues(12, 18);
           } else if (period == '1.5년 이상') {
             return RangeValues(18, max);
           }
@@ -143,13 +149,13 @@ class FilterPresenter extends GetxController {
         if (_postController.selectedActivityPeriod.value != null) {
           final period = _postController.selectedActivityPeriod.value!;
           if (period == '1개월 이하') {
-            return RangeValues(1, 1);
+            return const RangeValues(1, 1);
           } else if (period == '1~6개월') {
-            return RangeValues(1, 6);
+            return const RangeValues(1, 6);
           } else if (period == '6개월~1년') {
-            return RangeValues(6, 12);
+            return const RangeValues(6, 12);
           } else if (period == '1~1.5년') {
-            return RangeValues(12, 18);
+            return const RangeValues(12, 18);
           } else if (period == '1.5년 이상') {
             return RangeValues(18, max);
           }
@@ -159,20 +165,20 @@ class FilterPresenter extends GetxController {
         if (_postController.selectedEduPeriod.value != null) {
           final period = _postController.selectedEduPeriod.value!;
           if (period == '1일') {
-            return RangeValues(1, 1);
+            return const RangeValues(1, 1);
           } else if (period == '1일~1개월') {
-            return RangeValues(1, 30);
+            return const RangeValues(1, 30);
           } else if (period == '1~2개월') {
-            return RangeValues(30, 60);
+            return const RangeValues(30, 60);
           } else if (period == '2~4개월') {
-            return RangeValues(60, 120);
+            return const RangeValues(60, 120);
           } else if (period == '4~6개월') {
             return RangeValues(120, max);
           }
         }
         break;
     }
-    
+
     // 기본값: 최소값부터 1/4 지점까지
     return RangeValues(min, min + stepSize);
   }
@@ -228,7 +234,7 @@ class FilterPresenter extends GetxController {
     double min = config.min;
     double max = config.max;
     double stepSize = (max - min) / 4; // 4 divisions = 5 steps
-    
+
     // 움직임을 stepSize(max*1/4) 단위로 조정
     double adjustedStart = ((values.start - min) / stepSize).round() * stepSize + min;
     double adjustedEnd = ((values.end - min) / stepSize).round() * stepSize + min;
@@ -292,20 +298,27 @@ class FilterPresenter extends GetxController {
     String? location,
     String? education,
     String? period,
+    // 추가 필터들 (원래 없었음)
+    String? organization,
+    String? host,
+    String? target,
+    String? benefit,
+    String? onOffline,
+    String? experience,
   }) {
     // 만약 모든 필터가 null이면 필터가 초기화된 상태로 간주
     bool isReset = job == null && location == null && education == null && period == null;
-    
+
     if (isReset) {
       // 모든 필터가 초기화된 상태면 Controller의 값들도 모두 초기화
       resetFiltersForTab(tabIndex);
       return;
     }
-    
+
     // 그렇지 않으면 기존 로직대로 진행
     switch (tabIndex) {
       case 0: // 채용
-        // 직무 필터 적용
+      // 직무 필터 적용
         if (job != null) {
           _postController.selectedJob.value = job;
         }
@@ -337,7 +350,7 @@ class FilterPresenter extends GetxController {
         break;
 
       case 1: // 인턴
-        // 직무 필터 적용
+      // 직무 필터 적용
         if (job != null) {
           _postController.selectedInternJob.value = job;
         }
@@ -369,7 +382,7 @@ class FilterPresenter extends GetxController {
         break;
 
       case 2: // 대외활동
-        // 분야 필터 적용
+      // 분야 필터 적용
         if (job != null) {
           _postController.selectedField.value = job;
         }
@@ -396,7 +409,7 @@ class FilterPresenter extends GetxController {
         break;
 
       case 3: // 교육/강연
-        // 분야 필터 적용
+      // 분야 필터 적용
         if (job != null) {
           _postController.selectedEduField.value = job;
         }
@@ -424,14 +437,14 @@ class FilterPresenter extends GetxController {
 
       case 4: // 공모전
       default:
-        // 분야 필터 적용
+      // 분야 필터 적용
         if (job != null) {
           _postController.selectedContestField.value = job;
         }
         break;
     }
   }
-  
+
   // 멀티 셀렉트 필터 값 업데이트
   void updateMultiSelectValue(int tabIndex, String filterType, String option, bool isSelected) {
     switch (filterType) {

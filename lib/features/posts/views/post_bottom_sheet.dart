@@ -1,13 +1,19 @@
+// Flutter UI, GetX 상태관리 패키지, 프레젠터 및 위젯 불러오기
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:knowme_frontend/features/posts/presenters/filter_presenter.dart';
-import 'package:knowme_frontend/features/posts/models/filter_model.dart';
 
+import '../widgets/filter_apply_button.dart'; // 필터 적용 버튼
+import '../widgets/filter_dropdown.dart'; // 드롭다운 위젯
+import '../widgets/filter_header.dart'; // 필터 헤더 위젯
+import '../widgets/filter_slider.dart'; // 슬라이더 위젯
+import 'package:knowme_frontend/features/posts/widgets/filter_tag_selector.dart'; // 필터 태그 선택 위젯
+
+// 필터 바텀시트 StatefulWidget
 class FilterBottomSheet extends StatefulWidget {
-  final String title;
-  final String? selectedValue;
-  final int tabIndex;
+  final String title; // 필터 제목
+  final String? selectedValue; // 선택된 필터 값 (optional)
+  final int tabIndex; // 현재 탭 인덱스 (0~4)
 
   const FilterBottomSheet({
     Key? key,
@@ -21,75 +27,151 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  // Presenter 인스턴스
-  late FilterPresenter _presenter;
-  
-  // 슬라이더 값
-  RangeValues _currentRangeValues = const RangeValues(0, 5);
+  late FilterPresenter _presenter; // Presenter 인스턴스
+  RangeValues _currentRangeValues = const RangeValues(0, 5); // 슬라이더 초기값
 
-  // 선택된 학력 옵션
-  String? _selectedEducation;
+  String? _selectedEducation; // 선택된 학력
+  String? _selectedJob; // 선택된 직무
+  String? _selectedLocation; // 선택된 지역
+  String? _selectedPeriod; // 선택된 기간
+  // 추가 필터들
+  String? _selectedOnOffline; // 선택된 온/오프라인 필터
+  String? _selectedHost; // 선택된 주최기관
 
-  // 선택된 직무/분야
-  String? _selectedJob;
+  String? _selectedTarget; // 선택된 대상
+  String? _selectedBenefit; // 선택된 혜택
 
-  // 선택된 지역
-  String? _selectedLocation;
-
-  // 선택된 기간
-  String? _selectedPeriod;
 
   @override
   void initState() {
     super.initState();
-    // Presenter 초기화
-    _presenter = Get.find<FilterPresenter>();
-    
-    // 현재 값 초기화
-    _initializeValues();
+    _presenter = Get.find<FilterPresenter>(); // Presenter 인스턴스를 DI로 주입
+    _initializeValues(); // 초기 필터값 설정
   }
 
+  // 초기 필터 상태를 Presenter로부터 불러와 설정
   void _initializeValues() {
-    // Presenter에서 현재 탭에 대한 값들을 가져옴
     final filterValues = _presenter.getFilterValues(widget.tabIndex);
-    
     setState(() {
       _selectedJob = filterValues.job;
       _selectedLocation = filterValues.location;
       _selectedEducation = filterValues.education;
       _selectedPeriod = filterValues.period;
-      
-      // 슬라이더 값 설정
-      _currentRangeValues = _presenter.getSliderValues(widget.tabIndex);
+    // 추가 필터들 초기화
+      _selectedOnOffline = filterValues.onOffline;
+      _selectedHost = filterValues.host; // 주최기관 필터 추가
+
+      _selectedTarget = filterValues.target; // 대상 필터 추가
+      _selectedBenefit = filterValues.benefit; // 혜택 필터 추가
+
+      _currentRangeValues =
+          _presenter.getSliderValues(widget.tabIndex); // 슬라이더 값 설정
     });
   }
-  
-  // 필터 옵션 초기화 함수
+
+  // 필터 초기화
   void _resetFilters() {
     setState(() {
       _selectedJob = null;
       _selectedLocation = null;
       _selectedEducation = null;
       _selectedPeriod = null;
-      
-      // 슬라이더 값 초기화
-      SliderConfig config = _presenter.getSliderConfig(widget.tabIndex);
-      _currentRangeValues = RangeValues(config.min, config.min + (config.max - config.min) / 4);
+      // 추가 필터들 초기화
+      _selectedOnOffline = null; // 온/오프라인 필터 초기화
+      _selectedHost = null; // 주최기관 필터 초기화
+
+      _selectedTarget = null; // 대상 필터 초기화
+      _selectedBenefit = null; // 혜택 필터 초기화
+
+
+      // 슬라이더 초기값 설정
+      final config = _presenter.getSliderConfig(widget.tabIndex);
+      _currentRangeValues =
+          RangeValues(config.min, config.min + (config.max - config.min) / 4);
     });
-    
-    // Presenter에도 초기화 상태를 알려주기
-    _presenter.resetFiltersForTab(widget.tabIndex);
+    _presenter.resetFiltersForTab(widget.tabIndex); // Presenter에 필터 초기화 알림
+  }
+
+  // 현재 선택된 필터 값 적용
+  void _applyFilters() {
+    _presenter.applyFilters(
+      tabIndex: widget.tabIndex,
+      job: _selectedJob, // 선택된 직무, 경력, 분야
+      location: _selectedLocation, // 선택된 지역
+      education: _selectedEducation, // 학력
+      period: _selectedPeriod, // 선택된 기간, 경력
+      rangeValues: _currentRangeValues, // 슬라이더 값
+      // 추가된 필터 값 적용
+      onOffline: _selectedOnOffline, // 온/오프라인 필터
+      host: _selectedHost, // 주최기관 필터
+
+      target: _selectedTarget, // 대상 필터
+      benefit: _selectedBenefit, // 혜택 필터
+    );
+  }
+
+  // 드롭다운 또는 다이얼로그 방식의 선택창 띄우기
+  Future<String?> _selectValue(String title, List<String> options) async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (_) =>
+          AlertDialog(
+            title: Text('$title 선택'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: options.map((option) {
+                  return ListTile(
+                    title: Text(option),
+                    onTap: () => Navigator.pop(context, option),
+                  );
+                }).toList(),
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context),
+                  child: const Text('취소'))
+            ],
+          ),
+    );
+
+    // 선택값 반영
+    if (selected != null) {
+      setState(() {
+        if (title == '직무' || title == '분야') {
+          _selectedJob = selected;
+        } else if (title == '지역') {
+          _selectedLocation = selected;
+        } else if (title == '기간') {
+          _selectedPeriod = selected;
+        } else if (title == '온/오프라인') {
+          _selectedOnOffline = selected;
+        } else if (title == '주최기관') {
+          _selectedHost = selected;
+      } else if (title == '대상') {
+          _selectedTarget = selected;
+        } else if (title == '혜택') {
+          _selectedBenefit = selected;
+        } else if (title == '학력') {
+          _selectedEducation = selected;
+        }
+      }
+      );
+    }
+    return selected;
   }
 
   @override
   Widget build(BuildContext context) {
-    // 화면 크기 가져오기
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    
-    // 바텀시트 높이를 화면 높이의 5/7로 설정
-    final sheetHeight = screenHeight * 3/4;
-    
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final sheetHeight = screenHeight * 3 / 4; // 바텀시트 높이 75%
+
     return SingleChildScrollView(
       child: Container(
         width: screenWidth,
@@ -106,120 +188,27 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ),
         child: Stack(
           children: [
-            // 필터 콘텐츠 영역 (스크롤 가능)
+            // 필터 위젯 영역
             Positioned(
               left: 0,
-              top: 51,
+              top: 90,
               right: 0,
               bottom: 0,
               child: SingleChildScrollView(
-                child: Container(
-                  width: screenWidth,
-                  padding: const EdgeInsets.only(bottom: 80), // 적용 버튼을 위한 여백
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 필터 본문 영역
-                      Container(
-                        width: screenWidth,
-                        padding: const EdgeInsets.only(top: 16, bottom: 32),
-                        decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // 헤더 부분 (탭 이름)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.only(bottom: 16),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        _presenter.getTabTitle(widget.tabIndex),
-                                        style: const TextStyle(
-                                          color: Color(0xFF0068E5),
-                                          fontSize: 18,
-                                          fontFamily: 'Pretendard',
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: -0.72,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    // 리프레시 아이콘 추가
-                                    GestureDetector(
-                                      onTap: _resetFilters,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(right: 10),
-                                        child: SvgPicture.asset(
-                                          'assets/icons/refresh.svg',
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFDEE3E7)),
-                            const SizedBox(height: 16),
-
-                            // 각 탭별 필터 옵션
-                            ..._buildFilterOptions(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                padding: const EdgeInsets.only(bottom: 80),
+                child: Column(children: _buildFilterWidgets()),
               ),
             ),
-
-            // 적용 버튼 (고정 위치) - 분리된 메서드 호출
-            _buildApplyButton(),
-
-            // 상단 헤더 영역 (고정 위치)
-            Positioned(
-              left: 0,
-              top: 0,
-              right: 0,
-              child: Container(
-                width: screenWidth,
-                padding: const EdgeInsets.all(16),
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(color: Color(0xCCF5F5F5)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // 취소(X) 아이콘으로 변경
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: SvgPicture.asset(
-                            'assets/icons/cancel.svg',
-                            width: 16,
-                            height: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            // 적용 버튼
+            FilterApplyButton(onApply: () {
+              _applyFilters();
+              Navigator.pop(context);
+            }),
+            // 상단 헤더 (제목, 리셋 버튼, 닫기 버튼 포함)
+            FilterHeader(
+              title: _presenter.getTabTitle(widget.tabIndex),
+              onReset: _resetFilters,
+              onClose: () => Navigator.pop(context),
             ),
           ],
         ),
@@ -227,561 +216,120 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 
-  // 각 탭에 맞는 필터 옵션 위젯 리스트 생성
-  List<Widget> _buildFilterOptions() {
+// post_bottom_sheet.dart 내의 _buildFilterWidgets() 메서드 수정 부분
+
+// 탭 인덱스별 필터 위젯들 구성
+  List<Widget> _buildFilterWidgets() {
     switch (widget.tabIndex) {
-      case 0: // 채용
+      case 0:
         return [
-          _buildDropdownFilter('직무', _presenter.getJobOptions(0), _selectedJob),
-          _buildRangeSliderFilter('경력', '신입', '20년'),
-          _buildDropdownFilter('지역', _presenter.getLocationOptions(0), _selectedLocation),
-          _buildEducationFilter('학력'),
+          const SizedBox(height: 10),
+          FilterDropdown(title: '직무',
+              options: _presenter.getJobOptions(0),
+              selectedValue: _selectedJob,
+              onTap: () => _selectValue('직무', _presenter.getJobOptions(0))),
+          FilterRangeSlider(title: '경력',
+              tabIndex: 0,
+              currentRangeValues: _currentRangeValues,
+              onChanged: (val) => setState(() => _currentRangeValues = val),
+              presenter: _presenter),
+          FilterDropdown(title: '지역',
+              options: _presenter.getLocationOptions(0),
+              selectedValue: _selectedLocation,
+              onTap: () =>
+                  _selectValue('지역', _presenter.getLocationOptions(0))),
+          FilterTagSelector(title: '학력',
+              options: _presenter.getEducationOptions(),
+              selected: _selectedEducation,
+              onSelected: (val) => setState(() => _selectedEducation = val)),
         ];
-      case 1: // 인턴
+      case 1:
         return [
-          _buildDropdownFilter('직무', _presenter.getJobOptions(1), _selectedJob),
-          _buildRangeSliderFilter('기간', '1개월', '2년'),
-          _buildDropdownFilter('지역', _presenter.getLocationOptions(1), _selectedLocation),
-          _buildEducationFilter('학력'),
+          const SizedBox(height: 10),
+          FilterDropdown(title: '직무',
+              options: _presenter.getJobOptions(1),
+              selectedValue: _selectedJob,
+              onTap: () => _selectValue('직무', _presenter.getJobOptions(1))),
+          FilterRangeSlider(title: '경력',
+              tabIndex: 1,
+              currentRangeValues: _currentRangeValues,
+              onChanged: (val) => setState(() => _currentRangeValues = val),
+              presenter: _presenter),
+          FilterDropdown(title: '지역',
+              options: _presenter.getLocationOptions(1),
+              selectedValue: _selectedLocation,
+              onTap: () =>
+                  _selectValue('지역', _presenter.getLocationOptions(1))),
+          FilterTagSelector(title: '학력',
+              options: _presenter.getEducationOptions(),
+              selected: _selectedEducation,
+              onSelected: (val) => setState(() => _selectedEducation = val)),
         ];
-      case 2: // 대외활동
+      case 2:
         return [
-          _buildDropdownFilter('분야', _presenter.getFieldOptions(2), _selectedJob),
-          _buildRangeSliderFilter('기간', '1개월', '2년'),
-          _buildDropdownFilter('지역', _presenter.getLocationOptions(2), _selectedLocation),
-          _buildMultiSelectFilter('주최기관', _presenter.getOrganizerOptions(2), _presenter.getSelectedHost()),
+          const SizedBox(height: 10),
+          FilterDropdown(title: '분야',
+              options: _presenter.getFieldOptions(2),
+              selectedValue: _selectedJob,
+              onTap: () => _selectValue('분야', _presenter.getFieldOptions(2))),
+          FilterRangeSlider(title: '기간',
+              tabIndex: 2,
+              currentRangeValues: _currentRangeValues,
+              onChanged: (val) => setState(() => _currentRangeValues = val),
+              presenter: _presenter),
+          FilterDropdown(title: '지역',
+              options: _presenter.getLocationOptions(2),
+              selectedValue: _selectedLocation,
+              onTap: () => _selectValue('지역', _presenter.getLocationOptions(2))),
+          FilterTagSelector(title: '주최기관',
+              options: _presenter.getOrganizerOptions(2),
+              selected: _selectedHost,
+              onSelected: (val) => setState(() => _selectedHost = val)),
+
         ];
-      case 3: // 교육/강연
+      case 3:
         return [
-          _buildDropdownFilter('분야', _presenter.getFieldOptions(3), _selectedJob),
-          _buildRangeSliderFilter('기간', '1일', '6개월'),
-          _buildDropdownFilter('지역', _presenter.getLocationOptions(3), _selectedLocation),
-          _buildDropdownFilter('온/오프라인', _presenter.getOnOfflineOptions(), _presenter.getSelectedOnOffline()),
+          const SizedBox(height: 10),
+          FilterDropdown(title: '분야',
+              options: _presenter.getFieldOptions(3),
+              selectedValue: _selectedJob,
+              onTap: () => _selectValue('분야', _presenter.getFieldOptions(3))),
+          FilterRangeSlider(title: '기간',
+              tabIndex: 3,
+              currentRangeValues: _currentRangeValues,
+              onChanged: (val) => setState(() => _currentRangeValues = val),
+              presenter: _presenter),
+          FilterDropdown(title: '지역',
+              options: _presenter.getLocationOptions(3),
+              selectedValue: _selectedLocation,
+              onTap: () => _selectValue('지역', _presenter.getLocationOptions(3))),
+          FilterTagSelector(title: '온/오프라인',
+              options: _presenter.getOnOfflineOptions(),
+              selected: _selectedOnOffline,
+              onSelected: (val) => setState(() => _selectedOnOffline = val)),
         ];
-      case 4: // 공모전
       default:
         return [
-          _buildDropdownFilter('분야', _presenter.getFieldOptions(4), _selectedJob),
-          _buildMultiSelectFilter('대상', _presenter.getTargetOptions(), _presenter.getSelectedTarget()),
-          _buildMultiSelectFilter('주최기관', _presenter.getOrganizerOptions(4), _presenter.getSelectedOrganizer()),
-          _buildMultiSelectFilter('혜택', _presenter.getBenefitOptions(), _presenter.getSelectedBenefit()),
+          const SizedBox(height: 10),
+          FilterDropdown(title: '분야',
+              options: _presenter.getFieldOptions(4),
+              selectedValue: _selectedJob,
+              onTap: () => _selectValue('분야', _presenter.getFieldOptions(4))),
+          FilterTagSelector(title: '대상',
+              options: _presenter.getTargetOptions(),
+              selected: _selectedTarget,
+              onSelected: (val) => setState(() => _selectedTarget = val)),
+          FilterTagSelector(title: '주최기관',
+              options: _presenter.getOrganizerOptions(4),
+              selected: _selectedHost,
+              onSelected: (val) => setState(() => _selectedHost = val)),
+
+          FilterTagSelector(title: '혜택',
+              options: _presenter.getBenefitOptions(),
+              selected: _selectedBenefit,
+              onSelected: (val) => setState(() => _selectedBenefit = val)),
+
         ];
     }
-  }
-
-  // 드롭다운 필터 위젯 생성
-  Widget _buildDropdownFilter(String title, List<String> options, String? selectedValue) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 344,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Color(0xFF454C53),
-                fontSize: 14,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.56,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () async {
-              final result = await _showOptionsDialog(context, title, options, selectedValue);
-              if (result != null) {
-                setState(() {
-                  if (title == '직무' || title == '분야') {
-                    _selectedJob = result;
-                  } else if (title == '지역') {
-                    _selectedLocation = result;
-                  } else if (title == '기간') {
-                    _selectedPeriod = result;
-                  } else if (title == '온/오프라인') {
-                    _presenter.updateOnOfflineValue(result);
-                  }
-                });
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              decoration: ShapeDecoration(
-                color: const Color(0xFFF5F5F5),
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1,
-                    color: selectedValue != null ? const Color(0xFF232323) : const Color(0xFFB7C4D4),
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            selectedValue ?? '전체',
-                            style: TextStyle(
-                              color: selectedValue != null ? const Color(0xFF232323) : const Color(0xFFB7C4D4),
-                              fontSize: 12,
-                              fontFamily: 'Pretendard',
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.48,
-                            ),
-                          ),
-                          Transform.rotate(
-                            angle: -1.57, // -90도
-                            child: const Icon(
-                              Icons.arrow_back_ios_new,
-                              size: 14,
-                              color: Color(0xFFB7C4D4),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 범위 슬라이더 필터 위젯 생성
-  Widget _buildRangeSliderFilter(String title, String startLabel, String endLabel) {
-    // Presenter에서 슬라이더 설정 가져오기
-    SliderConfig config = _presenter.getSliderConfig(widget.tabIndex);
-    
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 344,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Color(0xFF454C53),
-                fontSize: 14,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.56,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: 343,
-            height: 48,
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 0,
-                  top: 36,
-                  child: Container(
-                    width: 343,
-                    height: 12,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          config.startLabel,
-                          style: TextStyle(
-                            color: const Color(0xFF0068E5),
-                            fontSize: 10,
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: -0.40,
-                          ),
-                        ),
-                        Text(
-                          config.endLabel,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: const Color(0xFF0068E5),
-                            fontSize: 10,
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: -0.40,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliderTheme(
-                  data: SliderThemeData(
-                    trackHeight: 2,
-                    activeTrackColor: const Color(0xFF0068E5),
-                    inactiveTrackColor: const Color(0xFFDEE3E7),
-                    thumbColor: Colors.white,
-                    overlayColor: const Color(0x290068E5),
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-                    rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 6),
-                    rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
-                    rangeTickMarkShape: const RoundRangeSliderTickMarkShape(),
-                    // 라벨 텍스트 및 배경 스타일 수정 - 직사각형 모양, 크기 축소
-                    valueIndicatorColor: const Color(0xFF0068E5), // 라벨 배경색 파란색
-                    valueIndicatorShape: const RectangularSliderValueIndicatorShape(), // 직사각형 모양으로 변경
-                    valueIndicatorTextStyle: const TextStyle(
-                      color: Colors.white, // 라벨 내 텍스트 색상
-                      fontSize: 12, // 텍스트 크기 감소
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w400, // 폰트 두께 감소
-                    ),
-                  ),
-                  child: RangeSlider(
-                    values: _currentRangeValues,
-                    min: config.min,
-                    max: config.max,
-                    divisions: config.divisions,
-                    labels: RangeLabels(
-                      _presenter.formatSliderLabel(_currentRangeValues.start, widget.tabIndex),
-                      _presenter.formatSliderLabel(_currentRangeValues.end, widget.tabIndex),
-                    ),
-                    onChanged: (RangeValues values) {
-                      setState(() {
-                        _currentRangeValues = _presenter.adjustSliderValues(values, config, _currentRangeValues);
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 학력 필터 위젯 생성
-  Widget _buildEducationFilter(String title) {
-    final options = _presenter.getEducationOptions();
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 344,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Color(0xFF454C53),
-                fontSize: 14,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.56,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            alignment: WrapAlignment.start,
-            runAlignment: WrapAlignment.start,
-            spacing: 10,
-            runSpacing: 8,
-            children: options.map((option) {
-              final bool isSelected = option == _selectedEducation;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedEducation = isSelected ? null : option;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: ShapeDecoration(
-                    color: isSelected ? const Color(0xFF0068E5) : const Color(0xFFDEE3E7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        option,
-                        style: TextStyle(
-                          color: isSelected ? const Color(0xFFF5F5F5) : const Color(0xFF454C53),
-                          fontSize: 12,
-                          fontFamily: 'Pretendard',
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: -0.48,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 다중 선택 필터 위젯 생성
-  Widget _buildMultiSelectFilter(String title, List<String> options, String? selectedValue) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 344,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Color(0xFF454C53),
-                fontSize: 14,
-                fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.56,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              runAlignment: WrapAlignment.start,
-              spacing: 10,
-              runSpacing: 8,
-              children: options.map((option) {
-                final bool isSelected = option == selectedValue;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      // Presenter를 통해 값 업데이트
-                      _presenter.updateMultiSelectValue(widget.tabIndex, title, option, isSelected);
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: ShapeDecoration(
-                      color: isSelected ? const Color(0xFF0068E5) : const Color(0xFFDEE3E7),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          option == '전체' && isSelected ? '전체' : option,
-                          style: TextStyle(
-                            color: isSelected ? const Color(0xFFF5F5F5) : const Color(0xFF454C53),
-                            fontSize: 12,
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.48,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 옵션 다이얼로그 표시
-  Future<String?> _showOptionsDialog(
-      BuildContext context,
-      String title,
-      List<String> options,
-      String? selectedValue
-      ) async {
-    return await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('$title 선택'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options.map((option) {
-              final bool isSelected = option == selectedValue;
-
-              return ListTile(
-                title: Text(option),
-                selected: isSelected,
-                trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF0068E5)) : null,
-                onTap: () {
-                  // 이미 선택된 옵션을 다시 클릭하면 선택 해제됨
-                  Navigator.of(context).pop(isSelected ? null : option);
-                },
-              );
-            }).toList(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('취소'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 필터 적용 메서드
-  void _applyFilters() {
-    // Presenter에 현재 선택한 값들 전달
-    _presenter.applyFilters(
-      tabIndex: widget.tabIndex,
-      job: _selectedJob,
-      location: _selectedLocation,
-      education: _selectedEducation,
-      period: _selectedPeriod,
-      rangeValues: _currentRangeValues,
-    );
-  }
-
-  // 적용 버튼 (고정 위치)
-  Positioned _buildApplyButton() {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 20, // 하단에서 20픽셀 위에 위치
-      child: Center(
-        child: GestureDetector(
-          onTap: () {
-            // 현재 UI에 선택된 필터값을 적용
-            _applyFilters();
-            Navigator.pop(context);
-          },
-          child: Container(
-            width: 300,
-            height: 45,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: ShapeDecoration(
-              color: const Color(0xFF0068E5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              shadows: const [
-                BoxShadow(
-                  color: Color(0x33184173),
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                  spreadRadius: 0,
-                )
-              ],
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 260,
-                  child: Text(
-                    '적용',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFFF5F5F5),
-                      fontSize: 18,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.72,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// FilterDialog 클래스 유지
-class FilterDialog extends StatelessWidget {
-  final String title;
-  final String? selectedValue;
-  final int tabIndex;
-
-  const FilterDialog({
-    Key? key,
-    required this.title,
-    this.selectedValue,
-    required this.tabIndex,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final FilterPresenter presenter = Get.find<FilterPresenter>();
-    List<String> options = presenter.getOptionsForDialog(tabIndex, title);
-
-    return AlertDialog(
-      title: Text('$title 선택'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options.map((option) {
-            final bool isSelected = option == selectedValue;
-
-            return ListTile(
-              title: Text(option),
-              selected: isSelected,
-              trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF0068E5)) : null,
-              onTap: () {
-                // 이미 선택된 옵션을 다시 클릭하면 선택 해제됨
-                Navigator.of(context).pop(isSelected ? null : option);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-      actions: [
-        TextButton(
-          child: const Text('취소'),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    );
   }
 }
