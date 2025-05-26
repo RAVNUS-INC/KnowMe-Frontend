@@ -67,7 +67,7 @@ jobs:
                   break
               else
                   echo "Retrying flutter pub upgrade... (attempt $i)"
-                  sleep $((2**i))
+                  sleep $((2**i))  # Increase retry backoff time
               fi
           done
 
