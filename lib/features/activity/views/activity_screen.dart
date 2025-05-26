@@ -55,9 +55,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
     ),
   ];
 
-  List<Project> get _visible => _selectedTag == null
-      ? _projects
-      : _projects.where((p) => p.tags.contains(_selectedTag)).toList();
+  List<Project> get _visible =>
+      _selectedTag == null
+          ? _projects
+          : _projects.where((p) => p.tags.contains(_selectedTag)).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -77,167 +78,169 @@ class _ActivityScreenState extends State<ActivityScreen> {
   }
 
   Widget _tagFilterRow() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: _side),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  GestureDetector(
-                    onTap: () => setState(() => _selectedTag = null),
-                    child: Image.asset(
-                      'assets/images/refresh.png',
-                      width: 26,
-                      height: 26,
-                    ),
-                  ),
-                  ..._filterTags.map((tag) {
-                    final sel = tag == _selectedTag;
-                    return GestureDetector(
-                      onTap: () =>
-                          setState(() => _selectedTag = sel ? null : tag),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: sel ? _Color.primaryBlue : _Color.gray100,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: sel ? _Color.primaryBlue : _Color.gray200,
-                          ),
-                        ),
-                        child: Text(
-                          tag,
-                          style: GoogleFonts.notoSansKr(
-                            fontSize: 13,
-                            color: sel ? Colors.white : _Color.gray700,
-                            fontWeight:
-                                sel ? FontWeight.w600 : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    );
-                  })
-                ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: _side),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => _selectedTag = null),
+                child: Image.asset(
+                  'assets/images/refresh.png',
+                  width: 26,
+                  height: 26,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      );
-
-  Widget _projectList() => Expanded(
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: _side),
-          itemCount: _visible.length + 1,
-          separatorBuilder: (_, i) => const SizedBox(height: 12),
-          itemBuilder: (_, i) {
-            if (i == _visible.length) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 20),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const ActivityAddScreen()),
-                    );
-                  },
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/btn-rounded.png',
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.contain,
+              ..._filterTags.map((tag) {
+                final sel = tag == _selectedTag;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedTag = sel ? null : tag),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                  ),
-                ),
-              );
-            }
-
-            final p = _visible[i];
-            return GestureDetector(
-              onTap: () async {
-                final deleted = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ActivityDetailScreen(project: p),
-                  ),
-                );
-
-                if (deleted != null && deleted is Project) {
-                  setState(() {
-                    _projects.remove(deleted);
-                  });
-                }
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _Color.gray200),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      p.title,
-                      style: GoogleFonts.notoSansKr(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: _Color.gray700,
+                    decoration: BoxDecoration(
+                      color: sel ? _Color.primaryBlue : _Color.gray100,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: sel ? _Color.primaryBlue : _Color.gray200,
                       ),
                     ),
-                    Container(
-                      width: double.infinity,
-                      height: 0.8,
-                      color: _Color.gray200,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      p.description,
+                    child: Text(
+                      tag,
                       style: GoogleFonts.notoSansKr(
                         fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                        color: sel ? Colors.white : _Color.gray700,
+                        fontWeight: sel ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: p.tags
-                          .map((t) => Chip(
-                                label: Text(
-                                  t,
-                                  style: GoogleFonts.notoSansKr(fontSize: 12),
-                                ),
-                                backgroundColor: _Color.gray100,
-                                visualDensity: VisualDensity.compact,
-                                side: BorderSide.none,
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      p.date,
-                      style: GoogleFonts.notoSansKr(
-                        fontSize: 12,
-                        color: _Color.gray400,
-                      ),
-                    ),
-                  ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
+    ],
+  );
+
+  Widget _projectList() => Expanded(
+    child: ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: _side),
+      itemCount: _visible.length + 1,
+      separatorBuilder: (_, i) => const SizedBox(height: 12),
+      itemBuilder: (_, i) {
+        if (i == _visible.length) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 20),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ActivityAddScreen()),
+                );
+              },
+              child: Center(
+                child: Image.asset(
+                  'assets/images/btn-rounded.png',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.contain,
                 ),
               ),
+            ),
+          );
+        }
+
+        final p = _visible[i];
+        return GestureDetector(
+          onTap: () async {
+            final deleted = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ActivityDetailScreen(project: p),
+              ),
             );
+
+            if (deleted != null && deleted is Project) {
+              setState(() {
+                _projects.remove(deleted);
+              });
+            }
           },
-        ),
-      );
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _Color.gray200),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.title,
+                  style: GoogleFonts.notoSansKr(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: _Color.gray700,
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 0.8,
+                  color: _Color.gray200,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  p.description,
+                  style: GoogleFonts.notoSansKr(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children:
+                      p.tags
+                          .map(
+                            (t) => Chip(
+                              label: Text(
+                                t,
+                                style: GoogleFonts.notoSansKr(fontSize: 12),
+                              ),
+                              backgroundColor: _Color.gray100,
+                              visualDensity: VisualDensity.compact,
+                              side: BorderSide.none,
+                            ),
+                          )
+                          .toList(),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  p.date,
+                  style: GoogleFonts.notoSansKr(
+                    fontSize: 12,
+                    color: _Color.gray400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
 }
 
 class Project {
@@ -309,13 +312,16 @@ class ActivityDetailScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 6,
-                        children: project.tags
-                            .map((tag) => Chip(
-                                  label: Text(tag),
-                                  backgroundColor: _Color.gray100,
-                                  side: BorderSide.none,
-                                ))
-                            .toList(),
+                        children:
+                            project.tags
+                                .map(
+                                  (tag) => Chip(
+                                    label: Text(tag),
+                                    backgroundColor: _Color.gray100,
+                                    side: BorderSide.none,
+                                  ),
+                                )
+                                .toList(),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -351,18 +357,27 @@ class ActivityDetailScreen extends StatelessWidget {
 
             // 🔽 요약 ~ 링크 ~ 파일 이미지들
             Divider(thickness: 3, color: Colors.grey[50], height: 20),
-            Image.asset('assets/images/summation.png',
-                height: 190, fit: BoxFit.contain),
+            Image.asset(
+              'assets/images/summation.png',
+              height: 190,
+              fit: BoxFit.contain,
+            ),
             const SizedBox(height: 8),
 
             Divider(thickness: 3, color: Colors.grey[50], height: 20),
-            Image.asset('assets/images/activity-link.png',
-                height: 190, fit: BoxFit.contain),
+            Image.asset(
+              'assets/images/activity-link.png',
+              height: 190,
+              fit: BoxFit.contain,
+            ),
 
             Divider(thickness: 3, color: Colors.grey[50], height: 20),
             const SizedBox(height: 16),
-            Image.asset('assets/images/activity-file.png',
-                height: 190, fit: BoxFit.contain),
+            Image.asset(
+              'assets/images/activity-file.png',
+              height: 190,
+              fit: BoxFit.contain,
+            ),
           ],
         ),
       ),
@@ -374,59 +389,65 @@ class ActivityDetailScreen extends StatelessWidget {
 Future<bool> _showDeleteDialog(BuildContext context, Project project) async {
   final confirmed = await showDialog<bool>(
     context: context,
-    builder: (_) => AlertDialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      content: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '활동을 삭제할까요?',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+    builder:
+        (_) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          SizedBox(height: 12),
-          Text(
-            '삭제한 내용은 복구할 수 없습니다.',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.black45,
-            ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
           ),
-        ],
-      ),
-      actionsAlignment: MainAxisAlignment.center,
-      actions: [
-        SizedBox(
-          width: 100,
-          height: 40,
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFF0066FF)),
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('확인', style: TextStyle(color: Color(0xFF0066FF))),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '활동을 삭제할까요?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 12),
+              Text(
+                '삭제한 내용은 복구할 수 없습니다.',
+                style: TextStyle(fontSize: 13, color: Colors.black45),
+              ),
+            ],
           ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            SizedBox(
+              width: 100,
+              height: 40,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFF0066FF)),
+                ),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(color: Color(0xFF0066FF)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 100,
+              height: 40,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0066FF),
+                ),
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 12),
-        SizedBox(
-          width: 100,
-          height: 40,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0066FF),
-            ),
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소', style: TextStyle(color: Colors.white)),
-          ),
-        ),
-      ],
-    ),
   );
 
   return confirmed ?? false;
@@ -454,10 +475,11 @@ class _MenuPopup extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AddProjectPage(
-                      project: project, // 수정할 데이터 전달
-                      isEdit: true, // 수정모드라는 플래그 전달
-                    ),
+                    builder:
+                        (_) => AddProjectPage(
+                          project: project, // 수정할 데이터 전달
+                          isEdit: true, // 수정모드라는 플래그 전달
+                        ),
                   ),
                 ); // 팝업 닫고
                 //
@@ -479,7 +501,9 @@ class _MenuPopup extends StatelessWidget {
             GestureDetector(
               onTap: () async {
                 await _showDeleteDialog(
-                    context, project); // ← project 삭제 요청 보내기
+                  context,
+                  project,
+                ); // ← project 삭제 요청 보내기
               },
               child: Row(
                 children: [
@@ -514,66 +538,69 @@ class _AddProjectPageState extends State<AddProjectPage> {
   void _showCancelDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '활동 작성을 취소할까요?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                '지금까지 작성한 내용이 저장되지 않습니다.',
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
+      builder:
+          (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // 다이얼로그 닫기
-                        Navigator.of(context).pop(); // 수정 페이지 나가기
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.blueAccent),
-                        foregroundColor: Colors.blueAccent,
-                        minimumSize: const Size(0, 48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('확인'),
-                    ),
+                  const Text(
+                    '활동 작성을 취소할까요?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  // 취소 버튼
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(0, 48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '지금까지 작성한 내용이 저장되지 않습니다.',
+                    style: TextStyle(fontSize: 13, color: Colors.black54),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 다이얼로그 닫기
+                            Navigator.of(context).pop(); // 수정 페이지 나가기
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.blueAccent),
+                            foregroundColor: Colors.blueAccent,
+                            minimumSize: const Size(0, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('확인'),
                         ),
                       ),
-                      child: const Text('취소'),
-                    ),
+                      // 취소 버튼
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(0, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('취소'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -694,7 +721,8 @@ class _AddProjectPageState extends State<AddProjectPage> {
                     height: 48,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                          backgroundColor: Colors.blueAccent),
+                        backgroundColor: Colors.blueAccent,
+                      ),
                       onPressed: () => Navigator.pop(context),
                       child: const Text('저장'),
                     ),
@@ -705,12 +733,15 @@ class _AddProjectPageState extends State<AddProjectPage> {
                     height: 48,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                          backgroundColor: Colors.grey[300]!),
+                        backgroundColor: Colors.grey[300]!,
+                      ),
                       onPressed: () => _showCancelDialog(context),
                       child: const Text(
                         '취소',
                         style: TextStyle(
-                            color: Colors.black54, fontWeight: FontWeight.w600),
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -821,89 +852,90 @@ class ActivityAddScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false, // 외부 터치로 닫히지 않게
-      builder: (_) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '활동 작성을 취소할까요?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                '지금까지 작성한 내용이 저장되지 않습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF5C5C5C),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
+      builder:
+          (_) => Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // 다이얼로그만 닫기
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF0066FF)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        '확인',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF0066FF),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  const Text(
+                    '활동 작성을 취소할까요?',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // 다이얼로그 닫기
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0066FF),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        '취소',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '지금까지 작성한 내용이 저장되지 않습니다.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF5C5C5C),
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 다이얼로그만 닫기
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF0066FF)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            '확인',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF0066FF),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 다이얼로그 닫기
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0066FF),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            '취소',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 }

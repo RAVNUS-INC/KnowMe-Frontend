@@ -17,10 +17,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       getPages: AppRoutes.routes,
       initialRoute: '/', // 아래 '/' 경로로 시작
-      onUnknownRoute: (settings) => GetPageRoute(
-        page: () => NotFoundPage(),
-        settings: settings,
-      ),
+      onUnknownRoute:
+          (settings) =>
+              GetPageRoute(page: () => NotFoundPage(), settings: settings),
     );
   }
 }
@@ -45,9 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

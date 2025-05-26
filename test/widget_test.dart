@@ -4,14 +4,13 @@ import 'package:knowme_new_2/main.dart';
 import 'package:knowme_new_2/features/membership/views/profile_screen.dart';
 
 void main() {
-  testWidgets('TestHome에 "프로필로 이동" 버튼이 보이고, 누르면 동작한다',
-      (WidgetTester tester) async {
+  testWidgets('TestHome에 "프로필로 이동" 버튼이 보이고, 누르면 동작한다', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       GetMaterialApp(
         home: TestHome(),
-        getPages: [
-          GetPage(name: '/profile', page: () => ProfileScreen()),
-        ],
+        getPages: [GetPage(name: '/profile', page: () => ProfileScreen())],
       ),
     );
 

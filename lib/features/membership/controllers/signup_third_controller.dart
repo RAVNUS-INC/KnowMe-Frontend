@@ -31,12 +31,15 @@ class SignupThirdController extends GetxController {
 
     // TextController에 리스너 추가
     nameController.addListener(() => updateName(nameController.text));
-    emailPrefixController
-        .addListener(() => updateEmailPrefix(emailPrefixController.text));
-    emailDomainController
-        .addListener(() => updateEmailDomain(emailDomainController.text));
-    schoolNameController
-        .addListener(() => updateSchoolName(schoolNameController.text));
+    emailPrefixController.addListener(
+      () => updateEmailPrefix(emailPrefixController.text),
+    );
+    emailDomainController.addListener(
+      () => updateEmailDomain(emailDomainController.text),
+    );
+    schoolNameController.addListener(
+      () => updateSchoolName(schoolNameController.text),
+    );
     majorController.addListener(() => updateMajor(majorController.text));
   }
 
@@ -120,15 +123,17 @@ class SignupThirdController extends GetxController {
 
   // 이메일 전체 유효성 검사
   void _validateEmail() {
-    model.isEmailValid = model.emailPrefix.isNotEmpty &&
+    model.isEmailValid =
+        model.emailPrefix.isNotEmpty &&
         model.emailDomain.isNotEmpty &&
         _isValidEmail();
   }
 
   // 이메일 형식 유효성 검사
   bool _isValidEmail() {
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$',
+    );
     final fullEmail = '${model.emailPrefix}@${model.emailDomain}';
     return emailRegex.hasMatch(fullEmail);
   }

@@ -21,11 +21,7 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Divider(
-            color: Colors.grey[100],
-            thickness: 10,
-            height: 20,
-          ),
+          Divider(color: Colors.grey[100], thickness: 10, height: 20),
 
           // 프로필 영역
           Center(
@@ -86,14 +82,18 @@ class ProfileScreen extends StatelessWidget {
                 backgroundColor: Colors.white,
                 elevation: 8,
                 shape: const StadiumBorder(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 20,
+                ),
                 side: BorderSide(color: Colors.grey[300]!),
               ),
               child: const Text(
                 '내 활동',
                 style: TextStyle(
-                    color: Colors.blueAccent, fontWeight: FontWeight.w600),
+                  color: Colors.blueAccent,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -107,34 +107,41 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: menuItems.map((item) {
-                final isMembership = item == '멤버십 구독';
-                final text = Text(
-                  item,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                );
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: isMembership
-                      ? InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const MembershipScreen()),
-                            );
-                          },
-                          child: const Text('멤버십 구독',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              )),
-                        )
-                      : text,
-                );
-              }).toList(),
+              children:
+                  menuItems.map((item) {
+                    final isMembership = item == '멤버십 구독';
+                    final text = Text(
+                      item,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child:
+                          isMembership
+                              ? InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const MembershipScreen(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  '멤버십 구독',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              )
+                              : text,
+                    );
+                  }).toList(),
             ),
           ),
 
@@ -160,9 +167,10 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('고객지원',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(
+                  '고객지원',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
                 SizedBox(height: 4),
                 Text('tel: 02-000-0000', style: TextStyle(fontSize: 12)),
                 Text('email : help@knowme.com', style: TextStyle(fontSize: 12)),
@@ -184,8 +192,9 @@ class ProfileScreen extends StatelessWidget {
                 colors: [
                   Colors.white.withValues(), // 완전 투명 (또는 흰색)
                   Colors.white.withValues(), // 중간까지 흰색/투명
-                  const Color(0xFFE8F2FF)
-                      .withValues(), // 아주 연한 파란색 (hex 값은 이미지 참고)
+                  const Color(
+                    0xFFE8F2FF,
+                  ).withValues(), // 아주 연한 파란색 (hex 값은 이미지 참고)
                   const Color(0xFFBFDFFF).withValues(),
                 ],
               ),
@@ -211,11 +220,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _divider() {
-    return Container(
-      width: 1,
-      height: 40,
-      color: Colors.grey[300],
-    );
+    return Container(width: 1, height: 40, color: Colors.grey[300]);
   }
 }
 
@@ -295,7 +300,9 @@ class MembershipScreen extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                                color: const Color(0xFF0066FF), width: 2),
+                              color: const Color(0xFF0066FF),
+                              width: 2,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Stack(
@@ -307,7 +314,9 @@ class MembershipScreen extends StatelessWidget {
                                 top: -8,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: const BoxDecoration(
                                     color: Color(0xFF0066FF),
                                     borderRadius: BorderRadius.only(
@@ -318,7 +327,9 @@ class MembershipScreen extends StatelessWidget {
                                   child: const Text(
                                     '추천',
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 12),
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -333,15 +344,20 @@ class MembershipScreen extends StatelessWidget {
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 40),
+                                  horizontal: 16,
+                                  vertical: 40,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('\u00A0\u00A0\u00A012개월',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold)),
+                                    Text(
+                                      '\u00A0\u00A0\u00A012개월',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
@@ -399,20 +415,27 @@ class MembershipScreen extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border:
-                                Border.all(color: Colors.grey[300]!, width: 2),
+                            border: Border.all(
+                              color: Colors.grey[300]!,
+                              width: 2,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 40),
+                              horizontal: 16,
+                              vertical: 40,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('\u00A0\u00A0\u00A01개월',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
+                                Text(
+                                  '\u00A0\u00A0\u00A01개월',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 Text.rich(
                                   TextSpan(
                                     children: [
@@ -453,26 +476,36 @@ class MembershipScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(color: Colors.grey[300]!, width: 1),
+                            border: Border.all(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
                           ),
                           child: InkWell(
                             onTap: () {},
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 12),
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  const Text('유의사항',
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
-                                  Image.asset('assets/images/arrow.png',
-                                      width: 12,
-                                      height: 12,
-                                      fit: BoxFit.contain),
+                                  const Text(
+                                    '유의사항',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  Image.asset(
+                                    'assets/images/arrow.png',
+                                    width: 12,
+                                    height: 12,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ],
                               ),
                             ),
@@ -485,7 +518,9 @@ class MembershipScreen extends StatelessWidget {
                   // 구독하기 버튼
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 24),
+                      horizontal: 20,
+                      vertical: 24,
+                    ),
                     child: Center(
                       child: FractionallySizedBox(
                         widthFactor: 0.85,
@@ -497,11 +532,16 @@ class MembershipScreen extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0052CC),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                            child: const Text('구독하기',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white)),
+                            child: const Text(
+                              '구독하기',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),

@@ -7,11 +7,8 @@ import 'package:knowme_new_2/features/ai_analysis/controllers/ai_analysis_result
 class AiAnalysisResultScreen extends StatelessWidget {
   const AiAnalysisResultScreen({super.key});
 
-  Widget get _verticalDivider => Container(
-        width: 1,
-        height: 60,
-        color: const Color(0xFFE5E5E5),
-      );
+  Widget get _verticalDivider =>
+      Container(width: 1, height: 60, color: const Color(0xFFE5E5E5));
 
   Widget _section(String title, String content) {
     return Column(
@@ -227,10 +224,7 @@ class _RecommendationButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _RecommendationButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _RecommendationButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -256,11 +250,7 @@ class _RecommendationButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/icon-ai.png',
-              width: 16,
-              height: 16,
-            ),
+            Image.asset('assets/images/icon-ai.png', width: 16, height: 16),
             const SizedBox(width: 8),
             Text(
               label,
@@ -274,11 +264,7 @@ class _RecommendationButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: Color(0xFF0068E5),
-            ),
+            const Icon(Icons.chevron_right, size: 18, color: Color(0xFF0068E5)),
           ],
         ),
       ),

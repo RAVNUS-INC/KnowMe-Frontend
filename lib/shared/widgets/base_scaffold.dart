@@ -24,12 +24,7 @@ class BaseScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildAppBar(),
-          Expanded(child: body),
-        ],
-      ),
+      body: Column(children: [_buildAppBar(), Expanded(child: body)]),
       bottomNavigationBar: showBottomBar ? _buildBottomNavBar() : null,
     );
   }
@@ -148,16 +143,17 @@ class BaseScaffold extends StatelessWidget {
             },
           ),
           _BottomNavItem(
-              iconPath: 'assets/images/활동추천.png',
-              label: '활동 추천',
-              isActive: currentIndex == 2,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
-              onTap: () {
-                if (currentIndex != 2) {
-                  Get.offAllNamed(AppRoutes.recommendation); // ✅
-                }
-              }),
+            iconPath: 'assets/images/활동추천.png',
+            label: '활동 추천',
+            isActive: currentIndex == 2,
+            activeColor: activeColor,
+            inactiveColor: inactiveColor,
+            onTap: () {
+              if (currentIndex != 2) {
+                Get.offAllNamed(AppRoutes.recommendation); // ✅
+              }
+            },
+          ),
           _BottomNavItem(
             iconPath: 'assets/images/AI분석.png',
             label: 'AI 분석',

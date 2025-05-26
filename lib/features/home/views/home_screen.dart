@@ -32,24 +32,27 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
 
             // 🔸 인디케이터
-            Obx(() => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    final isActive = controller.currentPage.value == index;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isActive
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey.shade300,
-                      ),
-                    );
-                  }),
-                )),
+            Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (index) {
+                  final isActive = controller.currentPage.value == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color:
+                          isActive
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey.shade300,
+                    ),
+                  );
+                }),
+              ),
+            ),
 
             const SizedBox(height: 30),
 
@@ -58,12 +61,13 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: controller.iconItems.map((item) {
-                  return _IconLabelItem(
-                    imageName: item['image']!,
-                    label: item['label']!,
-                  );
-                }).toList(),
+                children:
+                    controller.iconItems.map((item) {
+                      return _IconLabelItem(
+                        imageName: item['image']!,
+                        label: item['label']!,
+                      );
+                    }).toList(),
               ),
             ),
 
@@ -100,8 +104,10 @@ class HomeScreen extends StatelessWidget {
             GestureDetector(
               onTap: controller.goToAiAnalysis,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 13,
+                ),
                 decoration: ShapeDecoration(
                   color: const Color(0xFFF5F5F5),
                   shape: RoundedRectangleBorder(
@@ -119,8 +125,11 @@ class HomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset('assets/images/icon-ai.png',
-                        width: 16, height: 16),
+                    Image.asset(
+                      'assets/images/icon-ai.png',
+                      width: 16,
+                      height: 16,
+                    ),
                     const SizedBox(width: 8),
                     const Text(
                       'AI분석 바로가기',
@@ -133,8 +142,11 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.chevron_right,
-                        size: 18, color: Color(0xFF0068E5)),
+                    const Icon(
+                      Icons.chevron_right,
+                      size: 18,
+                      color: Color(0xFF0068E5),
+                    ),
                   ],
                 ),
               ),
@@ -231,10 +243,7 @@ class _IconLabelItem extends StatelessWidget {
   final String imageName;
   final String label;
 
-  const _IconLabelItem({
-    required this.imageName,
-    required this.label,
-  });
+  const _IconLabelItem({required this.imageName, required this.label});
 
   @override
   Widget build(BuildContext context) {
