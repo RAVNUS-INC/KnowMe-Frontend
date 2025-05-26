@@ -17,11 +17,11 @@ class FilterBottomSheet extends StatefulWidget {
   final int tabIndex; // 현재 탭 인덱스 (0~4)
 
   const FilterBottomSheet({
-    Key? key,
+    super.key,
     required this.title,
     this.selectedValue,
     required this.tabIndex,
-  }) : super(key: key);
+  });
 
   @override
   State<FilterBottomSheet> createState() => _FilterBottomSheetState();
@@ -194,7 +194,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             tabIndex: 0,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            controller: _filterController, // presenter → controller 변경
+            controller: _filterController,
           ),
           FilterDropdown(
             title: '지역',
@@ -202,13 +202,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             selectedValue: _selectedLocation,
             onTap: () => _selectValue('지역', _optionsService.getLocationOptions(0)),
           ),
-          // 학력 필터를 다중 선택 필터로 변경
+          // 채용 탭용 학력 필터 (tabIndex 0 명시)
           FilterTagSelector(
             title: '학력',
             options: _optionsService.getEducationOptions(),
             selected: null,
-            tabIndex: 0,
-            controller: _filterController, // presenter → controller 변경
+            tabIndex: 0, // 명확하게 tabIndex 0으로 전달하여 채용 탭임을 명시
+            controller: _filterController,
           ),
         ];
       case 1:
@@ -225,7 +225,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             tabIndex: 1,
             currentRangeValues: _currentRangeValues,
             onChanged: (val) => setState(() => _currentRangeValues = val),
-            controller: _filterController, // presenter → controller 변경
+            controller: _filterController,
           ),
           FilterDropdown(
             title: '지역',
@@ -233,13 +233,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             selectedValue: _selectedLocation,
             onTap: () => _selectValue('지역', _optionsService.getLocationOptions(1)),
           ),
-          // 학력 필터를 다중 선택 필터로 변경
+          // 인턴 탭용 학력 필터 (tabIndex 1 명시)
           FilterTagSelector(
             title: '학력',
             options: _optionsService.getEducationOptions(),
             selected: null,
-            tabIndex: 1,
-            controller: _filterController, // presenter → controller 변경
+            tabIndex: 1, // 명확하게 tabIndex 1로 전달하여 인턴 탭임을 명시
+            controller: _filterController,
           ),
         ];
       case 2:

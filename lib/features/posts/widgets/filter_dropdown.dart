@@ -1,4 +1,4 @@
-// 📁 widgets/filter_dropdown.dart
+// widgets/filter_dropdown.dart
 import 'package:flutter/material.dart';
 
 class FilterDropdown extends StatelessWidget {

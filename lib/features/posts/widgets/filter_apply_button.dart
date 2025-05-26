@@ -1,4 +1,4 @@
-// 📁 widgets/filter_apply_button.dart
+// widgets/filter_apply_button.dart
 import 'package:flutter/material.dart';
 
 class FilterApplyButton extends StatelessWidget {

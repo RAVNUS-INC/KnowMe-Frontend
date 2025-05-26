@@ -6,9 +6,9 @@ class PostGrid extends StatelessWidget {
   final List<Contest> contests;
 
   const PostGrid({
-    Key? key,
+    super.key,
     required this.contests,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +68,10 @@ class ContestCard extends StatelessWidget {
   final double width;
 
   const ContestCard({
-    Key? key,
+    super.key,
     required this.contest,
     this.width = 164, // 기본값을 Card1의 너비와 유사하게 설정 (실제로는 PostGrid에서 계산된 값 사용)
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

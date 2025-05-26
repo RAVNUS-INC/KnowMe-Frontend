@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import '../models/contest_model.dart';
-import '../repositories/post_repository.dart'; // 경로 수정
+import '../repositories/post_repository.dart';
 
 class PostController extends GetxController {
-  final PostRepository repository; // 생성자를 통해 초기화할 예정
+  final PostRepository repository;
 
   // 생성자를 통해 repository 초기화
   PostController({PostRepository? repository}) : this.repository = repository ?? PostRepository();
@@ -11,7 +11,7 @@ class PostController extends GetxController {
   final RxList<Contest> contests = <Contest>[].obs;
   final RxBool isLoading = false.obs;
 
-  final RxInt currentTabIndex = 0.obs; // 기본: 공모전 탭
+  final RxInt selectedTabIndex = 0.obs; // 기본: 공모전 탭
 
   // 필터 구조: 탭 인덱스별 → 필터명 → Rx 값
   final Map<int, Map<String, Rx<String?>>> filtersByTab = {
@@ -48,13 +48,20 @@ class PostController extends GetxController {
     },
   };
 
-  // 다중 선택 필터용 리스트들 (기존 로직과 별도로 관리)
+  // 다중 선택 필터용 리스트들
   final RxList<String> multiSelectTarget = <String>[].obs;
   final RxList<String> multiSelectHost = <String>[].obs;
   final RxList<String> multiSelectOrganizer = <String>[].obs;
   final RxList<String> multiSelectBenefit = <String>[].obs;  
   final RxList<String> multiSelectOnOffline = <String>[].obs;
-  final RxList<String> multiSelectEducation = <String>[].obs; // 학력 다중 선택 추가
+  final RxList<String> multiSelectEducation = <String>[].obs;
+  
+  // 채용과 인턴 탭의 학력 필터를 분리
+  final RxList<String> multiSelectJobEducation = <String>[].obs;
+  final RxList<String> multiSelectInternEducation = <String>[].obs;
+
+  // 호환성을 위한 getter 추가 (기존 코드와 호환되게 함)
+  RxInt get currentTabIndex => selectedTabIndex;
 
   @override
   void onInit() {
@@ -62,7 +69,7 @@ class PostController extends GetxController {
     loadContests();
   }
 
-  void changeTab(int index) => currentTabIndex.value = index;
+  void changeTab(int index) => selectedTabIndex.value = index;
 
   void resetFilters() {
     filtersByTab[currentTabIndex.value]?.forEach((_, value) => value.value = null);
@@ -72,7 +79,13 @@ class PostController extends GetxController {
     multiSelectOrganizer.clear();
     multiSelectBenefit.clear();
     multiSelectOnOffline.clear();
-    multiSelectEducation.clear(); // 학력 필터 초기화 추가
+    
+    // 해당 탭에 맞는 학력 필터만 초기화
+    if (currentTabIndex.value == 0) {
+      multiSelectJobEducation.clear();
+    } else if (currentTabIndex.value == 1) {
+      multiSelectInternEducation.clear();
+    }
   }
 
   void updateFilter(String filterType, String? value) {
@@ -113,16 +126,16 @@ class PostController extends GetxController {
           job: values['직무'],
           experience: values['신입~5년'],
           location: values['지역'],
-          education: multiSelectEducation.isEmpty ? values['학력'] : 
-              multiSelectEducation.join(', '), // 학력 다중 선택 지원
+          education: multiSelectJobEducation.isEmpty ? values['학력'] : 
+              multiSelectJobEducation.join(', '), // 학력 다중 선택 지원
         );
       case 1:
         return repository.getInternships(
           job: values['직무'],
           period: values['기간'],
           location: values['지역'],
-          education: multiSelectEducation.isEmpty ? values['학력'] : 
-              multiSelectEducation.join(', '), // 학력 다중 선택 지원
+          education: multiSelectInternEducation.isEmpty ? values['학력'] : 
+              multiSelectInternEducation.join(', '), // 학력 다중 선택 지원
         );
       case 2:
         return repository.getActivities(

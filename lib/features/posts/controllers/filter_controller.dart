@@ -72,14 +72,14 @@ class FilterController extends GetxController {
           experience: _postController.selectedExperience.value,
           location: _postController.selectedLocation.value,
           education: _postController.selectedEducation.value,
-          educationList: _postController.multiSelectEducation.toList(),
+          educationList: _postController.multiSelectJobEducation.toList(), // 채용 탭 전용 학력 리스트 사용
         );
       case 1: // 인턴
         return FilterValues(
           job: _postController.selectedInternJob.value,
           location: _postController.selectedInternLocation.value,
           education: _postController.selectedInternEducation.value,
-          educationList: _postController.multiSelectEducation.toList(),
+          educationList: _postController.multiSelectInternEducation.toList(), // 인턴 탭 전용 학력 리스트 사용
           period: _postController.selectedPeriod.value,
         );
       case 2: // 대외활동
@@ -263,35 +263,28 @@ class FilterController extends GetxController {
         _postController.selectedJob.value = null;
         _postController.selectedExperience.value = null;
         _postController.selectedLocation.value = null;
-        _postController.selectedEducation.value = null;
-        _postController.multiSelectEducation.clear(); // 학력 다중 선택 초기화
+        _postController.multiSelectJobEducation.clear(); // 채용 탭 학력 다중 선택 초기화
         break;
       case 1: // 인턴
         _postController.selectedInternJob.value = null;
         _postController.selectedPeriod.value = null;
         _postController.selectedInternLocation.value = null;
-        _postController.selectedInternEducation.value = null;
-        _postController.multiSelectEducation.clear(); // 학력 다중 선택 초기화
+        _postController.multiSelectInternEducation.clear(); // 인턴 탭 학력 다중 선택 초기화
         break;
       case 2: // 대외활동
         _postController.selectedField.value = null;
         _postController.selectedActivityPeriod.value = null;
         _postController.selectedActivityLocation.value = null;
-        _postController.selectedHost.value = null;
         _postController.multiSelectHost.clear();
         break;
       case 3: // 교육/강연
         _postController.selectedEduField.value = null;
         _postController.selectedEduPeriod.value = null;
         _postController.selectedEduLocation.value = null;
-        _postController.selectedOnOffline.value = null;
         _postController.multiSelectOnOffline.clear();
         break;
       case 4: // 공모전
         _postController.selectedContestField.value = null;
-        _postController.selectedTarget.value = null;
-        _postController.selectedOrganizer.value = null;
-        _postController.selectedBenefit.value = null;
         _postController.multiSelectTarget.clear();
         _postController.multiSelectOrganizer.clear();
         _postController.multiSelectBenefit.clear();
@@ -458,6 +451,21 @@ class FilterController extends GetxController {
   // 멀티 셀렉트 필터 값 업데이트
   void updateMultiSelectValue(int tabIndex, String filterType, String option, bool isSelected) {
     switch (filterType) {
+      case '학력':
+        if (tabIndex == 0) { // 채용 탭의 학력
+          if (isSelected) {
+            _postController.multiSelectJobEducation.remove(option);
+          } else {
+            _postController.multiSelectJobEducation.add(option);
+          }
+        } else if (tabIndex == 1) { // 인턴 탭의 학력
+          if (isSelected) {
+            _postController.multiSelectInternEducation.remove(option);
+          } else {
+            _postController.multiSelectInternEducation.add(option);
+          }
+        }
+        break;
       case '대상':
         if (isSelected) {
           _postController.multiSelectTarget.remove(option);
@@ -494,13 +502,6 @@ class FilterController extends GetxController {
           _postController.multiSelectOnOffline.add(option);
         }
         break;
-      case '학력':
-        if (isSelected) {
-          _postController.multiSelectEducation.remove(option);
-        } else {
-          _postController.multiSelectEducation.add(option);
-        }
-        break;
     }
     
     // 필터 변경 시 즉시 리스트 업데이트
@@ -510,6 +511,13 @@ class FilterController extends GetxController {
   // 옵션이 선택되었는지 확인
   bool isOptionSelected(int tabIndex, String filterType, String option) {
     switch (filterType) {
+      case '학력':
+        if (tabIndex == 0) { // 채용 탭의 학력
+          return _postController.multiSelectJobEducation.contains(option);
+        } else if (tabIndex == 1) { // 인턴 탭의 학력
+          return _postController.multiSelectInternEducation.contains(option);
+        }
+        return false;
       case '대상':
         return _postController.multiSelectTarget.contains(option);
       case '주최기관':
@@ -522,8 +530,6 @@ class FilterController extends GetxController {
         return _postController.multiSelectBenefit.contains(option);
       case '온/오프라인':
         return _postController.multiSelectOnOffline.contains(option);
-      case '학력':
-        return _postController.multiSelectEducation.contains(option);
       default:
         return false;
     }
