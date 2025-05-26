@@ -21,8 +21,17 @@ jobs:
             cache-key: flutter-linux-${{ runner.os }}-${{ hashFiles('pubspec.yaml') }}
             cache-path: ~/.pub-cache
 
+      - name: Add Flutter to PATH
+        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+      - name: Debug PATH and Flutter
+        run: |
+          echo $PATH
+          ls -l ~/.pub-cache  
+
       - name: Verify Flutter installation
         run: flutter doctor -v
+
 
       - name: Clean and upgrade dependencies
         run: |
