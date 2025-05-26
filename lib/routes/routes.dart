@@ -6,6 +6,9 @@ import '../features/membership/views/signup_firstpage.dart';
 import '../features/membership/views/signup_secondpage.dart';
 import '../features/membership/views/signup_thirdpage.dart';
 import '../features/membership/views/find_id_passwd.dart';
+import '../features/membership/views/find_id_result_screen.dart';
+import '../features/membership/views/password_reset_screen.dart'; // 새로 추가
+import '../features/membership/views/password_reset_success_screen.dart'; // 새로 추가
 import '../features/home/views/home_screen.dart';
 import '../features/ai_analysis/controllers/ai_analysis_controller.dart';
 import '../features/search/controllers/search_controller.dart';
@@ -18,6 +21,9 @@ class AppRoutes {
   static const String signupThird = '/signup/third';
   static const String home = '/home';
   static const String findIdPasswd = '/find-id-passwd';
+  static const String findIdResult = '/find-id-result'; // 새로 추가
+  static const String passwordReset = '/password-reset'; // 새로 추가
+  static const String passwordResetSuccess = '/password-reset-success'; // 새로 추가
   static const String search = '/search';
 
   // ✅ 새 라우트 추가
@@ -51,6 +57,21 @@ class AppRoutes {
       name: findIdPasswd,
       page: () => const FindIdPasswd(),
       transition: Transition.downToUp,
+    ),
+    GetPage(
+      name: findIdResult,
+      page: () => const FindIdResultScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: passwordReset,
+      page: () => const PasswordResetScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: passwordResetSuccess,
+      page: () => const PasswordResetSuccessScreen(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: home,
