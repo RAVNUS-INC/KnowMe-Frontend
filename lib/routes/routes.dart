@@ -36,8 +36,9 @@ class AppRoutes {
 
   static final routes = [
     GetPage(
-      name: '/',
-      page: () => MyHomePage(title: 'Know Me'),
+      name: AppRoutes.testHome,
+      page: () => const TestHome(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: login,
@@ -47,11 +48,6 @@ class AppRoutes {
     GetPage(
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),
-      transition: Transition.fadeIn,
-    ),
-    GetPage(
-      name: AppRoutes.testHome,
-      page: () => const TestHome(),
       transition: Transition.fadeIn,
     ),
     GetPage(
@@ -107,6 +103,10 @@ class AppRoutes {
       name: AppRoutes.activity,
       page: () => const ActivityScreen(),
       transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: '/',
+      page: () => MyHomePage(title: 'Know Me'),
     ),
   ];
 }
