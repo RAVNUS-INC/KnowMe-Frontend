@@ -2,6 +2,4 @@
 !/lib/
 !/assets/
 !/test/
-!/pubspec.yaml
-!/pubspec.lock
 !/.gitignore
