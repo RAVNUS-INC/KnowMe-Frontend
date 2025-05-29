@@ -10,6 +10,7 @@ class PostListAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       elevation: 0,
       backgroundColor: Colors.white,
+      scrolledUnderElevation: 0,
       titleSpacing: 16, // 로고와 왼쪽 여백 사이 간격 조정
       title: Image.asset(
         'assets/logos/logor가로@2x.png',

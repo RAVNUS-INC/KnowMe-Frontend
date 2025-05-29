@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:knowme_frontend/features/posts/widgets/post_list_app_bar.dart';
+import 'package:knowme_frontend/features/posts/widgets/post_text_widgets.dart';
 
 class PostDetailScreen extends StatelessWidget {
   const PostDetailScreen({super.key});
@@ -7,7 +9,32 @@ class PostDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomPostAppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        leadingWidth: 40, // 리딩 아이콘의 너비를 줄임
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8), // 왼쪽 패딩 조정
+          child: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/arrow.svg',
+              width: 24,
+              height: 24,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            padding: EdgeInsets.zero, // 아이콘 버튼의 내부 패딩 제거
+          ),
+        ),
+        titleSpacing: 0, // 타이틀과 리딩 아이콘 사이의 기본 간격 제거
+        title: const Padding(
+          padding: EdgeInsets.only(left: 8), // 로고에 약간의 패딩 추가
+          child: PostListAppBar(),
+        ),
+        centerTitle: false, // 로고를 중앙 정렬하지 않고 왼쪽으로 정렬
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -214,135 +241,3 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 }
-
-class CustomPostAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomPostAppBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      leading: IconButton(
-        icon: SvgPicture.asset(
-          'assets/icons/arrow.svg',
-          width: 24,
-          height: 24,
-        ),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      shadowColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      titleSpacing: 0,
-      title: Image.asset(
-        'assets/logos/logor가로@2x.png',
-        height: 30,
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 10), // 원하는 만큼 조정 (예: 12~20)
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
-                padding: EdgeInsets.zero,
-                icon: SvgPicture.asset(
-                  'assets/icons/Search.svg',
-                  width: 25,
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
-                padding: EdgeInsets.zero,
-                icon: SvgPicture.asset(
-                  'assets/icons/bell.svg',
-                  width: 25,
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
-                padding: const EdgeInsets.only(left: -3.5, right: 5),
-                icon: SvgPicture.asset(
-                  'assets/icons/user.svg',
-                  width: 25,
-                ),
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ),
-      ],
-
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class SectionTitle extends StatelessWidget {
-  final String text;
-  const SectionTitle(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: Colors.blue,
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-class SubSectionTitle extends StatelessWidget {
-  final String text;
-  const SubSectionTitle(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 4, height: 16, color: Colors.blue),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class BulletList extends StatelessWidget {
-  final List<String> items;
-  const BulletList(this.items, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: items
-          .map(
-            (e) => Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('• ', style: TextStyle(height: 1.5)),
-            Expanded(child: Text(e, style: const TextStyle(height: 1.5))),
-          ],
-        ),
-      )
-          .toList(),
-    );
-  }
-}
-
