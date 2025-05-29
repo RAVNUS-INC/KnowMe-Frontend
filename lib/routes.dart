@@ -29,4 +29,4 @@ class Routes {
   static void navigateToPostDetail() {
     Get.toNamed(postDetail);
   }
-}
+} //
