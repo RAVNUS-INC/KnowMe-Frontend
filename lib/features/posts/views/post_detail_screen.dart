@@ -30,12 +30,14 @@ class PostDetailScreen extends StatelessWidget {
         ),
         titleSpacing: 0, // 타이틀과 리딩 아이콘 사이의 기본 간격 제거
         title: const Padding(
-          padding: EdgeInsets.only(left: 8), // 로고에 약간의 패딩 추가
+          padding: EdgeInsets.only(left: 8), // 로고에 약��의 패딩 추가
           child: PostListAppBar(),
         ),
         centerTitle: false, // 로고를 중앙 정렬하지 않고 왼쪽으로 정렬
       ),
-      body: Stack(
+      backgroundColor: Colors.white, // 배경색 추가
+      body: 
+      Stack(
         children: [
           SingleChildScrollView(
             child: Column(
@@ -81,7 +83,7 @@ class PostDetailScreen extends StatelessWidget {
           const SectionTitle('회사 소개'),
           const SizedBox(height: 8),
           const Text(
-            '코드웨이브는 웹/앱 개발, B2B SaaS 플랫폼, 데이터 기반 UI/UX 개선 등 다양한 프로젝트를 통해 빠르게 성장 중인 스타트업으로, 기술을 통해 더 나은 일상을 만드는 디지털 솔루션 기업입니다.\n\n우리는 “기술로 연결된 가치”를 믿습니다. 함께 성장하고 싶은 당신을 기다립니다.',
+            '코드웨이브는 웹/앱 개발, B2B SaaS 플랫폼, 데이터 기반 UI/UX 개선 등 다양한 프로젝트를 통해 빠르게 성장 중인 스타트업으로, 기술을 통해 더 나은 일상을 만드는 디지털 솔루션 기업입니다.\n\n우리는 “기술로 연결된 가치”를 믿습니다. 함께 성장하고 싶은 당��을 기다립니다.',
           ),
           const SizedBox(height: 8),
           ClipRRect(
@@ -168,7 +170,7 @@ class PostDetailScreen extends StatelessWidget {
 
           const SectionTitle('지원 방법'),
           const SizedBox(height: 8),
-          const Text('이력서 및 포트폴리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
+          const Text('이력서 및 포트���리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
           const SizedBox(height: 20),
         ],
       ),
