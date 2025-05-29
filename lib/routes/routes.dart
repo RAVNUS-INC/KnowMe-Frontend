@@ -48,7 +48,7 @@ class AppRoutes {
     ),
     GetPage(
       name: AppRoutes.profile,
-      page: () => const ProfileScreen(),
+      page: () => ProfileScreen(),
       transition: Transition.fadeIn,
     ),
     GetPage(

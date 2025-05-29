@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/routes.dart'; // AppRoutes 경로 맞게 수정
 import '../../../shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 맞게 수정
+import 'package:knowme_final_new/features/membership/controllers/profile_controller.dart';
+import 'package:knowme_final_new/features/membership/models/profile_model.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  static const List<String> menuItems = [
-    '프로필 수정',
-    '비밀번호 변경',
-    '소셜 연동',
-    '멤버십 구독',
-  ];
+  ProfileScreen({super.key});
+  final controller = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -36,41 +32,44 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  '프론트엔드 개발자',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
+                // 1. 직업
+                Obx(() => Text(
+                  controller.userProfile.value.job,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                )),
                 const SizedBox(height: 8),
-                const Text(
-                  '이한양',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                // 2. 이름
+                Obx(() => Text(
+                  controller.userProfile.value.name,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                )),
                 const SizedBox(height: 16),
-                const Text(
-                  '끊임없이 배우고 도전하는\n프론트엔드 개발자',
+                // 3. 자기소개
+                Obx(() => Text(
+                  controller.userProfile.value.intro,
                   textAlign: TextAlign.center,
-                  style: TextStyle(height: 1.5),
-                ),
+                  style: const TextStyle(height: 1.5),
+                )),
                 const SizedBox(height: 16),
                 _divider(),
-                const Text(
-                  '한양대학교 ERICA\nICT융합학부 재학',
+                // 4. 학교/학과
+                Obx(() => Text(
+                  controller.userProfile.value.university,
                   textAlign: TextAlign.center,
-                  style: TextStyle(height: 1.5),
-                ),
+                  style: const TextStyle(height: 1.5),
+                )),
                 const SizedBox(height: 16),
                 _divider(),
-                const Text(
-                  'adc1234@knowme.kr',
-                  style: TextStyle(color: Colors.black87),
-                ),
+                // 5. 이메일
+                Obx(() => Text(
+                  controller.userProfile.value.email,
+                  style: const TextStyle(color: Colors.black87),
+                )),
                 const SizedBox(height: 16),
                 _divider(),
               ],
             ),
           ),
-
-          const SizedBox(height: 30),
 
           // 내 활동 버튼
           Center(
@@ -108,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:
-                  menuItems.map((item) {
+                  profileMenuItems.map((item) {
                     final isMembership = item == '멤버십 구독';
                     final text = Text(
                       item,
@@ -227,18 +226,18 @@ class ProfileScreen extends StatelessWidget {
 /// 새로 만든 Subscription 화면
 class MembershipScreen extends StatelessWidget {
   const MembershipScreen({super.key});
-
-  // 원본 이미지의 가로:세로 비율 (예: 375x217)
   static const double _imageAspectRatio = 375 / 217;
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(MembershipController());
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // ── 상단 이미지 + 텍스트 ──
+            // 상단 이미지
             SizedBox(
               width: double.infinity,
               child: AspectRatio(
@@ -265,10 +264,7 @@ class MembershipScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // ── '프리미엄 멤버십' 텍스트 ──
             const Padding(
               padding: EdgeInsets.fromLTRB(30, 0, 20, 0),
               child: Align(
@@ -283,190 +279,139 @@ class MembershipScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
 
-            // ── 구독 옵션 카드들 ──
+            // 카드 리스트
             Expanded(
-              child: ListView(
+              child: Obx(() => ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  // 12개월 추천 카드
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Center(
-                      child: FractionallySizedBox(
-                        widthFactor: 0.85,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFF0066FF),
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              // 추천 태그
-                              Positioned(
-                                left: 0,
-                                top: -8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF0066FF),
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(8),
-                                      topLeft: Radius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    '추천',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                  ...List.generate(membershipPlans.length, (i) {
+                    final plan = membershipPlans[i];
+                    final isSelected = controller.selectedIndex.value == i;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Center(
+                        child: FractionallySizedBox(
+                          widthFactor: 0.85,
+                          child: GestureDetector(
+                            onTap: () => controller.selectPlan(i),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF0066FF)
+                                      : Colors.grey[300]!,
+                                  width: 2,
                                 ),
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white,
                               ),
-                              // 체크 아이콘
-                              const Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Icon(
-                                  Icons.check_circle,
-                                  color: Color(0xFF0066FF),
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 40,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '\u00A0\u00A0\u00A012개월',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          '70,800원',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                            color: Colors.grey,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  // 추천 태그
+                                  if (plan.isRecommended)
+                                    Positioned(
+                                      left: 0,
+                                      top: -8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF0066FF),
+                                          borderRadius: BorderRadius.only(
+                                            bottomRight: Radius.circular(8),
+                                            topLeft: Radius.circular(8),
                                           ),
                                         ),
-                                        SizedBox(height: 4),
-                                        Text.rich(
-                                          TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: '63,800원',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: ' / 년',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.black54,
-                                                ),
-                                              ),
-                                            ],
+                                        child: const Text(
+                                          '추천',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
                                           ),
+                                        ),
+                                      ),
+                                    ),
+                                  // 체크 아이콘
+                                  if (isSelected)
+                                    const Positioned(
+                                      right: 8,
+                                      top: 8,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Color(0xFF0066FF),
+                                      ),
+                                    ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 40,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          plan.label,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            if (plan.originalPrice != null)
+                                              Text(
+                                                plan.originalPrice!,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  decoration: TextDecoration.lineThrough,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            if (plan.originalPrice != null)
+                                              const SizedBox(height: 4),
+                                            Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: plan.price,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: plan.periodText,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.normal,
+                                                      color: Colors.black54,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // 1개월 카드
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Center(
-                      child: FractionallySizedBox(
-                        widthFactor: 0.85,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 40,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '\u00A0\u00A0\u00A01개월',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '5,900원',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: ' / 월',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
 
-                  // 유의사항 박스
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Center(
@@ -528,7 +473,7 @@ class MembershipScreen extends StatelessWidget {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: controller.subscribe,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF0052CC),
                               shape: RoundedRectangleBorder(
@@ -548,7 +493,7 @@ class MembershipScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              )),
             ),
           ],
         ),
