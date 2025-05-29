@@ -125,6 +125,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text('$title 선택'),
+        backgroundColor: Colors.white,
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
