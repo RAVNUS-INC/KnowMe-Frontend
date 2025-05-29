@@ -42,74 +42,75 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Obx(() => TextField(
-                    controller: controller.passwordController,
-                    obscureText: controller.obscureText.value,
-                    decoration: _inputDecoration('비밀번호').copyWith(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          controller.obscureText.value
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.grey,
+                        controller: controller.passwordController,
+                        obscureText: controller.obscureText.value,
+                        decoration: _inputDecoration('비밀번호').copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              controller.obscureText.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () =>
+                                controller.togglePasswordVisibility(),
+                          ),
                         ),
-                        onPressed: () =>
-                            controller.togglePasswordVisibility(),
-                      ),
-                    ),
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => dismissKeyboard(),
-                  )),
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => dismissKeyboard(),
+                      )),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Obx(() => Checkbox(
-                        value: controller.rememberAccount.value,
-                        onChanged: controller.toggleRememberAccount,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        materialTapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                      )),
+                            value: controller.rememberAccount.value,
+                            onChanged: controller.toggleRememberAccount,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                          )),
                       const Text('로그인 상태 저장', style: TextStyle(fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Obx(() => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : () => controller.handleLogin(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: controller.isLoading.value
-                            ? Colors.grey[400]
-                            : Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => controller.handleLogin(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: controller.isLoading.value
+                                ? Colors.grey[400]
+                                : Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : const Text(
+                                  '로그인',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
-                      ),
-                      child: controller.isLoading.value
-                          ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                          : const Text(
-                        '로그인',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  )),
+                      )),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,42 +132,42 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 10),
                   // 네이버 로그인 버튼 - 구글 버튼 크기에 맞춤
                   GestureDetector(
-                    onTap: () {
-                      dismissKeyboard();
-                      controller.handleSocialLogin('네이버');
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF03C75A), // 네이버 초록색
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // 왼쪽 정렬로 변경
-                        children: [
-                          Text(
-                            'N',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w900,
+                      onTap: () {
+                        dismissKeyboard();
+                        controller.handleSocialLogin('네이버');
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF03C75A), // 네이버 초록색
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center, // 왼쪽 정렬로 변경
+                          children: [
+                            Text(
+                              'N',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            '네이버로 로그인',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
+                            const SizedBox(width: 10),
+                            Text(
+                              '네이버로 로그인',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ),
+                          ],
+                        ),
+                      )),
                   const SizedBox(height: 10),
                   // 구글 로그인 버튼 - 원본 크기 유지
                   GestureDetector(

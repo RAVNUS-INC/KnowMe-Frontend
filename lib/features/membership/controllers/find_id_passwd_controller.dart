@@ -58,11 +58,13 @@ class FindIdPasswdController extends GetxController {
     if (idFindMethod.value == 0) {
       // Email validation - check format
       final email = emailController.text.trim();
-      final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+      final emailRegex =
+          RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
       canSubmitFindId.value = email.isNotEmpty && emailRegex.hasMatch(email);
     } else {
       // Phone validation - check format (Korean phone number format)
-      final phone = phoneController.text.trim().replaceAll('-', '').replaceAll(' ', '');
+      final phone =
+          phoneController.text.trim().replaceAll('-', '').replaceAll(' ', '');
       final phoneRegex = RegExp(r'^01[0-9]{1}[0-9]{7,8}$');
       canSubmitFindId.value = phone.isNotEmpty && phoneRegex.hasMatch(phone);
     }

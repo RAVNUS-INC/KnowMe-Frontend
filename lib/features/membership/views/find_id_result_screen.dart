@@ -78,7 +78,8 @@ class FindIdResultScreen extends StatelessWidget {
                       // 아이디 표시 박스
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),

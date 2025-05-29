@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 class PasswordResetController extends GetxController {
   // Text controllers
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   // Rx variables
   final RxBool showNewPassword = false.obs;
@@ -51,7 +52,8 @@ class PasswordResetController extends GetxController {
     final hasLowercase = newPassword.contains(RegExp(r'[a-z]'));
     final hasDigits = newPassword.contains(RegExp(r'[0-9]'));
 
-    isNewPasswordValid.value = hasMinLength && (hasUppercase || hasLowercase) && hasDigits;
+    isNewPasswordValid.value =
+        hasMinLength && (hasUppercase || hasLowercase) && hasDigits;
 
     // Validate confirm password (matches new password)
     isConfirmPasswordValid.value =
@@ -80,7 +82,6 @@ class PasswordResetController extends GetxController {
 
       // Navigate to success screen
       Get.offNamed('/password-reset-success');
-
     } catch (e) {
       // Close loading dialog if still open
       if (Get.isDialogOpen ?? false) {
