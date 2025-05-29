@@ -129,21 +129,65 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _dividerWithText('또는'),
                   const SizedBox(height: 10),
+                  // 네이버 로그인 버튼 - 구글 버튼 크기에 맞춤
                   GestureDetector(
                     onTap: () {
                       dismissKeyboard();
-                      controller.handleSocialLogin('카카오');
+                      controller.handleSocialLogin('네이버');
                     },
-                    child: Image.asset(
-                        'assets/images/kakao_login_medium_wide.png'),
+                    child: Container(
+                      width: double.infinity,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF03C75A), // 네이버 초록색
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center, // 왼쪽 정렬로 변경
+                        children: [
+                          Text(
+                            'N',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            '네이버로 로그인',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ),
                   const SizedBox(height: 10),
+                  // 구글 로그인 버튼 - 원본 크기 유지
                   GestureDetector(
                     onTap: () {
                       dismissKeyboard();
                       controller.handleSocialLogin('구글');
                     },
-                    child: Image.asset('assets/images/google_login.png'),
+                    child: Container(
+                      width: double.infinity,
+                      height: 44, // 네이버 버튼과 동일한 높이
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.asset(
+                          'assets/images/google_login.png',
+                          fit: BoxFit.fitWidth, // 너비에 맞춰서 조정
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
