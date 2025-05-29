@@ -211,76 +211,43 @@ class FilterController extends GetxController {
     return RangeValues(min, min + stepSize);
   }
 
-  // 슬라이더 라벨 포맷 - 특정 단계 값에 따른 정확한 레이블 표시
+  // 슬라이더 라벨 포맷 - 통합된 메서드 (외부 및 내부 참조용)
   String formatSliderLabel(double value, int tabIndex) {
     SliderConfig config = getSliderConfig(tabIndex);
     
     switch (tabIndex) {
       case 0: // 채용
-        // 정확한 슬라이더 단계 값에 따른 레이블 표시
-        if (value == 0) return '신입';
-        if (value == 5) return '5년';
-        if (value == 10) return '10년';
-        if (value == 15) return '15년';
-        if (value == 20) return '20년';
-        
-        // 슬라이더가 정확한 단계에 있지 않을 때 가장 가까운 단계의 레이블 표시
-        final List<double> steps = [0, 5, 10, 15, 20];
-        final List<String> labels = ['신입', '5년', '10년', '15년', '20년'];
-        
-        // 가장 가까운 단계 찾기
-        double minDiff = double.infinity;
-        int closestIndex = 0;
-        
-        for (int i = 0; i < steps.length; i++) {
-          double diff = (value - steps[i]).abs();
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestIndex = i;
-          }
+        if (value == 0) {
+          return '신입';
+        } else if (value == 20) {
+          return '20년 이상';
+        } else {
+          return '${value.toInt()}년';
         }
-        
-        return labels[closestIndex];
-        
       case 1: // 인턴
       case 2: // 대외활동
-        // 정확한 슬라이더 단계 값에 따른 레이블 표시
         if (value == 1) return '1개월';
         if (value == 6) return '6개월';
         if (value == 12) return '1년';
         if (value == 18) return '1.5년';
         if (value == 24) return '2년';
         
-        // 슬라이더가 정확한 단계에 있지 않을 때 가장 가까운 단계의 레이블 표시
         final List<double> steps = [1, 6, 12, 18, 24];
         final List<String> labels = ['1개월', '6개월', '1년', '1.5년', '2년'];
         
-        // 가장 가까운 단계 찾기
-        double minDiff = double.infinity;
-        int closestIndex = 0;
-        
-        for (int i = 0; i < steps.length; i++) {
-          double diff = (value - steps[i]).abs();
-          if (diff < minDiff) {
-            minDiff = diff;
-            closestIndex = i;
-          }
-        }
-        
-        return labels[closestIndex];
+        return _findClosestLabel(value, steps, labels);
         
       case 3: // 교육/강연
-        // 균등 분배된 슬라이더 값에 따른 교육/강연 라벨 표시
         double range = config.max - config.min;
         double stepSize = range / 4;
         
-        if (value <= config.min + stepSize * 0.5) { // ~44.75/2
+        if (value <= config.min + stepSize * 0.5) {
           return '1일';
-        } else if (value <= config.min + stepSize * 1.5) { // ~44.75*1.5
+        } else if (value <= config.min + stepSize * 1.5) {
           return '1개월';
-        } else if (value <= config.min + stepSize * 2.5) { // ~44.75*2.5
+        } else if (value <= config.min + stepSize * 2.5) {
           return '2개월';
-        } else if (value <= config.min + stepSize * 3.5) { // ~44.75*3.5
+        } else if (value <= config.min + stepSize * 3.5) {
           return '4개월';
         } else {
           return '6개월';
@@ -377,8 +344,7 @@ class FilterController extends GetxController {
           _postController.selectedJob.value = job;
         }
 
-        // 슬라이더 값으로 경력 값 결정
-        applyJobExperienceFilter(rangeValues);
+        applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
           _postController.selectedLocation.value = location;
@@ -394,8 +360,7 @@ class FilterController extends GetxController {
           _postController.selectedInternJob.value = job;
         }
 
-        // 슬라이더 값으로 기간 값 결정
-        applyPeriodFilter(tabIndex, rangeValues);
+        applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
           _postController.selectedInternLocation.value = location;
@@ -411,8 +376,7 @@ class FilterController extends GetxController {
           _postController.selectedField.value = job;
         }
 
-        // 슬라이더 값으로 기간 값 결정
-        applyPeriodFilter(tabIndex, rangeValues);
+        applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
           _postController.selectedActivityLocation.value = location;
@@ -424,8 +388,7 @@ class FilterController extends GetxController {
           _postController.selectedEduField.value = job;
         }
 
-        // 슬라이더 값으로 기간 값 결정
-        applyPeriodFilter(tabIndex, rangeValues);
+        applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
           _postController.selectedEduLocation.value = location;
@@ -441,6 +404,86 @@ class FilterController extends GetxController {
     }
 
     _postController.loadContests();
+  }
+
+  // 슬라이더 필터링 적용 - 통합된 메서드
+  void applyRangeSliderFilter(int tabIndex, RangeValues values) {
+    applyRangeFilter(tabIndex, values);
+    _postController.loadContests();
+  }
+
+  // 모든 슬라이더 필터(경력, 기간)를 처리하는 통합된 메서드
+  void applyRangeFilter(int tabIndex, RangeValues values) {
+    String filterValue;
+    SliderConfig config = getSliderConfig(tabIndex);
+    
+    switch (tabIndex) {
+      case 0: // 채용 (경력)
+        if (values.start == 0 && values.end == 0) {
+          filterValue = '신입';
+        } else if (values.start == 20 && values.end == 20) {
+          filterValue = '20년 이상';
+        } else if (values.start == values.end) {
+          filterValue = formatSliderLabel(values.start, tabIndex);
+        } else {
+          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+        }
+        _postController.selectedExperience.value = filterValue;
+        break;
+        
+      case 1: // 인턴
+      case 2: // 대외활동
+        if (values.start == 1 && values.end == 1) {
+          filterValue = '1개월 이하';
+        } else if (values.start == 24 && values.end == 24) {
+          filterValue = '2년 이상';
+        } else if (values.start == values.end) {
+          filterValue = formatSliderLabel(values.start, tabIndex);
+        } else {
+          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+        }
+        
+        if (tabIndex == 1) {
+          _postController.selectedPeriod.value = filterValue;
+        } else {
+          _postController.selectedActivityPeriod.value = filterValue;
+        }
+        break;
+        
+      case 3: // 교육/강연
+        if (values.start == 1 && values.end == 1) {
+          filterValue = '1일';
+        } else if (values.start == 180 && values.end == 180) {
+          filterValue = '6개월 이상';
+        } else if (values.start == values.end) {
+          filterValue = formatSliderLabel(values.start, tabIndex);
+        } else {
+          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+        }
+        _postController.selectedEduPeriod.value = filterValue;
+        break;
+        
+      default:
+        // 기존 로직을 유지하는 대체 로직
+        if (values.start == values.end) {
+          if (values.start == config.min) {
+            filterValue = '${formatSliderLabel(values.start, tabIndex)} 이하';
+          } else if (values.start == config.max) {
+            filterValue = '${formatSliderLabel(values.start, tabIndex)} 이상';
+          } else {
+            filterValue = formatSliderLabel(values.start, tabIndex);
+          }
+        } else if (values.start == config.min) {
+          filterValue = '${formatSliderLabel(values.end, tabIndex)} 이하';
+        } else if (values.end == config.max) {
+          filterValue = '${formatSliderLabel(values.start, tabIndex)} 이상';
+        } else {
+          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+        }
+        break;
+    }
+    
+    currentRangeValues.value = values;
   }
 
   // 선택한 필터 값 업데이트
@@ -657,97 +700,19 @@ class FilterController extends GetxController {
     }
   }
 
-  // 슬라이더 필터링 적용 - 통합된 메서드
-  void applyRangeSliderFilter(int tabIndex, RangeValues values) {
-    switch (tabIndex) {
-      case 0:
-        applyJobExperienceFilter(values);
-        break;
-      case 1:
-      case 2: 
-      case 3:
-        applyPeriodFilter(tabIndex, values);
-        break;
+  // 가장 가까운 라벨 찾기 (중복 코드 제거)
+  String _findClosestLabel(double value, List<double> steps, List<String> labels) {
+    double minDiff = double.infinity;
+    int closestIndex = 0;
+    
+    for (int i = 0; i < steps.length; i++) {
+      double diff = (value - steps[i]).abs();
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
     }
     
-    _postController.loadContests();
-  }
-  
-  // 채용 탭 경력 필터 적용
-  void applyJobExperienceFilter(RangeValues values) {
-    String? experienceValue;
-    if (values.start == 0 && values.end == 0) {
-      experienceValue = '신입';
-    } else if (values.start == 0 && values.end <= 5) {
-      experienceValue = '5년 이하';
-    } else if (values.start >= 5 && values.end <= 10) {
-      experienceValue = '5~10년';
-    } else if (values.start >= 10 && values.end <= 15) {
-      experienceValue = '10~15년';
-    } else if (values.start >= 15) {
-      experienceValue = '15년 이상';
-    }else if (values.start >= 20) {
-      experienceValue = '20년 이상';
-    }
-    _postController.selectedExperience.value = experienceValue;
-    currentRangeValues.value = values;
-  }
-  
-  // 기간 필터 적용 - 통합된 메서드
-  void applyPeriodFilter(int tabIndex, RangeValues values) {
-    switch (tabIndex) {
-      case 1: // 인턴
-        String? periodValue;
-        if (values.end <= 1) {
-          periodValue = '1개월 이하';
-        } else if (values.end <= 6) {
-          periodValue = '1~6개월';
-        } else if (values.end <= 12) {
-          periodValue = '6개월~1년';
-        } else if (values.end <= 18) {
-          periodValue = '1~1.5년';
-        } else {
-          periodValue = '1.5년 이상';
-        }
-        _postController.selectedPeriod.value = periodValue;
-        break;
-        
-      case 2: // 대외활동
-        String? activityPeriodValue;
-        if (values.end <= 1) {
-          activityPeriodValue = '1개월 이하';
-        } else if (values.end <= 6) {
-          activityPeriodValue = '1~6개월';
-        } else if (values.end <= 12) {
-          activityPeriodValue = '6개월~1년';
-        } else if (values.end <= 18) {
-          activityPeriodValue = '1~1.5년';
-        } else {
-          activityPeriodValue = '1.5년 이상';
-        }
-        _postController.selectedActivityPeriod.value = activityPeriodValue;
-        break;
-        
-      case 3: // 교육/강연
-        String? eduPeriodValue;
-        double range = 179; // config.max - config.min
-        double stepSize = range / 4; // = 44.75
-        
-        if (values.end <= 1 + stepSize * 0.5) { // 1일 범위
-          eduPeriodValue = '1일';
-        } else if (values.end <= 1 + stepSize * 1.5) { // 1개월 범위
-          eduPeriodValue = '1일~1개월';
-        } else if (values.end <= 1 + stepSize * 2.5) { // 2개월 범위
-          eduPeriodValue = '1~2개월';
-        } else if (values.end <= 1 + stepSize * 3.5) { // 4개월 범위
-          eduPeriodValue = '2~4개월';
-        } else { // 6개월 범위
-          eduPeriodValue = '4~6개월';
-        }
-        _postController.selectedEduPeriod.value = eduPeriodValue;
-        break;
-    }
-    
-    currentRangeValues.value = values;
+    return labels[closestIndex];
   }
 }
