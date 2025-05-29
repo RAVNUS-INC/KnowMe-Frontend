@@ -154,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                Image.asset('images/knowme_logo.png', height: 40),
+                Image.asset('assets/images/knowme_logo.png', height: 40),
                 const SizedBox(width: 10),
               ],
             ),

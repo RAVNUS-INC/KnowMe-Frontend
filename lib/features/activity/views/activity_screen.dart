@@ -1,143 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
+import 'package:knowme_final_new/features/activity/models/activity_record.dart';
+import 'package:knowme_final_new/features/activity/controllers/activity_controller.dart';
 
-const double _side = 20;
-
-class ActivityScreen extends StatefulWidget {
+class ActivityScreen extends StatelessWidget {
   const ActivityScreen({super.key});
 
-  @override
-  State<ActivityScreen> createState() => _ActivityScreenState();
-}
-
-class _ActivityScreenState extends State<ActivityScreen> {
-  String? _selectedTag;
-  static const _filterTags = [
-    'React',
-    'Firebase',
-    'ResponsiveUI',
-    'TailwindCSS',
-    'TypeScript',
-    'API\\u연동',
-  ];
-
-  final _projects = const [
-    Project(
-      title: 'MyPlanner – 일정 관리 웹앱',
-      description: 'React와 Firebase로 만든 개인 일정 관리 서비스',
-      tags: ['React', 'Firebase', 'ResponsiveUI'],
-      date: '2025.03.28',
-    ),
-    Project(
-      title: 'Shopixel – 반응형 이커머스 프론트엔드',
-      description: 'SCSS와 JavaScript로 만든 쇼핑몰 웹사이트',
-      tags: ['ResponsiveUI', 'VanillaJS', 'SCSS'],
-      date: '2024.10.02',
-    ),
-    Project(
-      title: '코딩톡 – 개발자 커뮤니티 SPA',
-      description: 'Next.js 기반의 소셜 피드형 커뮤니티',
-      tags: ['React', 'TailwindCSS', 'TypeScript'],
-      date: '2024.08.12',
-    ),
-    Project(
-      title: 'DevBoard – 개발자 대시보드',
-      description: 'Github API 기반의 개인 프로젝트 관리 대시보드',
-      tags: ['React', 'API\\u연동', 'ResponsiveUI'],
-      date: '2024.06.05',
-    ),
-    Project(
-      title: '모두의 날씨 – 실시간 날씨 조회 앱',
-      description: 'OpenWeather API 연동과 사용자 경험 중심 UI',
-      tags: ['React', 'API\\u연동', 'ResponsiveUI'],
-      date: '2024.02.10',
-    ),
-  ];
-
-  List<Project> get _visible =>
-      _selectedTag == null
-          ? _projects
-          : _projects.where((p) => p.tags.contains(_selectedTag)).toList();
+  static const double _side = 20;
 
   @override
   Widget build(BuildContext context) {
+    // 라우터에서 binding으로 등록했다면 Get.find, 아니면 Get.put로 사용!
+    final ActivityController controller = Get.find<ActivityController>();
+
     return BaseScaffold(
       currentIndex: 1,
       body: Container(
         color: const Color(0xFFF8FAFC),
         child: Column(
           children: [
-            _tagFilterRow(),
+            _tagFilterRow(controller),
             const SizedBox(height: 8),
-            _projectList(),
+            _projectList(context, controller),
           ],
         ),
       ),
     );
   }
 
-  Widget _tagFilterRow() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: _side),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              GestureDetector(
-                onTap: () => setState(() => _selectedTag = null),
-                child: Image.asset(
-                  'assets/images/refresh.png',
-                  width: 26,
-                  height: 26,
-                ),
-              ),
-              ..._filterTags.map((tag) {
-                final sel = tag == _selectedTag;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedTag = sel ? null : tag),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: sel ? _Color.primaryBlue : _Color.gray100,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: sel ? _Color.primaryBlue : _Color.gray200,
-                      ),
-                    ),
-                    child: Text(
-                      tag,
-                      style: GoogleFonts.notoSansKr(
-                        fontSize: 13,
-                        color: sel ? Colors.white : _Color.gray700,
-                        fontWeight: sel ? FontWeight.w600 : FontWeight.normal,
-                      ),
+  // 필터 UI
+  Widget _tagFilterRow(ActivityController controller) => Obx(() =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _side),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  GestureDetector(
+                    onTap: () => controller.selectTag(null),
+                    child: Image.asset(
+                      'assets/images/refresh.png',
+                      width: 26,
+                      height: 26,
                     ),
                   ),
-                );
-              }),
-            ],
+                  ...controller.filterTags.map((tag) {
+                    final sel = tag == controller.selectedTag.value;
+                    return GestureDetector(
+                      onTap: () => controller.selectTag(sel ? null : tag),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: sel ? _Color.primaryBlue : _Color.gray100,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: sel ? _Color.primaryBlue : _Color.gray200,
+                          ),
+                        ),
+                        child: Text(
+                          tag,
+                          style: GoogleFonts.notoSansKr(
+                            fontSize: 13,
+                            color: sel ? Colors.white : _Color.gray700,
+                            fontWeight: sel ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+        ],
       ),
-      const SizedBox(height: 16),
-    ],
   );
 
-  Widget _projectList() => Expanded(
-    child: ListView.separated(
+  // 프로젝트 리스트 UI
+  Widget _projectList(BuildContext context, ActivityController controller) => Expanded(
+    child: Obx(() => ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: _side),
-      itemCount: _visible.length + 1,
+      itemCount: controller.visibleProjects.length + 1,
       separatorBuilder: (_, i) => const SizedBox(height: 12),
       itemBuilder: (_, i) {
-        if (i == _visible.length) {
+        if (i == controller.visibleProjects.length) {
+          // 하단 플러스 버튼 (프로젝트 추가)
           return Padding(
             padding: const EdgeInsets.only(top: 12, bottom: 20),
             child: GestureDetector(
@@ -159,7 +114,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
           );
         }
 
-        final p = _visible[i];
+        final p = controller.visibleProjects[i];
         return GestureDetector(
           onTap: () async {
             final deleted = await Navigator.push(
@@ -168,11 +123,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 builder: (_) => ActivityDetailScreen(project: p),
               ),
             );
-
             if (deleted != null && deleted is Project) {
-              setState(() {
-                _projects.remove(deleted);
-              });
+              controller.removeProject(deleted);
             }
           },
           child: Container(
@@ -211,20 +163,19 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children:
-                      p.tags
-                          .map(
-                            (t) => Chip(
-                              label: Text(
-                                t,
-                                style: GoogleFonts.notoSansKr(fontSize: 12),
-                              ),
-                              backgroundColor: _Color.gray100,
-                              visualDensity: VisualDensity.compact,
-                              side: BorderSide.none,
-                            ),
-                          )
-                          .toList(),
+                  children: p.tags
+                      .map(
+                        (t) => Chip(
+                      label: Text(
+                        t,
+                        style: GoogleFonts.notoSansKr(fontSize: 12),
+                      ),
+                      backgroundColor: _Color.gray100,
+                      visualDensity: VisualDensity.compact,
+                      side: BorderSide.none,
+                    ),
+                  )
+                      .toList(),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -239,24 +190,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
           ),
         );
       },
-    ),
+    )),
   );
 }
 
-class Project {
-  final String title, description, date;
-  final String? summary;
-  final List<String> tags;
-
-  const Project({
-    required this.title,
-    required this.description,
-    required this.tags,
-    required this.date,
-    this.summary,
-  });
-}
-
+// 컬러 상수
 class _Color {
   static const primaryBlue = Color(0xFF0066FF);
   static const gray100 = Color(0xFFF1F5F9);
@@ -604,29 +542,12 @@ class _AddProjectPageState extends State<AddProjectPage> {
     );
   }
 
-  final _title = TextEditingController();
-  final _desc = TextEditingController();
-  final _sum = TextEditingController();
-  final _tag = TextEditingController();
+  final controller = Get.find<ActivityController>();
 
   @override
   void initState() {
     super.initState();
-    if (widget.project != null) {
-      _title.text = widget.project!.title;
-      _desc.text = widget.project!.description;
-      _sum.text = widget.project!.summary ?? '';
-      _tag.text = ''; // 태그는 별도로 처리 가능
-    }
-  }
-
-  @override
-  void dispose() {
-    _title.dispose();
-    _desc.dispose();
-    _sum.dispose();
-    _tag.dispose();
-    super.dispose();
+    controller.loadProjectForEdit(widget.project); // 새로 추가/수정 시
   }
 
   @override

@@ -70,8 +70,8 @@ class BaseScaffold extends StatelessWidget {
               children: [
                 _AppIconButton(
                   activeIcon == 'search'
-                      ? 'assets/images/Search_on.png'
-                      : 'assets/images/Search.png',
+                      ? 'assets/images/search_on.png'
+                      : 'assets/images/search.png',
                   onTap: () => Get.toNamed(AppRoutes.search),
                 ),
                 const SizedBox(width: 16),
@@ -88,7 +88,7 @@ class BaseScaffold extends StatelessWidget {
                 _AppIconButton(
                   activeIcon == 'user'
                       ? 'assets/images/useron.png'
-                      : 'assets/images/User.png',
+                      : 'assets/images/user.png',
                   onTap: () {
                     Get.toNamed(AppRoutes.profile);
                     debugPrint('Profile tapped');

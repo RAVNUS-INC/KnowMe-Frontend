@@ -12,7 +12,8 @@ import '../features/home/views/notification_screen.dart';
 import '../features/ai_analysis/controllers/ai_analysis_controller.dart';
 import '../features/search/controllers/search_controller.dart';
 import '../features/search/views/search_screen.dart';
-import '../features/activity/views/activity_screen.dart';
+import 'package:knowme_final_new/features/activity/views/activity_screen.dart';
+import '../features/activity/controllers/activity_controller.dart';
 import '../main.dart';
 
 class AppRoutes {
@@ -102,6 +103,9 @@ class AppRoutes {
     GetPage(
       name: AppRoutes.activity,
       page: () => const ActivityScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(ActivityController());
+      }),
       transition: Transition.fadeIn,
     ),
   ];
