@@ -6,7 +6,6 @@ import '../controllers/recommendation_controller.dart';
 
 /// 저장된 활동 탭 - 사용자가 북마크한 활동들을 카테고리별로 정리해서 보여주는 탭 화면
 class SavedActivitiesTab extends StatelessWidget {
-  // key 파라미터 추가
   const SavedActivitiesTab({super.key});
   
   // GetX로 주입된 RecommendationController 사용
@@ -26,7 +25,7 @@ class SavedActivitiesTab extends StatelessWidget {
     );
   }
 
-  /// 저장된 활동들을 분류하고 UI로 렌더링
+  /// 저장된 활동들을 ��류하고 UI로 렌더링
   Widget _buildContent(BuildContext context) {
     final savedContests = controller.savedContests;
 
@@ -151,6 +150,7 @@ class SavedActivitiesTab extends StatelessWidget {
   /// 각 Contest 데이터를 위젯으로 만들어 반환 (북마크 버튼 포함된 카드)
   Widget _createCustomContestCard(Contest contest, double width) {
     return _CustomContestCard(
+      key: ValueKey(contest.id), // 고유 키 추가 - contest.id를 사용하여 각 카드에 고유 식별자 제공
       contest: contest,
       width: width,
       onBookmarkTap: () => controller.toggleBookmark(contest),
@@ -165,11 +165,11 @@ class _CustomContestCard extends StatelessWidget {
   final VoidCallback? onBookmarkTap;
 
   const _CustomContestCard({
-    Key? key, // 내부 private 클래스에서는 super.key 대신 Key? key 사용
+    super.key,
     required this.contest,
     required this.width,
     this.onBookmarkTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

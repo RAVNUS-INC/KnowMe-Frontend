@@ -4,6 +4,9 @@ import '../controllers/recommendation_controller.dart';
 
 class RecommendationTabBar extends StatelessWidget {
   final RecommendationController controller = Get.find<RecommendationController>();
+  
+  // key 매개변수 추가
+  RecommendationTabBar({super.key});
 
   @override
   Widget build(BuildContext context) {

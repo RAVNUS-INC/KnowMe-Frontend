@@ -70,7 +70,7 @@ class FilterRowWidget extends StatelessWidget {
                       return Stack(
                         children: [
                           Positioned(
-                            top: buttonPosition.dy + 30, // FilterRowWidget 바로 아래 위치
+                            top: buttonPosition.dy + 35, // FilterRowWidget 바로 아래 위치
                             right: 16, // 오른쪽 여백 16 유지
                             child: SizedBox(
                               width: 120, // 가로 길이 105로 고정
@@ -121,7 +121,7 @@ class FilterRowWidget extends StatelessWidget {
   /// 현재 선택된 탭 인덱스에 따라 필터 버튼 목록 반환
   List<Widget> _getFilterButtonsByTabIndex() {
     List<Widget> filterButtons = [];
-    
+
     switch (postController.selectedTabIndex.value) {
       case 0: // 채용
         filterButtons = [
@@ -170,14 +170,14 @@ class FilterRowWidget extends StatelessWidget {
         ];
         break;
     }
-    
+
     return filterButtons;
   }
 
   /// 일반 필터 버튼 위젯 생성 (단일 선택)
   Widget _buildFilterButton(String filterType, String? selectedValue, {required String defaultText}) {
     final bool isSelected = selectedValue != null;
-    
+
     // 선택된 값이 있으면 그 값을 표시하고, 없으면 기본 텍스트를 표시
     final displayText = isSelected ? selectedValue : defaultText;
 
@@ -226,10 +226,10 @@ class FilterRowWidget extends StatelessWidget {
   Widget _buildMultiSelectFilterButton(String filterType, RxList<String> selectedValues, {required String defaultText}) {
     // 선택된 값이 있는지 확인
     final bool isSelected = selectedValues.isNotEmpty;
-    
+
     // 다중 선택의 경우, 선택된 항목 수를 표시 (예: "학력 (3)")
     String displayText = isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
-    
+
     // 선택된 값이 하나인 경우, 해당 값을 직접 표시
     if (selectedValues.length == 1) {
       displayText = selectedValues.first;
@@ -284,7 +284,7 @@ class SortOptionsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 105, // 정확한 너비 지정
+      width: 120, // 정확한 너비 지정 105
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -347,12 +347,12 @@ class SortOptionsMenu extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const SizedBox(width: 4), // spacing: 4 대체
+            const SizedBox(width: 5), // spacing: 4 대체
             Text(
               title,
               style: const TextStyle(
                 color: Color(0xFF454C53),
-                fontSize: 12, // Figma 디자인에 맞게 폰트 크기 조정
+                fontSize: 13, // Figma 디자인에 맞게 폰트 크기 조정
                 fontFamily: 'Pretendard',
                 fontWeight: FontWeight.w500,
                 letterSpacing: -0.48,
