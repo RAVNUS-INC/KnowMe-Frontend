@@ -186,7 +186,7 @@ class ContestCard extends StatelessWidget {
     return Positioned(
       right: 4,
       top: 7,
-      child: Container(
+      child: SizedBox(
         width: 24,
         height: 24,
         child: IconButton(

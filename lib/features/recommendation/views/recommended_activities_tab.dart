@@ -9,17 +9,13 @@ import 'recommendation_postcard.dart';
 
 /// 추천 활동 탭 화면 - 추천 채용, 대외활동, 강의를 섹션별로 보여주는 UI
 class RecommendedActivitiesTab extends StatelessWidget {
-  RecommendedActivitiesTab({Key? key}) : super(key: key);
-
-  // 화면이 생성될 때 컨트롤러를 초기화하기 위한 빈 컨트롤러
-  final controller = Get.find<RecommendationController>();
+  const RecommendedActivitiesTab({super.key}); // const 추가, key 파라미터 확인
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: GetBuilder<RecommendationController>(
-        init: RecommendationController(),
         builder: (controller) {
           if (controller.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -28,7 +24,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
             children: [
               Container(
                 clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(color: const Color(0xFFEEEFF0)),
+                decoration: const BoxDecoration(color: Color(0xFFEEEFF0)),
                 child: Padding(
                   padding: const EdgeInsets.only(
                     top: 16,
@@ -78,8 +74,8 @@ class RecommendedActivitiesTab extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            style: TextStyle(
-              color: const Color(0xFF232323),
+            style: const TextStyle(
+              color: Color(0xFF232323),
               fontSize: 18,
               fontFamily: 'Pretendard',
               fontWeight: FontWeight.w700,
@@ -90,8 +86,8 @@ class RecommendedActivitiesTab extends StatelessWidget {
         ),
         IconButton(
           visualDensity: VisualDensity.comfortable,
-          padding: EdgeInsets.all(8.0),
-          constraints: BoxConstraints(minWidth: 44.0, minHeight: 44.0),
+          padding: const EdgeInsets.all(8.0),
+          constraints: const BoxConstraints(minWidth: 44.0, minHeight: 44.0),
           iconSize: 24.0,
           icon: SvgPicture.asset(
             'assets/icons/right_arrow.svg',
@@ -118,7 +114,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
 
     if (recruitmentContests.isEmpty) {
       return const Center(
-        child: Text('채용 정보를 불러오는 중입니다...'),
+        child: Text('채용 정보��� 불러오는 중입니다...'),
       );
     }
 
@@ -182,7 +178,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
 
     if (lectureContests.isEmpty) {
       return const Center(
-        child: Text('강의 정보를 불러오는 중입니다...'),
+        child: Text('강의 정보를 불러오는 중��니다...'),
       );
     }
 

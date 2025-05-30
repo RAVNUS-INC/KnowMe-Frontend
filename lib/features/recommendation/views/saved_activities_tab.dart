@@ -6,8 +6,11 @@ import '../controllers/recommendation_controller.dart';
 
 /// 저장된 활동 탭 - 사용자가 북마크한 활동들을 카테고리별로 정리해서 보여주는 탭 화면
 class SavedActivitiesTab extends StatelessWidget {
+  // key 파라미터 추가
+  const SavedActivitiesTab({super.key});
+  
   // GetX로 주입된 RecommendationController 사용
-  final RecommendationController controller = Get.find<RecommendationController>();
+  RecommendationController get controller => Get.find<RecommendationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +95,7 @@ class SavedActivitiesTab extends StatelessWidget {
 
   /// 카테고리 섹션 UI 빌드 (카테고리명 + 활동 있으면 카드 그리드, 없으면 비어있음 메시지)
   Widget _buildCategorySection(BuildContext context, String title, List<Contest> contests) {
-    return Container(
+    return SizedBox( // Container에서 SizedBox로 변경
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +137,7 @@ class SavedActivitiesTab extends StatelessWidget {
   /// 그리드 형태로 활동 카드 배치
   Widget _buildContestGrid(BuildContext context, List<Contest> contests) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 48) / 2; // 수정: 48로 변경 (좌우 패딩 16+16=32, 카드 사이 간격 16)
+    final cardWidth = (screenWidth - 48) / 2; // 전체 너비에서 padding, margin 감안
 
     return Wrap(
       spacing: 16,      // 가로 간격
@@ -162,45 +165,43 @@ class _CustomContestCard extends StatelessWidget {
   final VoidCallback? onBookmarkTap;
 
   const _CustomContestCard({
+    Key? key, // 내부 private 클래스에서는 super.key 대신 Key? key 사용
     required this.contest,
     required this.width,
     this.onBookmarkTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return SizedBox( // Container를 SizedBox로 변경
       width: width,
       child: Stack(
         children: [
-          // 기본 ContestCard (제목, 설명, 이미지 등 표시)
           ContestCard(
             contest: contest,
             width: width,
           ),
-          // 우측 상단에 북마크 버튼 오버레이
           _buildBookmarkButton(),
         ],
       ),
     );
   }
 
-  /// 북마크 버튼 아이콘 (상태에 따라 채워짐/비어있음)
   Widget _buildBookmarkButton() {
     return Positioned(
       right: 4,
       top: 7,
-      child: Container(
+      child: SizedBox( // Container를 SizedBox로 변경
         width: 24,
         height: 24,
         child: IconButton(
           icon: Icon(
             contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
             color: Colors.white,
-            size: 20,
+            size: 20
           ),
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(), // 기본 아이콘 버튼 여백 제거
+          constraints: const BoxConstraints(),
           onPressed: onBookmarkTap,
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/models/contest_model.dart';
 import 'package:knowme_frontend/routes/routes.dart';
+import 'package:flutter/foundation.dart';
 
 /// 추천 공고 카드를 나타내는 Stateless 위젯
 class RecommendationPostCard extends StatelessWidget {
@@ -18,10 +19,10 @@ class RecommendationPostCard extends StatelessWidget {
   final VoidCallback? onBookmarkTap;
 
   const RecommendationPostCard({
-    Key? key,
+    super.key,
     required this.contest,
     this.onBookmarkTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,9 @@ class RecommendationPostCard extends StatelessWidget {
 
   /// 카드 탭 시 상세 화면으로 이동
   void _navigateToDetailScreen() {
-    print('카드가 탭 됨: ${contest.id}');
+    if (kDebugMode) {
+      debugPrint('카드가 탭 됨: ${contest.id}');
+    }
     // AppRoutes 상수를 사용하여 경로 지정
     Get.toNamed(
       AppRoutes.postDetail,
@@ -66,9 +69,9 @@ class RecommendationPostCard extends StatelessWidget {
   /// 카드 배경 및 그림자 스타일 정의
   ShapeDecoration _buildCardDecoration() {
     return ShapeDecoration(
-      color: Color(0xFFF5F5F5),
+      color: const Color(0xFFF5F5F5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      shadows: [
+      shadows: const [
         BoxShadow(
           color: Color(0x33184173),
           blurRadius: 4,
@@ -86,11 +89,11 @@ class RecommendationPostCard extends StatelessWidget {
       top: 0,
       right: 0,
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(8),
           topRight: Radius.circular(8),
         ),
-        child: Container(
+        child: SizedBox(
           height: _imageHeight,
           child: Stack(
             children: [
@@ -175,7 +178,7 @@ class RecommendationPostCard extends StatelessWidget {
       top: _imageHeight,
       right: 0,
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(8),
         ),

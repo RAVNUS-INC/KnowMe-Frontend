@@ -81,7 +81,7 @@ class AppRoutes {
     // 추천 활동 페이지
     GetPage(
       name: recommendationScreen,
-      page: () => RecommendationScreen(),
+      page: () => const RecommendationScreen(),
       binding: recommendationBinding,
     ),
   ];

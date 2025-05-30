@@ -70,8 +70,8 @@ class FilterRowWidget extends StatelessWidget {
                       return Stack(
                         children: [
                           Positioned(
-                            top: buttonPosition.dy + 50, // FilterRowWidget 바로 아래 위치
-                            right: 12, // 오른쪽 여백 12 유지
+                            top: buttonPosition.dy + 30, // FilterRowWidget 바로 아래 위치
+                            right: 16, // 오른쪽 여백 16 유지
                             child: SizedBox(
                               width: 120, // 가로 길이 105로 고정
                               child: Dialog(
