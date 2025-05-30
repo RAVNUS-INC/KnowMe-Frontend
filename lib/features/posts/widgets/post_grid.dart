@@ -189,12 +189,8 @@ class ContestCard extends StatelessWidget {
       child: Container(
         width: 24,
         height: 24,
-        decoration: const ShapeDecoration(
-          color: Colors.black,
-          shape: CircleBorder(),
-        ),
         child: IconButton(
-          icon: const Icon(Icons.bookmark_border, color: Colors.white, size: 16),
+          icon: const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {

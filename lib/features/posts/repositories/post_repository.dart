@@ -1,4 +1,4 @@
-import '../models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contest_model.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
@@ -118,12 +118,180 @@ class PostRepository {
         .map((contest) => _applyContestFilters(contest, field, target, organizer, benefit))
         .toList();
   }
-  
+
+  List<Contest> getContests() {
+    return [
+      Contest(
+        id: '1', // int 값을 String으로 변경
+        title: "제1회 마이데이터 비즈니스 아이디어 공모전",
+        benefit: "총 상금 3,000만원",
+        target: "대학(원)생, 일반인",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "한국데이터산업진흥원",
+        location: "온라인",
+        field: "IT/프로그래밍",
+        dateRange: "2023.10.01 ~ 2023.11.30",
+      ),
+    ];
+  }
+
+  List<Contest> getPopularContests() {
+    return [
+      Contest(
+        id: '101', // int 값을 String으로 변경
+        title: "2023 서울 국제 디자인 공모전",
+        benefit: "총 상금 5,000만원",
+        target: "제한없음",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "서울디자인재단",
+        location: "서울",
+        field: "디자인",
+        dateRange: "2023.09.15 ~ 2023.11.15",
+      ),
+      Contest(
+        id: '102', // int 값을 String으로 변경
+        title: "환경보호 아이디어 해커톤",
+        benefit: "상금 및 창업지원",
+        target: "대학(원)생, 일반인",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "환경부",
+        location: "부산",
+        field: "환경/에너지",
+        dateRange: "2023.10.05 ~ 2023.12.05",
+      ),
+      Contest(
+        id: '103', // int 값을 String으로 변경
+        title: "청년 스타트업 비즈니스 모델 경진대회",
+        benefit: "총 상금 1억원",
+        target: "만 19~39세",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "중소벤처기업부",
+        location: "서울",
+        field: "창업/스타트업",
+        dateRange: "2023.09.01 ~ 2023.11.30",
+      ),
+    ];
+  }
+
+  List<Contest> getRecentContests() {
+    return [
+      Contest(
+        id: '201', // int 값을 String으로 변경
+        title: "농업기술 혁신 아이디어 공모전",
+        benefit: "총 상금 2,000만원",
+        target: "제한없음",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "농촌진흥청",
+        location: "대전",
+        field: "농업/식품",
+        dateRange: "2023.10.01 ~ 2023.11.30",
+      ),
+      Contest(
+        id: '202', // int 값을 String으로 변경
+        title: "금융 서비스 UX 디자인 공모전",
+        benefit: "총 상금 3,000만원",
+        target: "대학(원)생",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "한국금융정보원",
+        location: "서울",
+        field: "디자인/UX",
+        dateRange: "2023.09.15 ~ 2023.11.15",
+      ),
+      Contest(
+        id: '203', // int 값을 String으로 변경
+        title: "미래 모빌리티 아이디어 경진대회",
+        benefit: "총 상금 4,000만원",
+        target: "제한없음",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "한국자동차공학회",
+        location: "경기",
+        field: "자동차/모빌리티",
+        dateRange: "2023.10.10 ~ 2023.12.10",
+      ),
+    ];
+  }
+
+  List<Contest> getDesignContests() {
+    return [
+      Contest(
+        id: '301', // int 값을 String으로 변경
+        title: "국제 그래픽 디자인 공모전",
+        benefit: "총 상금 5,000만원",
+        target: "디자이너, 학생",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "세계디자인협회",
+        location: "온라인",
+        field: "그래픽디자인",
+        dateRange: "2023.09.01 ~ 2023.11.30",
+      ),
+      Contest(
+        id: '302', // int 값을 String으로 변경
+        title: "사용자 경험 개선 UI/UX 공모전",
+        benefit: "취업 연계 및 상금",
+        target: "디자이너, 개발자",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "테크기업협회",
+        location: "서울",
+        field: "UI/UX",
+        dateRange: "2023.10.15 ~ 2023.12.15",
+      ),
+      Contest(
+        id: '303', // int 값을 String으로 변경
+        title: "친환경 패키지 디자인 공모전",
+        benefit: "총 상금 2,000만원",
+        target: "제한없음",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "환경디자인협회",
+        location: "부산",
+        field: "패키지디자인",
+        dateRange: "2023.09.20 ~ 2023.11.20",
+      ),
+    ];
+  }
+
+  List<Contest> getITContests() {
+    return [
+      Contest(
+        id: '401', // int 값을 String으로 변경
+        title: "블록체인 기술 활용 해커톤",
+        benefit: "총 상금 5,000만원",
+        target: "개발자, 대학생",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "블록체인협회",
+        location: "서울",
+        field: "블록체인/핀테크",
+        dateRange: "2023.10.01 ~ 2023.11.15",
+      ),
+      Contest(
+        id: '402', // int 값을 String으로 변경
+        title: "인공지능 서비스 개발 경진대회",
+        benefit: "총 상금 1억원",
+        target: "개발자, 연구원",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "과학기술정보통신부",
+        location: "대전",
+        field: "AI/머신러닝",
+        dateRange: "2023.09.15 ~ 2023.12.15",
+      ),
+      Contest(
+        id: '403', // int 값을 String으로 변경
+        title: "빅데이터 분석 챌린지",
+        benefit: "취업연계 및 상금",
+        target: "데이터 분석가, 학생",
+        imageUrl: "https://placehold.co/400x300/png",
+        organization: "한국데이터산업협회",
+        location: "온라인",
+        field: "빅데이터/통계",
+        dateRange: "2023.10.10 ~ 2023.11.30",
+      ),
+    ];
+  }
+
   // 데이터 소스에서 채용 정보 가져오기 (데이터 로직과 비즈니스 로직 분리)
   List<Contest> _getJobListingsFromDataSource() {
     return [
       Contest(
-        id: 1,
+        id: '1',
         title: '프론트엔드 개발자 (React, 3년 이상)',
         organization: '주식회사 멋쟁이들',
         imageUrl: 'assets/images/company_a_logo.png',
@@ -134,7 +302,7 @@ class PostRepository {
         target: '경력 3년 이상',
       ),
       Contest(
-        id: 2,
+        id: '2',
         title: '신입 마케팅 콘텐츠 에디터',
         organization: '알잘딱깔센 마케팅',
         imageUrl: 'assets/images/company_b_banner.jpg',
@@ -145,7 +313,7 @@ class PostRepository {
         target: '학력무관, 신입 가능',
       ),
       Contest(
-        id: 11,
+        id: '11',
         title: '백엔드 개발자 (Java/Spring)',
         organization: '튼튼 IT 솔루션',
         imageUrl: 'assets/images/company_c_logo.png',
@@ -158,11 +326,11 @@ class PostRepository {
     ];
   }
   
-  // 데이터 소스에서 인턴십 정보 가져오기
+  // 데이터 인덱스에서 인턴십 정보 가져오기
   List<Contest> _getInternshipsFromDataSource() {
     return [
       Contest(
-        id: 3,
+        id: '3',
         title: '2024 하계 UX/UI 디자인 인턴',
         organization: '디자인팩토리',
         imageUrl: 'assets/images/intern_ux_banner.png',
@@ -173,7 +341,7 @@ class PostRepository {
         target: '대학교 재학생/졸업예정자',
       ),
       Contest(
-        id: 4,
+        id: '4',
         title: '글로벌 사업개발팀 인턴 (영어 능통자)',
         organization: '월드와이드 컴퍼니',
         imageUrl: 'assets/images/intern_global_logo.jpg',
@@ -184,7 +352,7 @@ class PostRepository {
         target: '영어 능통자, 관련 전공 우대',
       ),
       Contest(
-        id: 12,
+        id: '12',
         title: 'AI 데이터 분석 인턴십 프로그램',
         organization: '데이터사이언스랩',
         imageUrl: 'assets/images/intern_ai_poster.png',
@@ -201,7 +369,7 @@ class PostRepository {
   List<Contest> _getActivitiesFromDataSource() {
     return [
       Contest(
-        id: 5,
+        id: '5',
         title: '대학생 환경보호 서포터즈 "그린메이트" 10기',
         organization: '푸른환경재단',
         imageUrl: 'assets/images/activity_greenmate.jpg',
@@ -209,10 +377,10 @@ class PostRepository {
         location: '전국 (온/오프라인 병행)',
         field: '환경/봉사',
         benefit: '활동비 지원, 우수활동자 표창',
-        target: '환경에 관심있는 대학생 누구나',
+        target: '환경에 관심있는 대���생 누구나',
       ),
       Contest(
-        id: 6,
+        id: '6',
         title: '청소년 코딩 교육 봉사단 모집',
         organization: '코딩천사들',
         imageUrl: 'assets/images/activity_coding_angel.png',
@@ -223,7 +391,7 @@ class PostRepository {
         target: '코딩 교육 경험자 또는 관심있는 대학생',
       ),
       Contest(
-        id: 13,
+        id: '13',
         title: 'K-Culture 홍보대사 3기 모집',
         organization: '한국문화교류원',
         imageUrl: 'assets/images/activity_kculture.png',
@@ -262,7 +430,7 @@ class PostRepository {
   List<Contest> _getEducationEventsFromDataSource() {
     return [
       Contest(
-        id: 7,
+        id: '7',
         title: '실전! AWS 클라우드 엔지니어링 부트캠프 (8주)',
         organization: '클라우드에듀',
         imageUrl: 'assets/images/edu_aws_bootcamp.jpg',
@@ -274,7 +442,7 @@ class PostRepository {
         target: '클라우드 엔지니어 지망생',
       ),
       Contest(
-        id: 8,
+        id: '8',
         title: '데이터 시각화 마스터클래스 (Tableau 활용)',
         organization: '데이터인사이트 아카데미',
         imageUrl: 'assets/images/edu_data_viz.png',
@@ -286,7 +454,7 @@ class PostRepository {
         target: '데이터 분석가, 마케터, 기획자',
       ),
       Contest(
-        id: 14,
+        id: '14',
         title: '챗GPT 활용 프롬프트 엔지니어링 워크샵',
         organization: 'AI 러닝센터',
         imageUrl: 'assets/images/edu_prompt_engineering.png',
@@ -326,7 +494,7 @@ class PostRepository {
   List<Contest> _getContestsFromDataSource() {
     return [
       Contest(
-        id: 9,
+        id: '9',
         title: '제5회 전국 대학생 앱 개발 챌린지',
         organization: '대한민국 IT 협회',
         imageUrl: 'assets/images/contest_app_dev.png',
@@ -338,7 +506,7 @@ class PostRepository {
         benefit: '대상 수상팀 장관상 수여',
       ),
       Contest(
-        id: 10,
+        id: '10',
         title: '지속가능한 도시 아이디어 공모전',
         organization: '스마트시티 연구소',
         imageUrl: 'assets/images/contest_sustainable_city.jpg',
@@ -350,7 +518,7 @@ class PostRepository {
         benefit: '총 상금 1,000만원 및 전문가 컨설팅',
       ),
       Contest(
-        id: 15,
+        id: '15',
         title: '단편영화 시나리오 공모전 "나의 이야기"',
         organization: '필름메이커스 포럼',
         imageUrl: 'assets/images/contest_scenario.png',
