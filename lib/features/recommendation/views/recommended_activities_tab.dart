@@ -100,7 +100,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
           ),
           onPressed: () {
             // 해당 탭으로 이동
-            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': tabIndex}); // 정확히 말하면 해당 탭 인덱스에서 추천순 버튼 눌려서 추천순대로 나열한 코드로 넘어감
+            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': tabIndex}); // 정확히 말하면 해당 탭 인덱스에서 추천순 버튼 눌려서 추천순대로 나열한 페이지로 넘어감
           },
         ),
       ],
