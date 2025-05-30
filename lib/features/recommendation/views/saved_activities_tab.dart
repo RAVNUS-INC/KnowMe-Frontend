@@ -134,12 +134,11 @@ class SavedActivitiesTab extends StatelessWidget {
   /// 그리드 형태로 활동 카드 배치
   Widget _buildContestGrid(BuildContext context, List<Contest> contests) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 64) / 2; // 전체 너비에서 padding, margin 감안
+    final cardWidth = (screenWidth - 48) / 2; // 수정: 48로 변경 (좌우 패딩 16+16=32, 카드 사이 간격 16)
 
     return Wrap(
       spacing: 16,      // 가로 간격
       runSpacing: 16,   // 세로 간격
-      alignment: WrapAlignment.spaceBetween,
       children: contests.map((contest) =>
           _createCustomContestCard(contest, cardWidth)
       ).toList(),

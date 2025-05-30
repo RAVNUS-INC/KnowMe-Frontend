@@ -28,7 +28,7 @@ class RecommendationPostCard extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // 최대 너비가 343을 넘지 않도록 제한
-        final cardWidth = constraints.maxWidth > 343 ? 343.0 : constraints.maxWidth;
+        final cardWidth = constraints.maxWidth > 315 ? 315.0 : constraints.maxWidth;
 
         // 그림자를 위해 패딩 추가
         return Padding(
