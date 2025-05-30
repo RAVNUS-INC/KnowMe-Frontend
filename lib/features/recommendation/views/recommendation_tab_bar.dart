@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/reommendation_controller.dart';
+import '../controllers/recommendation_controller.dart';
 
 class RecommendationTabBar extends StatelessWidget {
   final RecommendationController controller = Get.find<RecommendationController>();

@@ -4,7 +4,7 @@ import 'package:knowme_frontend/features/posts/controllers/post_controller.dart'
 import 'package:knowme_frontend/features/posts/services/filter_options_service.dart';
 import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
 import 'package:knowme_frontend/features/posts/views/post_list_screen.dart';
-import 'package:knowme_frontend/features/recommendation/controllers/reommendation_controller.dart';
+import 'package:knowme_frontend/features/recommendation/controllers/recommendation_controller.dart';
 import 'package:knowme_frontend/features/recommendation/views/recommendation_screen.dart';
 
 class AppRoutes {

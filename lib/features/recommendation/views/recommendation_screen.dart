@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../features/posts/widgets/post_list_app_bar.dart';
-import '../controllers/reommendation_controller.dart';
+import '../controllers/recommendation_controller.dart';
 import 'recommendation_tab_bar.dart';
 import 'recommended_activities_tab.dart';
 import 'saved_activities_tab.dart';

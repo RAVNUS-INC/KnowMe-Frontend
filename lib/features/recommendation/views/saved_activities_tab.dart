@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/models/contest_model.dart';
-import '../controllers/reommendation_controller.dart';
+import '../controllers/recommendation_controller.dart';
 
 /// 저장된 활동 탭 - 사용자가 북마크한 활동들을 카테고리별로 정리해서 보여주는 탭 화면
 class SavedActivitiesTab extends StatelessWidget {

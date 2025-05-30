@@ -14,7 +14,7 @@ class RecommendationPostCard extends StatelessWidget {
 
   // 공고 데이터 모델
   final Contest contest;
-  // 북마크 버튼 클릭 시 ��행되는 콜백 함수 (선택 사항)
+  // 북마크 버튼 클릭 시 실행되는 콜백 함수 (선택 사항)
   final VoidCallback? onBookmarkTap;
 
   const RecommendationPostCard({
