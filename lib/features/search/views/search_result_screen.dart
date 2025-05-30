@@ -20,40 +20,62 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   Widget build(BuildContext context) {
     return BaseScaffold(
       currentIndex: 0,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SearchBarWithAction(
-                controller: TextEditingController(),
-                isSearching: false,
-                onSearch: () {},
-                onCancel: () {},
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SearchBarWithAction(
+                    controller: TextEditingController(),
+                    isSearching: false,
+                    onSearch: () {},
+                    onCancel: () {},
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    '대학생 대상 공모전',
+                    style: TextStyle(
+                      color: Color(0xFF232323),
+                      fontSize: 18,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.72,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                '대학생 대상 공모전',
-                style: TextStyle(
-                  color: Color(0xFF232323),
-                  fontSize: 18,
-                  fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.72,
-                ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: Obx(() => SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final item = controller.results[index];
+                  return Obx(() => _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  ));
+                },
+                childCount: controller.results.length.clamp(0, visibleCount),
               ),
-              const SizedBox(height: 12),
-              Obx(() => Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: List.generate(
-                  controller.results.length.clamp(0, visibleCount),
-                      (index) => _ContestCard(contest: controller.results[index], onSave: () => controller.toggleSave(controller.results[index]), isSaved: controller.isSaved(controller.results[index])),
-                ),
-              )),
-              const SizedBox(height: 16),
-              Center(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 180 / 240,
+              ),
+            )),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
                 child: GestureDetector(
                   onTap: () => setState(() {
                     visibleCount += 4;
@@ -79,38 +101,62 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                height: 1,
-                color: const Color(0xFFE5E5E5),
-              ),
-              const SizedBox(height: 20),
-              const SizedBox(
-                width: 343,
-                child: Text(
-                  '저장한 활동',
-                  style: TextStyle(
-                    color: Color(0xFF232323),
-                    fontSize: 18,
-                    fontFamily: 'Pretendard',
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.72,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  height: 1,
+                  color: const Color(0xFFE5E5E5),
+                ),
+                const SizedBox(height: 20),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: 343,
+                    child: Text(
+                      '저장한 활동',
+                      style: TextStyle(
+                        color: Color(0xFF232323),
+                        fontSize: 18,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.72,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Obx(() => Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: controller.savedContests
-                    .map((c) => _ContestCard(contest: c, onSave: () => controller.toggleSave(c), isSaved: true))
-                    .toList(),
-              )),
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
-        ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: Obx(() => SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final item = controller.savedContests[index];
+                  return Obx(() => _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  ));
+                },
+                childCount: controller.savedContests.length,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 180 / 240,
+              ),
+            )),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
       ),
     );
   }
