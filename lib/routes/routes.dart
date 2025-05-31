@@ -25,6 +25,8 @@ class AppRoutes {
   static const String activity = '/activity';
   static const String recommendation = '/recommendation';
   static const String aiAnalysis = '/ai-analysis';
+  static const notification = '/notification';
+  static const profile = '/profile';
 
   static final routes = [
     GetPage(
