@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'search_result_controller.dart';
+import '../views/search_result_screen.dart';
 
 class SearchController extends GetxController {
   final TextEditingController searchController = TextEditingController();
-
-  RxList<String> recentSearches = <String>[
-    '프론트엔드 개발자',
-    '프론트엔드',
-    '개발자 공고',
-    'HTML 강의',
-    '대학생 공모전',
-  ].obs;
-
+  RxList<String> recentSearches = <String>[].obs;
   RxBool isSearching = false.obs;
 
   @override
@@ -28,6 +22,10 @@ class SearchController extends GetxController {
 
     recentSearches.remove(query);
     recentSearches.insert(0, query);
+
+    Get.put(SearchResultController()).search(query);
+    Get.to(() => const SearchResultScreen());
+
     searchController.clear();
   }
 
