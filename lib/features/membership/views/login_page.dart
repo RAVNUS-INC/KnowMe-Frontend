@@ -8,11 +8,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LoginModel model = LoginModel();
-    // 컨트롤러에 모델만 전달하고 텍스트 컨트롤러는 제거
-    final LoginController controller = Get.put(LoginController(
-      model: model,
-    ));
+    // 로그인 컨트롤러 인스턴스 가져오기
+    final controller = Get.find<LoginController>();
 
     void dismissKeyboard() {
       FocusScope.of(context).unfocus();
@@ -79,27 +76,41 @@ class LoginPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => controller.handleLogin(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                  Obx(() => SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => controller.handleLogin(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: controller.isLoading.value
+                                ? Colors.grey[400]
+                                : Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : const Text(
+                                  '로그인',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
-                      ),
-                      child: const Text(
-                        '로그인',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+                      )),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,21 +130,65 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _dividerWithText('또는'),
                   const SizedBox(height: 10),
+                  // 네이버 로그인 버튼 - 구글 버튼 크기에 맞춤
                   GestureDetector(
-                    onTap: () {
-                      dismissKeyboard();
-                      controller.handleSocialLogin('카카오');
-                    },
-                    child: Image.asset(
-                        'assets/images/kakao_login_medium_wide.png'),
-                  ),
+                      onTap: () {
+                        dismissKeyboard();
+                        controller.handleSocialLogin('네이버');
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF03C75A), // 네이버 초록색
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center, // 왼쪽 정렬로 변경
+                          children: [
+                            Text(
+                              'N',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              '네이버로 로그인',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
                   const SizedBox(height: 10),
+                  // 구글 로그인 버튼 - 원본 크기 유지
                   GestureDetector(
                     onTap: () {
                       dismissKeyboard();
                       controller.handleSocialLogin('구글');
                     },
-                    child: Image.asset('assets/images/google_login.png'),
+                    child: Container(
+                      width: double.infinity,
+                      height: 44, // 네이버 버튼과 동일한 높이
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.asset(
+                          'assets/images/google_login.png',
+                          fit: BoxFit.fitWidth, // 너비에 맞춰서 조정
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
