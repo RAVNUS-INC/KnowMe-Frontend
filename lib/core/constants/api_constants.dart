@@ -8,4 +8,7 @@ class ApiConstants {
 class ApiEndpoints {
   // 회원가입
   static const String userJoin = '/api/user/join';
+
+  // 로그인
+  static const String userLogin = '/api/user/login';
 }
