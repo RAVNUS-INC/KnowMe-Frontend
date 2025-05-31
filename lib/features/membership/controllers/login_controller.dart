@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/login_model.dart';
 import '../models/login_dtos.dart';
-import '../../../shared/services/login_api_service.dart';
-import '../../../shared/services/auth_service.dart';
-import '../../../core/utils/storage_utils.dart';
+import '../repositories/auth_repository.dart';  // ✅ 변경: AuthRepository 사용
 import 'package:logger/logger.dart';
 
 class LoginController extends GetxController {
   final LoginModel model;
   final Logger logger = Logger();
-  final LoginApiService _loginApiService = LoginApiService();
+  final AuthRepository _authRepository = AuthRepository();  // ✅ 변경: AuthRepository 사용
 
   // TextEditingController
   final TextEditingController idController = TextEditingController();
@@ -43,9 +41,9 @@ class LoginController extends GetxController {
   /// 저장된 로그인 정보 로드
   Future<void> _loadSavedCredentials() async {
     try {
-      final rememberMe = await StorageUtils.getRememberMe();
+      final rememberMe = await _authRepository.getRememberMe();  // ✅ 변경
       if (rememberMe) {
-        final credentials = await StorageUtils.getSavedCredentials();
+        final credentials = await _authRepository.getSavedCredentials();  // ✅ 변경
         if (credentials != null) {
           idController.text = credentials['loginId'] ?? '';
           passwordController.text = credentials['password'] ?? '';
@@ -89,14 +87,14 @@ class LoginController extends GetxController {
     try {
       // LoginRequestDto 생성
       final loginRequest = LoginRequestDto(
-        loginId: userId,  // 서버 DTO에 맞춰 loginId로 전달
+        loginId: userId,
         password: password,
       );
 
       logger.d('로그인 요청: ${loginRequest.toJson()}');
 
-      // API 호출
-      final response = await _loginApiService.login(loginRequest);
+      // ✅ 변경: AuthRepository를 통한 API 호출
+      final response = await _authRepository.login(loginRequest);
 
       if (response.isSuccess && response.data != null) {
         final loginResponse = response.data!;
@@ -106,24 +104,24 @@ class LoginController extends GetxController {
           // 로그인 성공
           logger.d('로그인 성공: ${loginResponse.message}');
 
-          // JWT 토큰 저장
-          await AuthService.saveToken(loginResponse.token);
+          // ✅ 변경: AuthRepository를 통한 토큰 저장
+          await _authRepository.saveToken(loginResponse.token);
 
-          // 사용자 정보 저장
-          await AuthService.saveUserInfo({
+          // ✅ 변경: AuthRepository를 통한 사용자 정보 저장
+          await _authRepository.saveUserInfo({
             'userId': userId,
             'loginTime': DateTime.now().toIso8601String(),
           });
 
-          // Remember Me 처리
-          await StorageUtils.setRememberMe(rememberAccount.value);
+          // ✅ 변경: AuthRepository를 통한 Remember Me 처리
+          await _authRepository.setRememberMe(rememberAccount.value);
           if (rememberAccount.value) {
-            await StorageUtils.saveCredentials(
+            await _authRepository.saveCredentials(
               loginId: userId,
               password: password,
             );
           } else {
-            await StorageUtils.clearSavedCredentials();
+            await _authRepository.clearSavedCredentials();
           }
 
           // 모델 업데이트
@@ -197,5 +195,39 @@ class LoginController extends GetxController {
       backgroundColor: Colors.orange,
       colorText: Colors.white,
     );
+  }
+
+  /// 로그아웃 처리 (새로 추가)
+  Future<void> handleLogout() async {
+    try {
+      final success = await _authRepository.logout();
+      if (success) {
+        Get.offAllNamed('/login');
+        Get.snackbar(
+          '로그아웃',
+          '성공적으로 로그아웃되었습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.blue,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          '로그아웃 실패',
+          '로그아웃 중 오류가 발생했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      logger.e('로그아웃 오류: $e');
+      Get.snackbar(
+        '로그아웃 실패',
+        '로그아웃 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/signup_model.dart';
-import '../models/signup_dtos.dart';  // 통합 DTO 파일 import
-import '../../../shared/services/signup_api_service.dart';
+import '../models/signup_dtos.dart';
+import '../repositories/auth_repository.dart';  // ✅ 변경: AuthRepository 사용
 import 'package:logger/logger.dart';
 
 class SignupThirdController extends GetxController {
   final SignupModel model;
   final logger = Logger();
-  final SignupApiService _signupApiService = SignupApiService();
+  final AuthRepository _authRepository = AuthRepository();  // ✅ 변경: AuthRepository 사용
 
   // TextEditingController 추가
   final TextEditingController nameController = TextEditingController();
@@ -139,8 +139,7 @@ class SignupThirdController extends GetxController {
     return emailRegex.hasMatch(fullEmail);
   }
 
-  // 회원가입 완료 처리 - API
-  // 연동
+  /// ✅ 변경: AuthRepository를 사용한 회원가입 완료 처리
   Future<void> completeSignup() async {
     if (!model.isThirdNextButtonEnabled || isLoading.value) return;
 
@@ -169,8 +168,8 @@ class SignupThirdController extends GetxController {
 
       logger.d('회원가입 요청 데이터: ${signupRequest.toJson()}');
 
-      // API 호출
-      final response = await _signupApiService.signup(signupRequest);
+      // ✅ 변경: AuthRepository를 통한 API 호출
+      final response = await _authRepository.signup(signupRequest);
 
       if (response.isSuccess) {
         // 회원가입 성공
@@ -193,7 +192,6 @@ class SignupThirdController extends GetxController {
       } else {
         // 회원가입 실패
         logger.e('회원가입 실패: ${response.message}');
-
         _showErrorMessage(response.message ?? '회원가입에 실패했습니다.');
       }
     } catch (e) {
