@@ -14,7 +14,9 @@ class LoginController extends GetxController {
   final RxBool obscureText = true.obs;
   final RxBool rememberAccount = false.obs;
 
-  LoginController({required this.model});
+  LoginController({
+    required this.model,
+  });
 
   @override
   void onInit() {
@@ -56,7 +58,7 @@ class LoginController extends GetxController {
     model.rememberAccount = rememberAccount.value;
   }
 
-  /*
+/*
   Future<void> handleLogin() async {
     // 로그인 처리 로직
     try {
