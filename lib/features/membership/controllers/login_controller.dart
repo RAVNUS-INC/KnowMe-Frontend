@@ -16,9 +16,7 @@ class LoginController extends GetxController {
   final RxBool rememberAccount = false.obs;
   final RxBool isLoading = false.obs;
 
-  LoginController({
-    required this.model,
-  });
+  LoginController({LoginModel? model}) : model = model ?? LoginModel();
 
   @override
   void onInit() {

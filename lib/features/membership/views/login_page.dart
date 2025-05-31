@@ -8,8 +8,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 매번 새로운 컨트롤러 생성 (GetX가 자동으로 관리)
-    final controller = Get.put(LoginController(model: LoginModel()));
+    // 로그인 컨트롤러 인스턴스 가져오기
+    final controller = Get.find<LoginController>();
 
     void dismissKeyboard() {
       FocusScope.of(context).unfocus();

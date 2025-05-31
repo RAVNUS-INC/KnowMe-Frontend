@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 class PasswordResetController extends GetxController {
   // Text controllers
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   // Rx variables
   final RxBool showNewPassword = false.obs;

@@ -7,8 +7,8 @@ class PasswordResetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PasswordResetController controller =
-        Get.put(PasswordResetController());
+    // Get.find()를 사용하여 binding에서 생성된 컨트롤러 가져오기
+    final PasswordResetController controller = Get.find<PasswordResetController>();
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -84,37 +84,37 @@ class PasswordResetScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Obx(() => TextField(
-                                  controller: controller.newPasswordController,
-                                  obscureText:
-                                      !controller.showNewPassword.value,
-                                  decoration: InputDecoration(
-                                    hintText: '새 비밀번호를 입력하세요',
-                                    hintStyle:
-                                        const TextStyle(color: Colors.grey),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide:
-                                          const BorderSide(color: Colors.grey),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide:
-                                          const BorderSide(color: Colors.blue),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 14),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        controller.showNewPassword.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: controller
-                                          .toggleNewPasswordVisibility,
-                                    ),
+                              controller: controller.newPasswordController,
+                              obscureText:
+                              !controller.showNewPassword.value,
+                              decoration: InputDecoration(
+                                hintText: '새 비밀번호를 입력하세요',
+                                hintStyle:
+                                const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                  const BorderSide(color: Colors.grey),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                  const BorderSide(color: Colors.blue),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    controller.showNewPassword.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
                                   ),
-                                )),
+                                  onPressed: controller
+                                      .toggleNewPasswordVisibility,
+                                ),
+                              ),
+                            )),
                           ],
                         ),
 
@@ -134,38 +134,38 @@ class PasswordResetScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Obx(() => TextField(
-                                  controller:
-                                      controller.confirmPasswordController,
-                                  obscureText:
-                                      !controller.showConfirmPassword.value,
-                                  decoration: InputDecoration(
-                                    hintText: '새 비밀번호를 다시 입력하세요',
-                                    hintStyle:
-                                        const TextStyle(color: Colors.grey),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide:
-                                          const BorderSide(color: Colors.grey),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide:
-                                          const BorderSide(color: Colors.blue),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 14),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        controller.showConfirmPassword.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: controller
-                                          .toggleConfirmPasswordVisibility,
-                                    ),
+                              controller:
+                              controller.confirmPasswordController,
+                              obscureText:
+                              !controller.showConfirmPassword.value,
+                              decoration: InputDecoration(
+                                hintText: '새 비밀번호를 다시 입력하세요',
+                                hintStyle:
+                                const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                  const BorderSide(color: Colors.grey),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                  const BorderSide(color: Colors.blue),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    controller.showConfirmPassword.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
                                   ),
-                                )),
+                                  onPressed: controller
+                                      .toggleConfirmPasswordVisibility,
+                                ),
+                              ),
+                            )),
                           ],
                         ),
 
@@ -173,31 +173,31 @@ class PasswordResetScreen extends StatelessWidget {
 
                         // 확인 버튼
                         Obx(() => SizedBox(
-                              width: double.infinity,
-                              height: 48,
-                              child: ElevatedButton(
-                                onPressed: controller.canSubmit.value
-                                    ? controller.resetPassword
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: controller.canSubmit.value
-                                      ? Colors.blue
-                                      : Colors.grey[300],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: const Text(
-                                  '확인',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: controller.canSubmit.value
+                                ? controller.resetPassword
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: controller.canSubmit.value
+                                  ? Colors.blue
+                                  : Colors.grey[300],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            )),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              '확인',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        )),
                       ],
                     ),
                   ),
