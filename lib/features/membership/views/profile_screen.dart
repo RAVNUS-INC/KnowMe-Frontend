@@ -8,7 +8,7 @@ import '../views/membership_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
-  final controller = Get.put(ProfileController());
+  final controller = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {

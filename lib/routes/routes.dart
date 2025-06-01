@@ -17,6 +17,9 @@ import '../features/membership/controllers/login_controller.dart';
 import '../features/membership/controllers/find_id_passwd_controller.dart';
 import '../features/membership/controllers/password_reset_controller.dart';
 import '../features/membership/models/login_model.dart';
+import '../features/home/views/notification_screen.dart';
+import '../features/membership/views/profile_screen.dart';
+import '../features/membership/controllers/profile_controller.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -109,6 +112,19 @@ class AppRoutes {
       page: () => const SearchScreen(),
       binding: BindingsBuilder(() {
         Get.put(SearchController());
+      }),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => const NotificationScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => ProfileScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(ProfileController());
       }),
       transition: Transition.fadeIn,
     ),
