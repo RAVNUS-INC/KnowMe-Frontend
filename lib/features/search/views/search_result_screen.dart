@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:knowme_frontend/features/search/views/search_screen.dart';
 import '../../../shared/widgets/base_scaffold.dart';
 import '../controllers/search_result_controller.dart';
 import '../models/contest_model.dart';
-import 'search_screen.dart';
 
 class SearchResultScreen extends StatefulWidget {
   const SearchResultScreen({super.key});
@@ -29,10 +29,11 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SearchBarWithAction(
-                    controller: TextEditingController(),
+                    controller: controller.searchController,
                     isSearching: false,
                     onSearch: () {},
-                    onCancel: () {},
+                    onCancel: () => Get.back(),
+                    readOnly: true,
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -52,26 +53,25 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: Obx(() => SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final item = controller.results[index];
-                      return Obx(() => _ContestCard(
-                            contest: item,
-                            onSave: () => controller.toggleSave(item),
-                            isSaved: controller.isSaved(item),
-                          ));
-                    },
-                    childCount:
-                        controller.results.length.clamp(0, visibleCount),
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 180 / 240,
-                  ),
-                )),
+                  final item = controller.results[index];
+                  return Obx(() => _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  ));
+                },
+                childCount: controller.results.length.clamp(0, visibleCount),
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 180 / 240,
+              ),
+            ),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -82,8 +82,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     visibleCount += 4;
                   }),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: ShapeDecoration(
                       color: const Color(0xFFB7C4D4),
                       shape: RoundedRectangleBorder(
@@ -137,25 +136,25 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: Obx(() => SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final item = controller.savedContests[index];
-                      return Obx(() => _ContestCard(
-                            contest: item,
-                            onSave: () => controller.toggleSave(item),
-                            isSaved: controller.isSaved(item),
-                          ));
-                    },
-                    childCount: controller.savedContests.length,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 180 / 240,
-                  ),
-                )),
+                  final item = controller.savedContests[index];
+                  return Obx(() => _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  ));
+                },
+                childCount: controller.savedContests.length,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 180 / 240,
+              ),
+            ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
@@ -169,8 +168,11 @@ class _ContestCard extends StatelessWidget {
   final VoidCallback onSave;
   final bool isSaved;
 
-  const _ContestCard(
-      {required this.contest, required this.onSave, required this.isSaved});
+  const _ContestCard({
+    required this.contest,
+    required this.onSave,
+    required this.isSaved,
+  });
 
   @override
   Widget build(BuildContext context) {

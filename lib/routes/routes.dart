@@ -16,7 +16,7 @@ import '../features/search/views/search_screen.dart';
 import '../features/membership/controllers/login_controller.dart';
 import '../features/membership/controllers/find_id_passwd_controller.dart';
 import '../features/membership/controllers/password_reset_controller.dart';
-// import '../features/membership/models/login_model.dart';
+import '../features/membership/models/login_model.dart';
 //posts, recommendation
 import 'package:knowme_frontend/features/posts/controllers/filter_controller.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
@@ -46,7 +46,6 @@ class AppRoutes {
   static const String activity = '/activity';
   static const String recommendation = '/recommendation';
   static const String aiAnalysis = '/ai-analysis';
-
   // 게시물 관련 라우트 상수 추가
   static const String postList = '/posts';
   static const String postDetail = '/post/detail';
@@ -127,63 +126,54 @@ class AppRoutes {
       }),
       transition: Transition.fadeIn,
     ),
-
     // 게시물 관련 라우트
-    // 포스트 관련 페이지들
     GetPage(
       name: postList,
       page: () => const PostListScreen(),
-      binding: postListBinding,
+      binding: PostBinding(), // 컨트롤러 바인딩 추가
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: postDetail,
       page: () => const PostDetailScreen(),
-      binding: postDetailBinding,
+      binding: PostBinding(), // 필요한 경우 상세 페이지에도 바인딩
+      transition: Transition.rightToLeft,
     ),
 
-    // 추천 활동 페이지
+    // 추천 활동 화면 라우트
     GetPage(
-      name: recommendationScreen,
+      name: recommendation,
       page: () => const RecommendationScreen(),
-      binding: recommendationBinding,
+      binding: RecommendationBinding(), // 추천 컨트롤러 바인딩 추가
+      transition: Transition.fadeIn,
     ),
   ];
-  //////////게시물 관련 라우트
-// 의존성 주입을 위한 공통 메서드
-  static void dependencies() {
-    // Controller 등록
-    Get.put(PostController());
-    Get.put(FilterController());
-    Get.put(RecommendationController());
-
-    // Services 등록
-    Get.put(FilterOptionsService());
+  static void navigateToPostList() {
+    Get.toNamed(postList);
   }
 
-  // main.dart에서 사용할 지연 의존성 주입
-  static void lazyDependencies() {
-    // 필터 옵션 서비스 등록
-    Get.lazyPut(() => FilterOptionsService());
-
-    // 필터 컨트롤러 등록
-    Get.lazyPut(() => FilterController());
-
-    // 추천 컨트롤러 등록
-    Get.lazyPut(() => RecommendationController());
+  static void navigateToPostDetail() {
+    Get.toNamed(postDetail);
   }
 
-  // 각 화면별 바인딩 클래스 정의
-  static final Bindings postListBinding = BindingsBuilder(() {
-    Get.put(PostController());
-    Get.put(FilterController());
-    Get.put(FilterOptionsService());
-  });
+  static void navigateToRecommendation() {
+    Get.toNamed(recommendation);
+  }
+}
 
-  static final Bindings postDetailBinding = BindingsBuilder(() {
-    Get.put(PostController());
-  });
+// PostController를 바인딩하는 클래스 생성
+class PostBinding implements Bindings {
+  @override
+  void dependencies() {
+    // 메인 컨트롤러 생성 및 주입 (PageController 포함)
+    Get.lazyPut<PostController>(() => PostController());
+  }
+}
 
-  static final Bindings recommendationBinding = BindingsBuilder(() {
-    Get.put(RecommendationController());
-  });
+class RecommendationBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<RecommendationController>(() => RecommendationController(),
+        fenix: true);
+  }
 }
