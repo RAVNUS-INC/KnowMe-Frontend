@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // flutter_svg 패키지 import
 import '../../../routes/routes.dart'; // ✅ AppRoutes 사용
 // 홈, 검색 등 실제 페이지는 AppRoutes 통해 관리되므로 직접 import 불필요
 
 class BaseScaffold extends StatelessWidget {
   final Widget body;
   final int currentIndex;
+  final bool showBackButton; // 추가
+  final VoidCallback? onBack; // 추가
 
   const BaseScaffold({
     super.key,
     required this.body,
     this.currentIndex = 0,
+    this.showBackButton = false, // 추가
+    this.onBack, // 추가
   });
 
   @override
@@ -19,7 +24,7 @@ class BaseScaffold extends StatelessWidget {
       backgroundColor: const Color(0xFFFDFDFD),
       body: Column(
         children: [
-          _buildAppBar(),
+          _buildAppBar(context), // context 전달
           Expanded(child: body),
         ],
       ),
@@ -27,7 +32,7 @@ class BaseScaffold extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar(BuildContext context) {
     return Container(
       width: double.infinity,
       height: 100,
@@ -44,14 +49,28 @@ class BaseScaffold extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 로고
+            // 왼쪽: 뒤로가기 버튼 + 로고(심볼+텍스트) 항상 표시
             Row(
               children: [
+                if (showBackButton)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/arrow.svg',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
                 Image.asset('assets/images/symbol.png', width: 28, height: 28),
                 const SizedBox(width: 6),
                 GestureDetector(
                   onTap: () {
-                    Get.offAllNamed(AppRoutes.home); // ✅ 이름기반 경로
+                    Get.offAllNamed(AppRoutes.home);
                   },
                   child: Image.asset(
                     'assets/images/knowme.png',
@@ -65,7 +84,7 @@ class BaseScaffold extends StatelessWidget {
             Row(
               children: [
                 _AppIconButton('assets/images/Search.png', onTap: () {
-                  Get.toNamed(AppRoutes.search); // ✅ binding 적용됨
+                  Get.toNamed(AppRoutes.search);
                 }),
                 const SizedBox(width: 16),
                 _AppIconButton('assets/images/bell.png', onTap: () {
@@ -100,7 +119,9 @@ class BaseScaffold extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _BottomNavItem(
-            iconPath: 'assets/images/icon-공고.png',
+            iconPath: currentIndex == 0 
+                ? 'assets/bottom_nav_svgs/icon-공고_blue.svg'
+                : 'assets/bottom_nav_svgs/icon-공고.svg',
             label: '공고',
             isActive: currentIndex == 0,
             activeColor: activeColor,
@@ -110,7 +131,9 @@ class BaseScaffold extends StatelessWidget {
             },
           ),
           _BottomNavItem(
-            iconPath: 'assets/images/내활동.png',
+            iconPath: currentIndex == 1
+                ? 'assets/bottom_nav_svgs/icon-내활동_blue.svg'
+                : 'assets/bottom_nav_svgs/icon-내활동.svg',
             label: '내 활동',
             isActive: currentIndex == 1,
             activeColor: activeColor,
@@ -120,7 +143,9 @@ class BaseScaffold extends StatelessWidget {
             },
           ),
           _BottomNavItem(
-            iconPath: 'assets/images/활동추천.png',
+            iconPath: currentIndex == 2
+                ? 'assets/bottom_nav_svgs/icon-활동추천_blue.svg'
+                : 'assets/bottom_nav_svgs/icon-활동추천.svg',
             label: '활동 추천',
             isActive: currentIndex == 2,
             activeColor: activeColor,
@@ -130,7 +155,9 @@ class BaseScaffold extends StatelessWidget {
             },
           ),
           _BottomNavItem(
-            iconPath: 'assets/images/AI분석.png',
+            iconPath: currentIndex == 3
+                ? 'assets/bottom_nav_svgs/icon-AI분석_blue.svg'
+                : 'assets/bottom_nav_svgs/icon-AI분석.svg',
             label: 'AI 분석',
             isActive: currentIndex == 3,
             activeColor: activeColor,
@@ -187,7 +214,18 @@ class _BottomNavItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(iconPath, width: 26, height: 26, color: color),
+          // SVG 파일이면 SvgPicture.asset 사용, 아니면 Image.asset 사용
+          iconPath.endsWith('.svg')
+              ? SvgPicture.asset(
+                  iconPath,
+                  width: 26,
+                  height: 26,
+                )
+              : Image.asset(
+                  iconPath,
+                  width: 26,
+                  height: 26,
+                ),
           const SizedBox(height: 4),
           Text(
             label,

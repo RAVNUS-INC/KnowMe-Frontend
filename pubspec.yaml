@@ -70,6 +70,7 @@ flutter:
     - assets/icons/
     - assets/logos/
     - assets/posts_images/
+    - assets/bottom_nav_svgs/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

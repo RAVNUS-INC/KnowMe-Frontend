@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
-import 'package:knowme_frontend/features/posts/widgets/post_list_app_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/filter_row_widget.dart';
+import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
 
 class PostListScreen extends StatefulWidget {
   const PostListScreen({super.key});
@@ -69,9 +69,8 @@ class _PostListScreenState extends State<PostListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFEDEFF0),
-      appBar: const PostListAppBar(),
+    return BaseScaffold(
+      currentIndex: 0, // '공고' 탭 인덱스
       body: Column(
         children: [
           // 상단 고정 영역

@@ -1,41 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:knowme_frontend/features/posts/widgets/post_list_app_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_text_widgets.dart';
+import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
 
 class PostDetailScreen extends StatelessWidget {
   const PostDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        leadingWidth: 40, // 리딩 아이콘의 너비를 줄임
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8), // 왼쪽 패딩 조정
-          child: IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/arrow.svg',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            padding: EdgeInsets.zero, // 아이콘 버튼의 내부 패딩 제거
-          ),
-        ),
-        titleSpacing: 0, // 타이틀과 리딩 아이콘 사이의 기본 간격 제거
-        title: const Padding(
-          padding: EdgeInsets.only(left: 8), // 로고에 약��의 패딩 추가
-          child: PostListAppBar(),
-        ),
-        centerTitle: false, // 로고를 중앙 정렬하지 않고 왼쪽으로 정렬
-      ),
-      backgroundColor: Colors.white, // 배경색 추가
+    return BaseScaffold(
+      currentIndex: 0, // 공고 탭 활성화
+      showBackButton: true, // 뒤로가기 버튼 표시
+      onBack: () => Navigator.of(context).pop(), // 뒤로가기 동작
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -82,7 +57,7 @@ class PostDetailScreen extends StatelessWidget {
           const SectionTitle('회사 소개'),
           const SizedBox(height: 8),
           const Text(
-            '코드웨이브는 웹/앱 개발, B2B SaaS 플랫폼, 데이터 기반 UI/UX 개선 등 다양한 프로젝트를 통해 빠르게 성장 중인 스타트업으로, 기술을 통해 더 나은 일상을 만드는 디지털 솔루션 기업입니다.\n\n우리는 “기술로 연결된 가치”를 믿습니다. 함께 성장하고 싶은 당��을 기다립니다.',
+            '코드웨이브는 웹/앱 개발, B2B SaaS 플랫폼, 데이터 기반 UI/UX 개선 등 다양한 프로젝트를 통해 빠르게 성장 중인 스타트업으로, 기술을 통해 더 나은 일상을 만드는 디지털 솔루션 기업입니다.\n\n우리는 “기술로 연결된 가치”를 믿습니다. 함께 성장하고 싶은 당신을 기다립니다.',
           ),
           const SizedBox(height: 8),
           ClipRRect(
@@ -244,4 +219,3 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 }
-//
