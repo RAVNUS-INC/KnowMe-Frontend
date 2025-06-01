@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import '../../../shared/widgets/base_scaffold.dart';
+import '../../../routes/routes.dart'; // AppRoutes를 임포트합니다
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -62,7 +63,29 @@ class HomeScreen extends StatelessWidget {
                   children: controller.iconItems.map((item) {
                     return GestureDetector(
                       onTap: () {
-                        // TODO: 여기에 onTap 기능을 넣으면 됩니다~
+                        // 각 카테고리에 맞는 탭 인덱스로 이동하도록 수정
+                        switch (item['label']) {
+                          case '채용':
+                            // 첫 번째 탭(인덱스 0)으로 이동
+                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 0});
+                            break;
+                          case '인턴':
+                            // 두 번째 탭(인덱스 1)으로 이동
+                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 1});
+                            break;
+                          case '대외활동':
+                            // 세 번째 탭(인덱스 2)으로 이동
+                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 2});
+                            break;
+                          case '교육/강연':
+                            // 네 번째 탭(인덱스 3)으로 이동
+                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 3});
+                            break;
+                          case '공모전': // 중복된 '대외활동'을 '공모전'으로 수정
+                            // 다섯 번째 탭(인덱스 4)으로 이동
+                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 4});
+                            break;
+                        }
                       },
                       child: _IconLabelItem(
                         imageName: item['image']!,
@@ -72,7 +95,6 @@ class HomeScreen extends StatelessWidget {
                   }).toList(),
                 ),
               ),
-
 
               const SizedBox(height: 24),
               Padding(

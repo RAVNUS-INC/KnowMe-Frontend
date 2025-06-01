@@ -114,7 +114,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
 
     if (recruitmentContests.isEmpty) {
       return const Center(
-        child: Text('채용 정보��� 불러오는 중입니다...'),
+        child: Text('채용 정보를 불러오는 중입니다...'),
       );
     }
 
