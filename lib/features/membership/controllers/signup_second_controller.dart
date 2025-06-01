@@ -120,15 +120,12 @@ class SignupSecondController extends GetxController {
   // Navigate to the third page
   void navigateToThirdPage() {
     if (signupModel.isSecondNextButtonEnabled) {
-      Get.toNamed(
-        '/signup/third',
-        arguments: {
+      Get.toNamed('/signup/third', arguments: {
           'marketingConsent': signupModel.agreeToMarketingInfo,
           'userId': signupModel.userId,
           'password': signupModel.password,
           'phoneNumber': signupModel.phoneNumber,
-        },
-      );
+        },);
     }
   }
 }

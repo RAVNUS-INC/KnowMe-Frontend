@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 확인해서 맞춰줘!
-import 'package:knowme_final_new/features/home/models/notification_item.dart';
+import '../../../shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 확인해서 맞춰줘!
+import '../models/notification_item.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});

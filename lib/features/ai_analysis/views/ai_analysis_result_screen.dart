@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/ai_analysis/controllers/ai_analysis_result_controller.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../controllers/ai_analysis_result_controller.dart';
 
 // 추후 하드코딩된 텍스트들은 mvc구조에 맞게 데이터로 대체 예정
 class AiAnalysisResultScreen extends StatelessWidget {
   const AiAnalysisResultScreen({super.key});
 
-  Widget get _verticalDivider =>
-      Container(width: 1, height: 60, color: const Color(0xFFE5E5E5));
+  Widget get _verticalDivider => Container(
+        width: 1,
+        height: 60,
+        color: const Color(0xFFE5E5E5),
+      );
 
   Widget _section(String title, String content) {
     return Column(
@@ -117,25 +120,25 @@ class AiAnalysisResultScreen extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildBar('실전형 주제', const Color(0xFF0068E5), 240),
+                _buildBar('실전형 주제', Color(0xFF0068E5), 240),
                 const SizedBox(height: 8),
-                _buildBar('실무 적용력', const Color(0xFF0068E5), 200),
+                _buildBar('실무 적용력', Color(0xFF0068E5), 200),
                 const SizedBox(height: 8),
-                _buildBar('UX 중심 구성', const Color(0xFF0068E5), 160),
+                _buildBar('UX 중심 구성', Color(0xFF0068E5), 160),
                 const SizedBox(height: 32),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: _buildBar('실무 협업 역량', const Color(0xCDD0CFC7), 200),
+                  child: _buildBar('실무 협업 역량', Color(0xCDD0CFC7), 200),
                 ),
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: _buildBar('운영 관점 역량', const Color(0xCDD0CFC7), 160),
+                  child: _buildBar('운영 관점 역량', Color(0xCDD0CFC7), 160),
                 ),
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: _buildBar('전문성', const Color(0xCDD0CFC7), 120),
+                  child: _buildBar('전문성', Color(0xCDD0CFC7), 120),
                 ),
               ],
             ),
@@ -224,7 +227,10 @@ class _RecommendationButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _RecommendationButton({required this.label, required this.onTap});
+  const _RecommendationButton({
+    required this.label, 
+    required this.onTap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +256,11 @@ class _RecommendationButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/icon-ai.png', width: 16, height: 16),
+            Image.asset(
+              'assets/images/icon-ai.png',
+              width: 16, 
+              height: 16
+            ),
             const SizedBox(width: 8),
             Text(
               label,
@@ -264,7 +274,11 @@ class _RecommendationButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, size: 18, color: Color(0xFF0068E5)),
+            const Icon(
+              Icons.chevron_right, 
+              size: 18,
+              color: Color(0xFF0068E5),
+            ),
           ],
         ),
       ),

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/routes.dart'; // AppRoutes 경로 맞게 수정
 import '../../../shared/widgets/base_scaffold.dart'; // BaseScaffold 경로 맞게 수정
-import 'package:knowme_final_new/features/membership/controllers/profile_controller.dart';
-import 'package:knowme_final_new/features/membership/models/profile_model.dart';
-import 'package:knowme_final_new/features/membership/views/membership_screen.dart';
+import '../controllers/profile_controller.dart';
+import '../models/profile_model.dart';
+import '../views/membership_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/profile_model.dart';
 import '../views/profile_screen.dart';
-import 'package:knowme_final_new/features/membership/models/profile_model.dart';
+import '../models/profile_model.dart';
 
 class ProfileController extends GetxController {
   final userProfile = dummyProfile.obs;

@@ -46,7 +46,7 @@ class SignupModel {
     'gmail.com',
     'naver.com',
     'daum.net',
-    'hotmail.com',
+    'hotmail.com'
   ];
 
   static final List<String> grades = ['1학년', '2학년', '3학년', '4학년'];
@@ -69,7 +69,7 @@ class SignupModel {
     '식품',
     '공공/복지',
     '건설/시설',
-    '기타',
+    '기타'
   ];
 
   // 테스트 사용자 정보 - 개발용

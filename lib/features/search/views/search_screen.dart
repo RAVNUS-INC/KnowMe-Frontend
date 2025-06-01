@@ -17,14 +17,12 @@ class SearchScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(
-              () => SearchBarWithAction(
-                controller: controller.searchController,
-                isSearching: controller.isSearching.value,
-                onSearch: controller.handleSearch,
-                onCancel: () => Navigator.pop(context),
-              ),
-            ),
+            Obx(() => SearchBarWithAction(
+                  controller: controller.searchController,
+                  isSearching: controller.isSearching.value,
+                  onSearch: controller.handleSearch,
+                  onCancel: () => Navigator.pop(context),
+                )),
             const SizedBox(height: 20),
             _SearchHeader(onClearAll: controller.clearRecentSearches),
             const SizedBox(height: 6),
@@ -42,8 +40,8 @@ class SearchScreen extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.only(top: 4),
       itemCount: controller.recentSearches.length,
-      separatorBuilder:
-          (_, __) => Container(height: 1, color: const Color(0xFFE5E5E5)),
+      separatorBuilder: (_, __) =>
+          Container(height: 1, color: const Color(0xFFE5E5E5)),
       itemBuilder: (context, index) {
         final item = controller.recentSearches[index];
         return RecentSearchItem(
@@ -84,11 +82,8 @@ class SearchBarWithAction extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/images/icon-search.png',
-                  width: 16,
-                  height: 16,
-                ),
+                Image.asset('assets/images/icon-search.png',
+                    width: 16, height: 16),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(

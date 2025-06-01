@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/activity/models/activity_record.dart';
-import 'package:knowme_final_new/features/activity/controllers/activity_controller.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../models/activity_record.dart';
+import '../controllers/activity_controller.dart';
 
 ///활동 수정 페이지
 class AddProjectPage extends StatefulWidget {
