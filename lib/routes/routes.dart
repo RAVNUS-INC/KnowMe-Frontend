@@ -1,88 +1,114 @@
 import 'package:get/get.dart';
-import 'package:knowme_frontend/features/posts/controllers/filter_controller.dart';
-import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-import 'package:knowme_frontend/features/posts/services/filter_options_service.dart';
-import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
-import 'package:knowme_frontend/features/posts/views/post_list_screen.dart';
-import 'package:knowme_frontend/features/recommendation/controllers/recommendation_controller.dart';
-import 'package:knowme_frontend/features/recommendation/views/recommendation_screen.dart';
+import '../features/ai_analysis/views/ai_analysis_screen.dart';
+import '../features/home/controllers/home_controller.dart';
+import '../features/membership/views/login_page.dart';
+import '../features/membership/views/signup_firstpage.dart';
+import '../features/membership/views/signup_secondpage.dart';
+import '../features/membership/views/signup_thirdpage.dart';
+import '../features/membership/views/find_id_passwd.dart';
+import '../features/membership/views/find_id_result_screen.dart';
+import '../features/membership/views/password_reset_screen.dart';
+import '../features/membership/views/password_reset_success_screen.dart';
+import '../features/home/views/home_screen.dart';
+import '../features/ai_analysis/controllers/ai_analysis_controller.dart';
+import '../features/search/controllers/search_controller.dart';
+import '../features/search/views/search_screen.dart';
+import '../features/membership/controllers/login_controller.dart';
+import '../features/membership/controllers/find_id_passwd_controller.dart';
+import '../features/membership/controllers/password_reset_controller.dart';
+import '../features/membership/models/login_model.dart';
 
 class AppRoutes {
-  static const String splash = '/splash';
-  static const String onboarding = '/onboarding';
   static const String login = '/login';
-  static const String signUp = '/signup';
+  static const String signupFirst = '/signup/first';
+  static const String signupSecond = '/signup/second';
+  static const String signupThird = '/signup/third';
   static const String home = '/home';
-  static const String profile = '/profile';
-  static const String editProfile = '/profile/edit';
-  static const String settings = '/settings';
-  static const String postList = '/posts';
-  static const String postDetail = '/posts/detail';
-  static const String notification = '/notification';
-  static const String chat = '/chat';
-  static const String chatRoom = '/chat/room';
+  static const String findIdPasswd = '/find-id-passwd';
+  static const String findIdResult = '/find-id-result';
+  static const String passwordReset = '/password-reset';
+  static const String passwordResetSuccess = '/password-reset-success';
   static const String search = '/search';
 
-  // 추천 활동 관련 라우트
-  static const String recommendationScreen = '/recommendation';
+  // ✅ 새 라우트 추가
+  static const String post = '/post';
+  static const String activity = '/activity';
+  static const String recommendation = '/recommendation';
+  static const String aiAnalysis = '/ai-analysis';
 
-  // 의존성 주입을 위한 공통 메서드
-  static void dependencies() {
-    // Controller 등록
-    Get.put(PostController());
-    Get.put(FilterController());
-    Get.put(RecommendationController());
-    
-    // Services 등록
-    Get.put(FilterOptionsService());
-  }
-  
-  // main.dart에서 사용할 지연 의존성 주입
-  static void lazyDependencies() {
-    // 필터 옵션 서비스 등록
-    Get.lazyPut(() => FilterOptionsService());
-    
-    // 필터 컨트롤러 등록
-    Get.lazyPut(() => FilterController());
-    
-    // 추천 컨트롤러 등록
-    Get.lazyPut(() => RecommendationController());
-  }
-  
-  // 각 화면별 바인딩 클래스 정의
-  static final Bindings postListBinding = BindingsBuilder(() {
-    Get.put(PostController());
-    Get.put(FilterController());
-    Get.put(FilterOptionsService());
-  });
-
-  static final Bindings postDetailBinding = BindingsBuilder(() {
-    Get.put(PostController());
-  });
-  
-  static final Bindings recommendationBinding = BindingsBuilder(() {
-    Get.put(RecommendationController());
-  });
-  
-  // 라우트 목록
   static final routes = [
-    // 포스트 관련 페이지들
     GetPage(
-      name: postList,
-      page: () => const PostListScreen(),
-      binding: postListBinding,
+      name: login,
+      page: () => const LoginPage(),
+      binding: BindingsBuilder(() {
+        Get.put(LoginController());
+      }),
+      transition: Transition.fadeIn,
     ),
     GetPage(
-      name: postDetail,
-      page: () => const PostDetailScreen(),
-      binding: postDetailBinding,
+      name: signupFirst,
+      page: () => const SignupFirstPage(),
+      transition: Transition.rightToLeft,
     ),
-    
-    // 추천 활동 페이지
     GetPage(
-      name: recommendationScreen,
-      page: () => const RecommendationScreen(),
-      binding: recommendationBinding,
+      name: signupSecond,
+      page: () => const SignupSecondPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: signupThird,
+      page: () => const SignupThirdPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: findIdPasswd,
+      page: () => const FindIdPasswd(),
+      binding: BindingsBuilder(() {
+        Get.put(FindIdPasswdController());
+      }),
+      transition: Transition.downToUp,
+    ),
+    GetPage(
+      name: findIdResult,
+      page: () => const FindIdResultScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: passwordReset,
+      page: () => const PasswordResetScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(PasswordResetController());
+      }),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: passwordResetSuccess,
+      page: () => const PasswordResetSuccessScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: home,
+      page: () => const HomeScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(HomeController());
+      }),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.aiAnalysis,
+      page: () => const AiAnalysisScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(AiAnalysisController()); // ✅ 이게 반드시 있어야 합니다.
+      }),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.search,
+      page: () => const SearchScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(SearchController());
+      }),
+      transition: Transition.fadeIn,
     ),
   ];
 }

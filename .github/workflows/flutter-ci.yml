@@ -16,7 +16,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.16.0"
+          flutter-version: '3.29.3'
           channel: "stable"
           cache: true
 
@@ -24,7 +24,7 @@ jobs:
         run: flutter pub get
 
       - name: Verify formatting
-        run: flutter format --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
 
       - name: Analyze project source
         run: flutter analyze
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.16.0"
+          flutter-version: "3.29.3"
           channel: "stable"
           cache: true
 

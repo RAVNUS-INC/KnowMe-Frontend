@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: '>=3.4.1 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,19 +30,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # GetX 상태 관리 및 라우팅
-  get: ^4.6.5
-
-  # UI 관련
-  flutter_svg: ^2.0.7
-
-  # 로깅 (logger 패키지만 사용)
   logger: ^2.0.2
+
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  get: ^4.7.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_svg: ^2.0.7
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -56,16 +57,13 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  assets:
-    - assets/
-    - assets/posts_images/
-    - assets/icons/
-    - assets/logos/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
