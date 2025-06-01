@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:knowme_frontend/features/search/views/search_screen.dart';
 import '../../../shared/widgets/base_scaffold.dart';
 import '../controllers/search_result_controller.dart';
-import '../models/contest_model.dart';
+import 'package:knowme_frontend/features/search/models/contest_model.dart';
 
 class SearchResultScreen extends StatefulWidget {
   const SearchResultScreen({super.key});

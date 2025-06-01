@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/contest_model.dart';
+import 'package:knowme_frontend/features/search/models/contest_model.dart';
 
 class SearchResultController extends GetxController {
   // 🔍 검색어
