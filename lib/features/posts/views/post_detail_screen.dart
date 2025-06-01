@@ -170,7 +170,7 @@ class PostDetailScreen extends StatelessWidget {
 
           const SectionTitle('지원 방법'),
           const SizedBox(height: 8),
-          const Text('이력서 및 포트���리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
+          const Text('이력서 및 포트폴리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
           const SizedBox(height: 20),
         ],
       ),

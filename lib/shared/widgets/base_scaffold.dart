@@ -127,7 +127,7 @@ class BaseScaffold extends StatelessWidget {
             inactiveColor: inactiveColor,
             onTap: () {
               if (currentIndex != 2)
-                Get.offAllNamed(AppRoutes.recommendation); // ✅
+                Get.offAllNamed(AppRoutes.recommendation);
             },
           ),
           _BottomNavItem(
