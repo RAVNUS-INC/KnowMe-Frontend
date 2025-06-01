@@ -27,10 +27,10 @@ class _PostListScreenState extends State<PostListScreen>
     super.initState();
     // 컨트롤러 주입받기
     _postController = Get.find<PostController>();
-    
+
     // Get.arguments에서 tabIndex를 받아옴
     int initialIndex = 0; // 기본값
-    
+
     if (Get.arguments != null && Get.arguments is Map<String, dynamic>) {
       final args = Get.arguments as Map<String, dynamic>;
       if (args.containsKey('tabIndex') && args['tabIndex'] is int) {
@@ -53,7 +53,7 @@ class _PostListScreenState extends State<PostListScreen>
         _postController.changeTab(_tabController.index);
       }
     });
-    
+
     // PostController의 pageController도 해당 페이지로 이동시킴
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _postController.pageController.jumpToPage(initialIndex);
@@ -100,7 +100,7 @@ class _PostListScreenState extends State<PostListScreen>
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
                   List<Contest> filteredContests =
-                  _postController.getFilteredContentsByTabIndex(index);
+                      _postController.getFilteredContentsByTabIndex(index);
                   return PostGrid(contests: filteredContests);
                 });
               },

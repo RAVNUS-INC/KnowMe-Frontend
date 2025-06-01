@@ -187,8 +187,6 @@ class AppRoutes {
   static final Bindings recommendationBinding = BindingsBuilder(() {
     Get.put(RecommendationController());
   });
-
-
 }
 
 // PostController를 바인딩하는 클래스 생성

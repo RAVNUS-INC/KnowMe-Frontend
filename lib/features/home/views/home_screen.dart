@@ -67,23 +67,28 @@ class HomeScreen extends StatelessWidget {
                         switch (item['label']) {
                           case '채용':
                             // 첫 번째 탭(인덱스 0)으로 이동
-                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 0});
+                            Get.toNamed(AppRoutes.postList,
+                                arguments: {'tabIndex': 0});
                             break;
                           case '인턴':
                             // 두 번째 탭(인덱스 1)으로 이동
-                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 1});
+                            Get.toNamed(AppRoutes.postList,
+                                arguments: {'tabIndex': 1});
                             break;
                           case '대외활동':
                             // 세 번째 탭(인덱스 2)으로 이동
-                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 2});
+                            Get.toNamed(AppRoutes.postList,
+                                arguments: {'tabIndex': 2});
                             break;
                           case '교육/강연':
                             // 네 번째 탭(인덱스 3)으로 이동
-                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 3});
+                            Get.toNamed(AppRoutes.postList,
+                                arguments: {'tabIndex': 3});
                             break;
                           case '공모전': // 중복된 '대외활동'을 '공모전'으로 수정
                             // 다섯 번째 탭(인덱스 4)으로 이동
-                            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': 4});
+                            Get.toNamed(AppRoutes.postList,
+                                arguments: {'tabIndex': 4});
                             break;
                         }
                       },
