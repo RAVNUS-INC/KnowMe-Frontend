@@ -11,13 +11,14 @@ class PostBinding implements Bindings {
   void dependencies() {
     // 메인 컨트롤러 생성 및 주입 (PageController 포함)
     Get.lazyPut<PostController>(() => PostController());
-
   }
 }
+
 class RecommendationBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<RecommendationController>(() => RecommendationController(), fenix: true);
+    Get.lazyPut<RecommendationController>(() => RecommendationController(),
+        fenix: true);
   }
 }
 
@@ -42,7 +43,7 @@ class Routes {
       binding: PostBinding(), // 필요한 경우 상세 페이지에도 바인딩
       transition: Transition.rightToLeft,
     ),
-    
+
     // 추천 활동 화면 라우트
     GetPage(
       name: recommendation,
@@ -59,7 +60,7 @@ class Routes {
   static void navigateToPostDetail() {
     Get.toNamed(postDetail);
   }
-  
+
   static void navigateToRecommendation() {
     Get.toNamed(recommendation);
   }

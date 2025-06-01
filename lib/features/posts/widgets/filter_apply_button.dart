@@ -20,7 +20,8 @@ class FilterApplyButton extends StatelessWidget {
             height: 45,
             decoration: ShapeDecoration(
               color: const Color(0xFF0068E5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               shadows: const [
                 BoxShadow(
                   color: Color(0x33184173),

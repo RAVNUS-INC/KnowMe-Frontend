@@ -27,7 +27,8 @@ class RecommendationScreen extends StatelessWidget {
           Expanded(
             child: TabBarView(
               controller: controller.tabController,
-              children: const [ // const 추가
+              children: const [
+                // const 추가
                 RecommendedActivitiesTab(),
                 SavedActivitiesTab(),
               ],

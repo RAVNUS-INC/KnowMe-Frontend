@@ -20,7 +20,7 @@ class FilterHeader extends StatelessWidget {
       color: const Color(0xFFF5F5F5), // 반투명 흰색 배경
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16,0), // 적당한 여백 설정
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0), // 적당한 여백 설정
         child: Column(
           mainAxisSize: MainAxisSize.min, // 내용만큼만 차지하도록
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,11 +30,13 @@ class FilterHeader extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: onClose,
-                  child: SvgPicture.asset('assets/icons/cancel.svg', width: 16, height: 16),
+                  child: SvgPicture.asset('assets/icons/cancel.svg',
+                      width: 16, height: 16),
                 ),
                 GestureDetector(
                   onTap: onReset,
-                  child: SvgPicture.asset('assets/icons/refresh.svg', width: 24, height: 24),
+                  child: SvgPicture.asset('assets/icons/refresh.svg',
+                      width: 24, height: 24),
                 ),
               ],
             ),
@@ -52,7 +54,6 @@ class FilterHeader extends StatelessWidget {
             Divider(color: Colors.grey[300], thickness: 1),
           ],
         ),
-
       ),
     );
   }

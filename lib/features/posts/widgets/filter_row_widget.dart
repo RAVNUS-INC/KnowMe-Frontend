@@ -19,7 +19,8 @@ class FilterRowWidget extends StatelessWidget {
 
     return Obx(() {
       // 클래스 메소드 호출 시 postController를 전달
-      final List<Widget> filterButtons = _getFilterButtonsByTabIndex(postController);
+      final List<Widget> filterButtons =
+          _getFilterButtonsByTabIndex(postController);
 
       return SizedBox(
         height: 50, // filter button row
@@ -59,9 +60,13 @@ class FilterRowWidget extends StatelessWidget {
                   postController.resetFilters();
 
                   // 정렬 옵션 버튼의 위치 계산을 위한 RenderBox 가져오기
-                  final RenderBox button = context.findRenderObject() as RenderBox;
-                  final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-                  final buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
+                  final RenderBox button =
+                      context.findRenderObject() as RenderBox;
+                  final RenderBox overlay = Overlay.of(context)
+                      .context
+                      .findRenderObject() as RenderBox;
+                  final buttonPosition =
+                      button.localToGlobal(Offset.zero, ancestor: overlay);
 
                   // 팝업 메뉴 표시
                   showDialog(
@@ -71,7 +76,8 @@ class FilterRowWidget extends StatelessWidget {
                       return Stack(
                         children: [
                           Positioned(
-                            top: buttonPosition.dy + 35, // FilterRowWidget 바로 아래 위치
+                            top: buttonPosition.dy +
+                                35, // FilterRowWidget 바로 아래 위치
                             right: 16, // 오른쪽 여백 16 유지
                             child: SizedBox(
                               width: 120, // 가로 길이 105로 고정
@@ -128,47 +134,87 @@ class FilterRowWidget extends StatelessWidget {
       case 0: // 채용
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton(postController, '직무', postController.getFilterByType(currentTabIndex, '직무').value, defaultText: '직무'),
-          _buildFilterButton(postController, '경력', postController.getFilterByType(currentTabIndex, '신입~5년').value, defaultText: '경력'),
-          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
-          _buildMultiSelectFilterButton(postController, '학력', postController.multiSelectJobEducation, defaultText: '학력'),
+          _buildFilterButton(postController, '직무',
+              postController.getFilterByType(currentTabIndex, '직무').value,
+              defaultText: '직무'),
+          _buildFilterButton(postController, '경력',
+              postController.getFilterByType(currentTabIndex, '신입~5년').value,
+              defaultText: '경력'),
+          _buildFilterButton(postController, '지역',
+              postController.getFilterByType(currentTabIndex, '지역').value,
+              defaultText: '지역'),
+          _buildMultiSelectFilterButton(
+              postController, '학력', postController.multiSelectJobEducation,
+              defaultText: '학력'),
         ];
         break;
       case 1: // 인턴
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton(postController, '직무', postController.getFilterByType(currentTabIndex, '직무').value, defaultText: '직무'),
-          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
-          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
-          _buildMultiSelectFilterButton(postController, '학력', postController.multiSelectInternEducation, defaultText: '학력'),
+          _buildFilterButton(postController, '직무',
+              postController.getFilterByType(currentTabIndex, '직무').value,
+              defaultText: '직무'),
+          _buildFilterButton(postController, '기간',
+              postController.getFilterByType(currentTabIndex, '기간').value,
+              defaultText: '기간'),
+          _buildFilterButton(postController, '지역',
+              postController.getFilterByType(currentTabIndex, '지역').value,
+              defaultText: '지역'),
+          _buildMultiSelectFilterButton(
+              postController, '학력', postController.multiSelectInternEducation,
+              defaultText: '학력'),
         ];
         break;
       case 2: // 대외활동
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
-          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
-          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
-          _buildMultiSelectFilterButton(postController, '주최기관', postController.multiSelectHost, defaultText: '주최기관'),
+          _buildFilterButton(postController, '분야',
+              postController.getFilterByType(currentTabIndex, '분야').value,
+              defaultText: '분야'),
+          _buildFilterButton(postController, '기간',
+              postController.getFilterByType(currentTabIndex, '기간').value,
+              defaultText: '기간'),
+          _buildFilterButton(postController, '지역',
+              postController.getFilterByType(currentTabIndex, '지역').value,
+              defaultText: '지역'),
+          _buildMultiSelectFilterButton(
+              postController, '주최기관', postController.multiSelectHost,
+              defaultText: '주최기관'),
         ];
         break;
       case 3: // 교육/강연
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
-          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
-          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
-          _buildMultiSelectFilterButton(postController, '온/오프라인', postController.multiSelectOnOffline, defaultText: '온/오프라인'),
+          _buildFilterButton(postController, '분야',
+              postController.getFilterByType(currentTabIndex, '분야').value,
+              defaultText: '분야'),
+          _buildFilterButton(postController, '기간',
+              postController.getFilterByType(currentTabIndex, '기간').value,
+              defaultText: '기간'),
+          _buildFilterButton(postController, '지역',
+              postController.getFilterByType(currentTabIndex, '지역').value,
+              defaultText: '지역'),
+          _buildMultiSelectFilterButton(
+              postController, '온/오프라인', postController.multiSelectOnOffline,
+              defaultText: '온/오프라인'),
         ];
         break;
       case 4: // 공모전
       default:
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
-          _buildMultiSelectFilterButton(postController, '대상', postController.multiSelectTarget, defaultText: '대상'),
-          _buildMultiSelectFilterButton(postController, '주최기관', postController.multiSelectOrganizer, defaultText: '주최기관'),
-          _buildMultiSelectFilterButton(postController, '혜택', postController.multiSelectBenefit, defaultText: '혜택'),
+          _buildFilterButton(postController, '분야',
+              postController.getFilterByType(currentTabIndex, '분야').value,
+              defaultText: '분야'),
+          _buildMultiSelectFilterButton(
+              postController, '대상', postController.multiSelectTarget,
+              defaultText: '대상'),
+          _buildMultiSelectFilterButton(
+              postController, '주최기관', postController.multiSelectOrganizer,
+              defaultText: '주최기관'),
+          _buildMultiSelectFilterButton(
+              postController, '혜택', postController.multiSelectBenefit,
+              defaultText: '혜택'),
         ];
         break;
     }
@@ -177,7 +223,9 @@ class FilterRowWidget extends StatelessWidget {
   }
 
   /// 일반 필터 버튼 위젯 생성 (단일 선택)
-  Widget _buildFilterButton(PostController postController, String filterType, String? selectedValue, {required String defaultText}) {
+  Widget _buildFilterButton(
+      PostController postController, String filterType, String? selectedValue,
+      {required String defaultText}) {
     final bool isSelected = selectedValue != null;
 
     // 선택된 값이 있으면 그 값을 표시하고, 없으면 기본 텍스트를 표시
@@ -204,7 +252,9 @@ class FilterRowWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(
             side: BorderSide(
               width: 1,
-              color: isSelected ? const Color(0xFF89C1EF) : const Color(0xFFDEE3E7),
+              color: isSelected
+                  ? const Color(0xFF89C1EF)
+                  : const Color(0xFFDEE3E7),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -225,12 +275,15 @@ class FilterRowWidget extends StatelessWidget {
   }
 
   /// 다중 선택 필터 버튼 위젯 생성
-  Widget _buildMultiSelectFilterButton(PostController postController, String filterType, RxList<String> selectedValues, {required String defaultText}) {
+  Widget _buildMultiSelectFilterButton(PostController postController,
+      String filterType, RxList<String> selectedValues,
+      {required String defaultText}) {
     // 선택된 값이 있는지 확인
     final bool isSelected = selectedValues.isNotEmpty;
 
     // 다중 선택의 경우, 선택된 항목 수를 표시 (예: "학력 (3)")
-    String displayText = isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
+    String displayText =
+        isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
 
     // 선택된 값이 하나인 경우, 해당 값을 직접 표시
     if (selectedValues.length == 1) {
@@ -258,7 +311,9 @@ class FilterRowWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(
             side: BorderSide(
               width: 1,
-              color: isSelected ? const Color(0xFF89C1EF) : const Color(0xFFDEE3E7),
+              color: isSelected
+                  ? const Color(0xFF89C1EF)
+                  : const Color(0xFFDEE3E7),
             ),
             borderRadius: BorderRadius.circular(8),
           ),

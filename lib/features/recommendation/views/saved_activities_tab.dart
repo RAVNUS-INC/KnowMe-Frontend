@@ -7,9 +7,10 @@ import '../controllers/recommendation_controller.dart';
 /// 저장된 활동 탭 - 사용자가 북마크한 활동들을 카테고리별로 정리해서 보여주는 탭 화면
 class SavedActivitiesTab extends StatelessWidget {
   const SavedActivitiesTab({super.key});
-  
+
   // GetX로 주입된 RecommendationController 사용
-  RecommendationController get controller => Get.find<RecommendationController>();
+  RecommendationController get controller =>
+      Get.find<RecommendationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,8 @@ class SavedActivitiesTab extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: controller.refreshData, // 당겨서 새로고침 기능
           child: controller.isLoading
-              ? const Center(child: CircularProgressIndicator()) // 로딩 중이면 로딩 인디케이터
+              ? const Center(
+                  child: CircularProgressIndicator()) // 로딩 중이면 로딩 인디케이터
               : _buildContent(context), // 로딩이 끝났으면 콘텐츠 빌드
         );
       },
@@ -31,25 +33,23 @@ class SavedActivitiesTab extends StatelessWidget {
 
     // 활동을 타입(ActivityType)에 따라 분류
     final groupedContests = _groupContestsByType(savedContests);
-    
+
     // 모든 카테고리 이름 목록 정의
     final allCategories = ['채용', '인턴십', '대외 활동', '교육/강연', '공모전'];
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Container(
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
+        padding:
+            const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
         decoration: const BoxDecoration(color: Color(0xFFEDEFF0)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 모든 카테고리를 순회하면서 섹션 빌드
             for (int i = 0; i < allCategories.length; i++) ...[
-              _buildCategorySection(
-                context, 
-                allCategories[i], 
-                groupedContests[allCategories[i]] ?? []
-              ),
+              _buildCategorySection(context, allCategories[i],
+                  groupedContests[allCategories[i]] ?? []),
               // 마지막 항목이 아닌 경우에만 구분선 추가
               if (i < allCategories.length - 1) ...[
                 const SizedBox(height: 20),
@@ -93,8 +93,10 @@ class SavedActivitiesTab extends StatelessWidget {
   }
 
   /// 카테고리 섹션 UI 빌드 (카테고리명 + 활동 있으면 카드 그리드, 없으면 비어있음 메시지)
-  Widget _buildCategorySection(BuildContext context, String title, List<Contest> contests) {
-    return SizedBox( // Container에서 SizedBox로 변경
+  Widget _buildCategorySection(
+      BuildContext context, String title, List<Contest> contests) {
+    return SizedBox(
+      // Container에서 SizedBox로 변경
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,11 +141,11 @@ class SavedActivitiesTab extends StatelessWidget {
     final cardWidth = (screenWidth - 48) / 2; // 전체 너비에서 padding, margin 감안
 
     return Wrap(
-      spacing: 16,      // 가로 간격
-      runSpacing: 16,   // 세로 간격
-      children: contests.map((contest) =>
-          _createCustomContestCard(contest, cardWidth)
-      ).toList(),
+      spacing: 16, // 가로 간격
+      runSpacing: 16, // 세로 간격
+      children: contests
+          .map((contest) => _createCustomContestCard(contest, cardWidth))
+          .toList(),
     );
   }
 
@@ -173,7 +175,8 @@ class _CustomContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox( // Container를 SizedBox로 변경
+    return SizedBox(
+      // Container를 SizedBox로 변경
       width: width,
       child: Stack(
         children: [
@@ -191,15 +194,15 @@ class _CustomContestCard extends StatelessWidget {
     return Positioned(
       right: 4,
       top: 7,
-      child: SizedBox( // Container를 SizedBox로 변경
+      child: SizedBox(
+        // Container를 SizedBox로 변경
         width: 24,
         height: 24,
         child: IconButton(
           icon: Icon(
-            contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            color: Colors.white,
-            size: 20
-          ),
+              contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+              color: Colors.white,
+              size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: onBookmarkTap,

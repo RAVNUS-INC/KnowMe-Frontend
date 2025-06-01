@@ -47,8 +47,10 @@ class FilterRangeSlider extends StatelessWidget {
                       max: config.max,
                       divisions: config.divisions,
                       labels: RangeLabels(
-                        controller.formatSliderLabel(currentRangeValues.start, tabIndex),
-                        controller.formatSliderLabel(currentRangeValues.end, tabIndex),
+                        controller.formatSliderLabel(
+                            currentRangeValues.start, tabIndex),
+                        controller.formatSliderLabel(
+                            currentRangeValues.end, tabIndex),
                       ),
                       onChanged: (values) {
                         onChanged(values);
@@ -78,18 +80,18 @@ class FilterRangeSlider extends StatelessWidget {
   }
 
   TextStyle get _titleStyle => const TextStyle(
-    color: Color(0xFF454C53),
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: -0.56,
-  );
+        color: Color(0xFF454C53),
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.56,
+      );
 
   TextStyle get _labelStyle => const TextStyle(
-    color: Color(0xFF0068E5),
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    letterSpacing: -0.40,
-  );
+        color: Color(0xFF0068E5),
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.40,
+      );
 
   SliderThemeData _sliderTheme(BuildContext context) {
     return SliderTheme.of(context).copyWith(

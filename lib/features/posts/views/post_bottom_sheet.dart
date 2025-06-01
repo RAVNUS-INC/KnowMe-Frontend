@@ -30,13 +30,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   // Controller 및 Service 참조
   late final FilterController _filterController;
   late final FilterOptionsService _optionsService;
-  
+
   @override
   void initState() {
     super.initState();
     _filterController = Get.find<FilterController>();
     _optionsService = Get.find<FilterOptionsService>();
-    
+
     // 컨트롤러에 초기화 요청
     _filterController.initializeFilterValues(widget.tabIndex);
   }
@@ -82,10 +82,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               // 값을 실제로 필터에 적용하고 바텀시트 닫기
               _filterController.applyFilters(
                 tabIndex: widget.tabIndex,
-                job: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
-                location: _filterController.selectedLocation.value.isEmpty ? null : _filterController.selectedLocation.value,
-                education: _filterController.selectedEducation.value.isEmpty ? null : _filterController.selectedEducation.value,
-                period: _filterController.selectedPeriod.value.isEmpty ? null : _filterController.selectedPeriod.value,
+                job: _filterController.selectedJob.value.isEmpty
+                    ? null
+                    : _filterController.selectedJob.value,
+                location: _filterController.selectedLocation.value.isEmpty
+                    ? null
+                    : _filterController.selectedLocation.value,
+                education: _filterController.selectedEducation.value.isEmpty
+                    ? null
+                    : _filterController.selectedEducation.value,
+                period: _filterController.selectedPeriod.value.isEmpty
+                    ? null
+                    : _filterController.selectedPeriod.value,
                 rangeValues: _filterController.currentRangeValues.value,
               );
               Navigator.pop(context);
@@ -118,7 +126,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         return _buildContestFilterWidgets();
     }
   }
-  
+
   // 드롭다운 옵션 선택 시 처리 - 이제 단순히 controller에 위임만 수행
   Future<String?> _selectValue(String title, List<String> options) async {
     final selected = await showDialog<String>(
@@ -134,7 +142,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 title: Text(option),
                 onTap: () {
                   // Controller에만 이벤트 전달
-                  _filterController.updateFilterValue(widget.tabIndex, title, option);
+                  _filterController.updateFilterValue(
+                      widget.tabIndex, title, option);
                   Navigator.pop(context, option);
                 },
               );
@@ -143,16 +152,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소')
-          )
+              onPressed: () => Navigator.pop(context), child: const Text('취소'))
         ],
       ),
     );
-    
+
     return selected;
   }
-  
+
   // 채용 탭 필터 위젯 - UI 구성만 담당
   List<Widget> _buildJobFilterWidgets() {
     return [
@@ -160,14 +167,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       FilterDropdown(
         title: '직무',
         options: _optionsService.getJobOptions(0),
-        selectedValue: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
+        selectedValue: _filterController.selectedJob.value.isEmpty
+            ? null
+            : _filterController.selectedJob.value,
         onTap: () => _selectValue('직무', _optionsService.getJobOptions(0)),
       ),
       _buildRangeSliderWithValueListener(0, '경력'),
       FilterDropdown(
         title: '지역',
         options: _optionsService.getLocationOptions(0),
-        selectedValue: _filterController.selectedLocation.value.isEmpty ? null : _filterController.selectedLocation.value,
+        selectedValue: _filterController.selectedLocation.value.isEmpty
+            ? null
+            : _filterController.selectedLocation.value,
         onTap: () => _selectValue('지역', _optionsService.getLocationOptions(0)),
       ),
       FilterTagSelector(
@@ -179,7 +190,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     ];
   }
-  
+
   // 인턴 탭 필터 위젯
   List<Widget> _buildInternFilterWidgets() {
     return [
@@ -187,14 +198,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       FilterDropdown(
         title: '직무',
         options: _optionsService.getJobOptions(1),
-        selectedValue: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
+        selectedValue: _filterController.selectedJob.value.isEmpty
+            ? null
+            : _filterController.selectedJob.value,
         onTap: () => _selectValue('직무', _optionsService.getJobOptions(1)),
       ),
       _buildRangeSliderWithValueListener(1, '기간'),
       FilterDropdown(
         title: '지역',
         options: _optionsService.getLocationOptions(1),
-        selectedValue: _filterController.selectedLocation.value.isEmpty ? null : _filterController.selectedLocation.value,
+        selectedValue: _filterController.selectedLocation.value.isEmpty
+            ? null
+            : _filterController.selectedLocation.value,
         onTap: () => _selectValue('지역', _optionsService.getLocationOptions(1)),
       ),
       FilterTagSelector(
@@ -206,7 +221,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     ];
   }
-  
+
   // 대외활동 탭 필터 위젯
   List<Widget> _buildActivityFilterWidgets() {
     return [
@@ -214,14 +229,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       FilterDropdown(
         title: '분야',
         options: _optionsService.getFieldOptions(2),
-        selectedValue: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
+        selectedValue: _filterController.selectedJob.value.isEmpty
+            ? null
+            : _filterController.selectedJob.value,
         onTap: () => _selectValue('분야', _optionsService.getFieldOptions(2)),
       ),
       _buildRangeSliderWithValueListener(2, '기간'),
       FilterDropdown(
         title: '지역',
         options: _optionsService.getLocationOptions(2),
-        selectedValue: _filterController.selectedLocation.value.isEmpty ? null : _filterController.selectedLocation.value,
+        selectedValue: _filterController.selectedLocation.value.isEmpty
+            ? null
+            : _filterController.selectedLocation.value,
         onTap: () => _selectValue('지역', _optionsService.getLocationOptions(2)),
       ),
       FilterTagSelector(
@@ -233,7 +252,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     ];
   }
-  
+
   // 교육/강연 탭 필터 위젯
   List<Widget> _buildEducationFilterWidgets() {
     return [
@@ -241,14 +260,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       FilterDropdown(
         title: '분야',
         options: _optionsService.getFieldOptions(3),
-        selectedValue: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
+        selectedValue: _filterController.selectedJob.value.isEmpty
+            ? null
+            : _filterController.selectedJob.value,
         onTap: () => _selectValue('분야', _optionsService.getFieldOptions(3)),
       ),
       _buildRangeSliderWithValueListener(3, '기간'),
       FilterDropdown(
         title: '지역',
         options: _optionsService.getLocationOptions(3),
-        selectedValue: _filterController.selectedLocation.value.isEmpty ? null : _filterController.selectedLocation.value,
+        selectedValue: _filterController.selectedLocation.value.isEmpty
+            ? null
+            : _filterController.selectedLocation.value,
         onTap: () => _selectValue('지역', _optionsService.getLocationOptions(3)),
       ),
       FilterTagSelector(
@@ -260,7 +283,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     ];
   }
-  
+
   // 공모전 탭 필터 위젯
   List<Widget> _buildContestFilterWidgets() {
     return [
@@ -268,14 +291,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       FilterDropdown(
         title: '분야',
         options: _optionsService.getFieldOptions(4),
-        selectedValue: _filterController.selectedJob.value.isEmpty ? null : _filterController.selectedJob.value,
+        selectedValue: _filterController.selectedJob.value.isEmpty
+            ? null
+            : _filterController.selectedJob.value,
         onTap: () => _selectValue('분야', _optionsService.getFieldOptions(4)),
       ),
       FilterTagSelector(
         title: '대상',
         options: _optionsService.getTargetOptions(),
         selected: null,
-        tabIndex: 4, 
+        tabIndex: 4,
         controller: _filterController,
       ),
       FilterTagSelector(
@@ -294,7 +319,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     ];
   }
-  
+
   // 레인지 슬라이더 위젯 생성 - 단순 UI 구성만 담당
   Widget _buildRangeSliderWithValueListener(int tabIndex, String title) {
     return Obx(() {

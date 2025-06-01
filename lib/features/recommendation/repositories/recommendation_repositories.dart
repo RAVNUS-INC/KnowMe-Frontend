@@ -121,7 +121,7 @@ class RecommendationRepository {
       ),
     ];
   }
-  
+
   List<Contest> getSavedContests() {
     // 사용자가 저장한 활동 목록
     return [

@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import '../controllers/recommendation_controller.dart';
 
 class RecommendationTabBar extends StatelessWidget {
-  final RecommendationController controller = Get.find<RecommendationController>();
-  
+  final RecommendationController controller =
+      Get.find<RecommendationController>();
+
   // key 매개변수 추가
   RecommendationTabBar({super.key});
 
@@ -38,15 +39,17 @@ class RecommendationTabBar extends StatelessWidget {
               fontWeight: FontWeight.w600,
               letterSpacing: -0.64,
             ),
-            tabs: controller.tabTitles.map((title) => Tab(
-              child: SizedBox(
-                width: double.infinity,
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            )).toList(),
+            tabs: controller.tabTitles
+                .map((title) => Tab(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
         );
       },

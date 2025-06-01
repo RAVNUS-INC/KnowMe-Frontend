@@ -53,7 +53,6 @@ class AppRoutes {
   // 추천 활동 관련 라우트
   static const String recommendationScreen = '/recommendation';
 
-
   static final routes = [
     GetPage(
       name: login,
@@ -148,7 +147,6 @@ class AppRoutes {
       page: () => const RecommendationScreen(),
       binding: recommendationBinding,
     ),
-
   ];
   //////////게시물 관련 라우트
 // 의존성 주입을 위한 공통 메서드
@@ -188,6 +186,4 @@ class AppRoutes {
   static final Bindings recommendationBinding = BindingsBuilder(() {
     Get.put(RecommendationController());
   });
-
-
 }

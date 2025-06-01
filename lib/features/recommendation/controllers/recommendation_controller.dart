@@ -4,7 +4,8 @@ import '../../../features/posts/models/contest_model.dart';
 import '../services/recommendation_service.dart';
 import 'package:flutter/foundation.dart';
 
-class RecommendationController extends GetxController with GetSingleTickerProviderStateMixin {
+class RecommendationController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   final RecommendationService _service = RecommendationService();
   // 사용되지 않는 _repository 필드 제거
 

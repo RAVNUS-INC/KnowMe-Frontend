@@ -53,24 +53,25 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: Obx(() => SliverGrid(
-              delegate: SliverChildBuilderDelegate(
+                  delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  final item = controller.results[index];
-                  return Obx(() => _ContestCard(
-                    contest: item,
-                    onSave: () => controller.toggleSave(item),
-                    isSaved: controller.isSaved(item),
-                  ));
-                },
-                childCount: controller.results.length.clamp(0, visibleCount),
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 180 / 240,
-              ),
-            )),
+                      final item = controller.results[index];
+                      return Obx(() => _ContestCard(
+                            contest: item,
+                            onSave: () => controller.toggleSave(item),
+                            isSaved: controller.isSaved(item),
+                          ));
+                    },
+                    childCount:
+                        controller.results.length.clamp(0, visibleCount),
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 180 / 240,
+                  ),
+                )),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -81,7 +82,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     visibleCount += 4;
                   }),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: ShapeDecoration(
                       color: const Color(0xFFB7C4D4),
                       shape: RoundedRectangleBorder(
@@ -136,24 +138,24 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: Obx(() => SliverGrid(
-              delegate: SliverChildBuilderDelegate(
+                  delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  final item = controller.savedContests[index];
-                  return Obx(() => _ContestCard(
-                    contest: item,
-                    onSave: () => controller.toggleSave(item),
-                    isSaved: controller.isSaved(item),
-                  ));
-                },
-                childCount: controller.savedContests.length,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 180 / 240,
-              ),
-            )),
+                      final item = controller.savedContests[index];
+                      return Obx(() => _ContestCard(
+                            contest: item,
+                            onSave: () => controller.toggleSave(item),
+                            isSaved: controller.isSaved(item),
+                          ));
+                    },
+                    childCount: controller.savedContests.length,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 180 / 240,
+                  ),
+                )),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
@@ -167,7 +169,8 @@ class _ContestCard extends StatelessWidget {
   final VoidCallback onSave;
   final bool isSaved;
 
-  const _ContestCard({required this.contest, required this.onSave, required this.isSaved});
+  const _ContestCard(
+      {required this.contest, required this.onSave, required this.isSaved});
 
   @override
   Widget build(BuildContext context) {

@@ -10,12 +10,13 @@ class PostController extends GetxController {
   // 의존성
   final PostRepository repository;
   final _logger = Logger();
-  
+
   // 서브 컨트롤러로 PageController 추가
   late PageController pageController;
 
   // 생성자를 통해 repository 초기화 (의존성 주입)
-  PostController({PostRepository? repository}) : repository = repository ?? PostRepository();
+  PostController({PostRepository? repository})
+      : repository = repository ?? PostRepository();
 
   // 상태 변수들 - 반응형으로 관리
   final RxList<Contest> contests = <Contest>[].obs;
@@ -72,7 +73,8 @@ class PostController extends GetxController {
   // 필터 접근 메서드 (리팩토링을 위한 새로운 접근 방식)
   /// 현재 선택된 탭에서 특정 타입의 필터값 가져오기
   Rx<String?> getFilter(String filterType) {
-    return filtersByTab[selectedTabIndex.value]?[filterType] ?? Rx<String?>(null);
+    return filtersByTab[selectedTabIndex.value]?[filterType] ??
+        Rx<String?>(null);
   }
 
   /// 특정 탭의 특정 타입 필터값 가져오기
@@ -97,7 +99,7 @@ class PostController extends GetxController {
     pageController = PageController(initialPage: selectedTabIndex.value);
     loadContests();
   }
-  
+
   @override
   void onClose() {
     // PageController 자원 해제
@@ -118,7 +120,7 @@ class PostController extends GetxController {
     }
     loadContests();
   }
-  
+
   /// PageView에서 페이지 변경 시 호출하는 메서드
   void onPageChanged(int index) {
     selectedTabIndex.value = index;
@@ -201,7 +203,9 @@ class PostController extends GetxController {
           experience: values['신입~5년'],
           location: values['지역'],
           education: values['학력'],
-          educationList: multiSelectJobEducation.isEmpty ? null : multiSelectJobEducation.toList(),
+          educationList: multiSelectJobEducation.isEmpty
+              ? null
+              : multiSelectJobEducation.toList(),
         );
       case 1: // 인턴
         return repository.getInternships(
@@ -209,29 +213,41 @@ class PostController extends GetxController {
           period: values['기간'],
           location: values['지역'],
           education: values['학력'],
-          educationList: multiSelectInternEducation.isEmpty ? null : multiSelectInternEducation.toList(),
+          educationList: multiSelectInternEducation.isEmpty
+              ? null
+              : multiSelectInternEducation.toList(),
         );
       case 2: // 대외활동
         return repository.getActivities(
           field: values['분야'],
           organization: values['기관'],
           location: values['지역'],
-          host: multiSelectHost.isEmpty ? values['주최기관'] : multiSelectHost.join(", "),
+          host: multiSelectHost.isEmpty
+              ? values['주최기관']
+              : multiSelectHost.join(", "),
         );
       case 3: // 교육/강연
         return repository.getEducationEvents(
           field: values['분야'],
           period: values['기간'],
           location: values['지역'],
-          onOffline: multiSelectOnOffline.isEmpty ? values['온/오프라인'] : multiSelectOnOffline.join(", "),
+          onOffline: multiSelectOnOffline.isEmpty
+              ? values['온/오프라인']
+              : multiSelectOnOffline.join(", "),
         );
       case 4: // 공모전
       default:
         return repository.getFilteredContests(
           field: values['분야'],
-          target: multiSelectTarget.isEmpty ? values['대상'] : multiSelectTarget.join(", "),
-          organizer: multiSelectOrganizer.isEmpty ? values['주최기관'] : multiSelectOrganizer.join(", "),
-          benefit: multiSelectBenefit.isEmpty ? values['혜택'] : multiSelectBenefit.join(", "),
+          target: multiSelectTarget.isEmpty
+              ? values['대상']
+              : multiSelectTarget.join(", "),
+          organizer: multiSelectOrganizer.isEmpty
+              ? values['주최기관']
+              : multiSelectOrganizer.join(", "),
+          benefit: multiSelectBenefit.isEmpty
+              ? values['혜택']
+              : multiSelectBenefit.join(", "),
         );
     }
   }

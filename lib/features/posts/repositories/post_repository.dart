@@ -12,32 +12,41 @@ class PostRepository {
   }) {
     // 데이터 소스 호출 (실제로는 API 또는 데이터베이스 호출)
     final allJobs = _getJobListingsFromDataSource();
-    
+
     // 필터링 적용
     return allJobs.where((jobItem) {
       // 필드 접근 안전성 보장
       final String fieldValue = jobItem.field;
       final String locationValue = jobItem.location;
       final String targetValue = jobItem.target;
-      
+
       // 직무 필터링
       bool matchesJob = job == null || job.isEmpty || fieldValue.contains(job);
-      
+
       // 지역 필터링
-      bool matchesLocation = location == null || location.isEmpty || locationValue.contains(location);
-      
+      bool matchesLocation = location == null ||
+          location.isEmpty ||
+          locationValue.contains(location);
+
       // 학력 필터링
-      bool matchesEducation = _matchesEducationFilter(targetValue, education, educationList);
-      
+      bool matchesEducation =
+          _matchesEducationFilter(targetValue, education, educationList);
+
       // 경력 필터링
-      bool matchesExperience = experience == null || experience.isEmpty || targetValue.contains(experience);
-      
-      return matchesJob && matchesLocation && matchesEducation && matchesExperience;
+      bool matchesExperience = experience == null ||
+          experience.isEmpty ||
+          targetValue.contains(experience);
+
+      return matchesJob &&
+          matchesLocation &&
+          matchesEducation &&
+          matchesExperience;
     }).toList();
   }
-  
+
   // 학력 필터 일치 여부 확인 (중복 코드 제거 - DRY 원칙 적용)
-  bool _matchesEducationFilter(String targetValue, String? education, List<String>? educationList) {
+  bool _matchesEducationFilter(
+      String targetValue, String? education, List<String>? educationList) {
     if (education != null && education.isNotEmpty) {
       return targetValue.contains(education);
     } else if (educationList != null && educationList.isNotEmpty) {
@@ -56,26 +65,30 @@ class PostRepository {
   }) {
     // 데이터 소스 호출
     final allInterns = _getInternshipsFromDataSource();
-    
+
     // 필터링 적용
     return allInterns.where((intern) {
       final String fieldValue = intern.field;
       final String locationValue = intern.location;
       final String targetValue = intern.target;
       final String dateRangeValue = intern.dateRange;
-      
+
       // 직무 필터링
       bool matchesJob = job == null || job.isEmpty || fieldValue.contains(job);
-      
+
       // 지역 필터링
-      bool matchesLocation = location == null || location.isEmpty || locationValue.contains(location);
-      
+      bool matchesLocation = location == null ||
+          location.isEmpty ||
+          locationValue.contains(location);
+
       // 학력 필터링
-      bool matchesEducation = _matchesEducationFilter(targetValue, education, educationList);
-      
+      bool matchesEducation =
+          _matchesEducationFilter(targetValue, education, educationList);
+
       // 기간 필터링
-      bool matchesPeriod = period == null || period.isEmpty || dateRangeValue.contains(period);
-      
+      bool matchesPeriod =
+          period == null || period.isEmpty || dateRangeValue.contains(period);
+
       return matchesJob && matchesLocation && matchesEducation && matchesPeriod;
     }).toList();
   }
@@ -89,7 +102,8 @@ class PostRepository {
   }) {
     // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
     return _getActivitiesFromDataSource()
-        .map((activity) => _applyActivityFilters(activity, field, organization, location, host))
+        .map((activity) => _applyActivityFilters(
+            activity, field, organization, location, host))
         .toList();
   }
 
@@ -102,7 +116,8 @@ class PostRepository {
   }) {
     // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
     return _getEducationEventsFromDataSource()
-        .map((event) => _applyEducationFilters(event, field, period, location, onOffline))
+        .map((event) =>
+            _applyEducationFilters(event, field, period, location, onOffline))
         .toList();
   }
 
@@ -115,7 +130,8 @@ class PostRepository {
   }) {
     // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
     return _getContestsFromDataSource()
-        .map((contest) => _applyContestFilters(contest, field, target, organizer, benefit))
+        .map((contest) =>
+            _applyContestFilters(contest, field, target, organizer, benefit))
         .toList();
   }
 
@@ -325,7 +341,7 @@ class PostRepository {
       ),
     ];
   }
-  
+
   // 데이터 인덱스에서 인턴십 정보 가져오기
   List<Contest> _getInternshipsFromDataSource() {
     return [
@@ -364,7 +380,7 @@ class PostRepository {
       ),
     ];
   }
-  
+
   // 데이터 소스에서 대외활동 정보 가져오기
   List<Contest> _getActivitiesFromDataSource() {
     return [
@@ -403,15 +419,10 @@ class PostRepository {
       ),
     ];
   }
-  
+
   // 대외활동에 필터 적용
-  Contest _applyActivityFilters(
-    Contest activity, 
-    String? field, 
-    String? organization, 
-    String? location, 
-    String? host
-  ) {
+  Contest _applyActivityFilters(Contest activity, String? field,
+      String? organization, String? location, String? host) {
     return Contest(
       id: activity.id,
       title: activity.title,
@@ -425,7 +436,7 @@ class PostRepository {
       additionalInfo: activity.additionalInfo,
     );
   }
-  
+
   // 데이터 소스에서 교육/강연 정보 가져오기
   List<Contest> _getEducationEventsFromDataSource() {
     return [
@@ -467,15 +478,10 @@ class PostRepository {
       ),
     ];
   }
-  
+
   // 교육/강연에 필터 적용
-  Contest _applyEducationFilters(
-    Contest event, 
-    String? field, 
-    String? period, 
-    String? location, 
-    String? onOffline
-  ) {
+  Contest _applyEducationFilters(Contest event, String? field, String? period,
+      String? location, String? onOffline) {
     return Contest(
       id: event.id,
       title: event.title,
@@ -489,7 +495,7 @@ class PostRepository {
       target: event.target,
     );
   }
-  
+
   // 데이터 소스에서 공모전 정보 가져오기
   List<Contest> _getContestsFromDataSource() {
     return [
@@ -531,15 +537,10 @@ class PostRepository {
       ),
     ];
   }
-  
+
   // 공모전에 필터 적용
-  Contest _applyContestFilters(
-    Contest contest, 
-    String? field, 
-    String? target, 
-    String? organizer, 
-    String? benefit
-  ) {
+  Contest _applyContestFilters(Contest contest, String? field, String? target,
+      String? organizer, String? benefit) {
     return Contest(
       id: contest.id,
       title: contest.title,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class PostTabBar extends StatelessWidget {
   final TabController tabController;
   final List<String> tabTitles;
-  
+
   const PostTabBar({
     super.key,
     required this.tabController,
@@ -38,15 +38,17 @@ class PostTabBar extends StatelessWidget {
           fontWeight: FontWeight.w600,
           letterSpacing: -0.64,
         ),
-        tabs: tabTitles.map((title) => Tab(
-          child: SizedBox(
-            width: double.infinity,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        )).toList(),
+        tabs: tabTitles
+            .map((title) => Tab(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ))
+            .toList(),
       ),
     );
   }

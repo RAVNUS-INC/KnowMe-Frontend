@@ -49,11 +49,13 @@ class SearchResultController extends GetxController {
     keyword.value = query;
 
     final lowerQuery = query.toLowerCase();
-    results.value = allContests.where((contest) =>
-    contest.title.toLowerCase().contains(lowerQuery) ||
-        contest.reward.toLowerCase().contains(lowerQuery) ||
-        contest.eligibility.toLowerCase().contains(lowerQuery) ||
-        contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery))).toList();
+    results.value = allContests
+        .where((contest) =>
+            contest.title.toLowerCase().contains(lowerQuery) ||
+            contest.reward.toLowerCase().contains(lowerQuery) ||
+            contest.eligibility.toLowerCase().contains(lowerQuery) ||
+            contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery)))
+        .toList();
   }
 
   /// ⭐ 저장 또는 저장 취소 (title 기준으로 중복 방지)

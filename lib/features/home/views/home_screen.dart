@@ -26,8 +26,7 @@ class HomeScreen extends StatelessWidget {
                 child: PageView.builder(
                   controller: controller.pageController,
                   itemCount: 3,
-                  itemBuilder: (context, index) =>
-                      controller.buildPage(index),
+                  itemBuilder: (context, index) => controller.buildPage(index),
                 ),
               ),
 
@@ -35,23 +34,23 @@ class HomeScreen extends StatelessWidget {
 
               // 🔸 인디케이터
               Obx(() => Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) {
-                  final isActive = controller.currentPage.value == index;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey.shade300,
-                    ),
-                  );
-                }),
-              )),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(3, (index) {
+                      final isActive = controller.currentPage.value == index;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isActive
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey.shade300,
+                        ),
+                      );
+                    }),
+                  )),
 
               const SizedBox(height: 30),
 
@@ -103,7 +102,7 @@ class HomeScreen extends StatelessWidget {
                 onTap: controller.goToAiAnalysis,
                 child: Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                   decoration: ShapeDecoration(
                     color: const Color(0xFFF5F5F5),
                     shape: RoundedRectangleBorder(

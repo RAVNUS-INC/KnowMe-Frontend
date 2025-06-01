@@ -14,10 +14,11 @@ class PostListScreen extends StatefulWidget {
   State<PostListScreen> createState() => _PostListScreenState();
 }
 
-class _PostListScreenState extends State<PostListScreen> with SingleTickerProviderStateMixin {
+class _PostListScreenState extends State<PostListScreen>
+    with SingleTickerProviderStateMixin {
   final List<String> tabTitles = ['채용', '인턴', '대외활동', '교육/강연', '공모전'];
   late TabController _tabController;
-  
+
   // View에서 직접 생성하지 않고 routes에서 주입된 컨트롤러 사용
   late PostController _postController;
 
@@ -26,7 +27,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
     super.initState();
     // 컨트롤러 주입받기
     _postController = Get.find<PostController>();
-    
+
     _tabController = TabController(
       length: tabTitles.length,
       vsync: this,
@@ -61,7 +62,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
             tabController: _tabController,
             tabTitles: tabTitles,
           ),
-          
+
           // 필터 행 위젯
           FilterRowWidget(
             tabController: _tabController,
@@ -81,7 +82,8 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
               itemBuilder: (context, index) {
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
-                  List<Contest> filteredContests = _postController.getFilteredContentsByTabIndex(index);
+                  List<Contest> filteredContests =
+                      _postController.getFilteredContentsByTabIndex(index);
                   return PostGrid(contests: filteredContests);
                 });
               },

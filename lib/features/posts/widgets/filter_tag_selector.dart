@@ -19,7 +19,7 @@ class FilterTagSelector extends StatelessWidget {
     this.controller,
     this.onSelected,
   }) : assert((tabIndex != null && controller != null) || onSelected != null,
-      '(tabIndex와 controller) 또는 onSelected 중 하나가 제공되어야 합니다');
+            '(tabIndex와 controller) 또는 onSelected 중 하나가 제공되어야 합니다');
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,11 @@ class FilterTagSelector extends StatelessWidget {
           Text(title, style: _titleStyle),
           const SizedBox(height: 8),
           // 필터 상태가 변경될 때 UI가 업데이트되도록 Obx 사용
-          title == '대상' || title == '주최기관' || title == '혜택' || title == '온/오프라인' || title == '학력' 
+          title == '대상' ||
+                  title == '주최기관' ||
+                  title == '혜택' ||
+                  title == '온/오프라인' ||
+                  title == '학력'
               ? _buildMultiSelectOptions()
               : _buildSingleSelectOptions(),
         ],
@@ -51,13 +55,16 @@ class FilterTagSelector extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               if (controller != null && tabIndex != null) {
-                controller!.updateMultiSelectValue(tabIndex!, title, option, isSelected);
+                controller!.updateMultiSelectValue(
+                    tabIndex!, title, option, isSelected);
               }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF0068E5) : const Color(0xFFDEE3E7),
+                color: isSelected
+                    ? const Color(0xFF0068E5)
+                    : const Color(0xFFDEE3E7),
                 borderRadius: BorderRadius.circular(100),
               ),
               child: Text(
@@ -93,7 +100,9 @@ class FilterTagSelector extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF0068E5) : const Color(0xFFDEE3E7),
+              color: isSelected
+                  ? const Color(0xFF0068E5)
+                  : const Color(0xFFDEE3E7),
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
@@ -120,9 +129,9 @@ class FilterTagSelector extends StatelessWidget {
   }
 
   TextStyle get _titleStyle => const TextStyle(
-    color: Color(0xFF454C53),
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: -0.56,
-  );
+        color: Color(0xFF454C53),
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.56,
+      );
 }

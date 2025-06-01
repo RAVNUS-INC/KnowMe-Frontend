@@ -62,12 +62,18 @@ class FilterController extends GetxController {
   // 탭 제목 가져오기
   String getTabTitle(int tabIndex) {
     switch (tabIndex) {
-      case 0: return '채용';
-      case 1: return '인턴';
-      case 2: return '대외활동';
-      case 3: return '교육/강연';
-      case 4: return '공모전';
-      default: return '필터';
+      case 0:
+        return '채용';
+      case 1:
+        return '인턴';
+      case 2:
+        return '대외활동';
+      case 3:
+        return '교육/강연';
+      case 4:
+        return '공모전';
+      default:
+        return '필터';
     }
   }
 
@@ -134,7 +140,8 @@ class FilterController extends GetxController {
 
     switch (tabIndex) {
       case 0: // 채용
-        final expValue = _postController.getFilterByType(tabIndex, '신입~5년').value;
+        final expValue =
+            _postController.getFilterByType(tabIndex, '신입~5년').value;
         if (expValue != null) {
           if (expValue == '신입') {
             return const RangeValues(0, 0);
@@ -152,7 +159,8 @@ class FilterController extends GetxController {
         }
         break;
       case 1: // 인턴
-        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        final periodValue =
+            _postController.getFilterByType(tabIndex, '기간').value;
         if (periodValue != null) {
           if (periodValue == '1개월 이하') {
             return const RangeValues(1, 1);
@@ -170,7 +178,8 @@ class FilterController extends GetxController {
         }
         break;
       case 2: // 대외활동
-        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        final periodValue =
+            _postController.getFilterByType(tabIndex, '기간').value;
         if (periodValue != null) {
           if (periodValue == '1개월 이하') {
             return const RangeValues(1, 1);
@@ -188,7 +197,8 @@ class FilterController extends GetxController {
         }
         break;
       case 3: // 교육/강연
-        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        final periodValue =
+            _postController.getFilterByType(tabIndex, '기간').value;
         if (periodValue != null) {
           if (periodValue == '1일') {
             return const RangeValues(1, 1);
@@ -214,7 +224,7 @@ class FilterController extends GetxController {
   // 슬라이더 라벨 포맷 - 통합된 메서드 (외부 및 내부 참조용)
   String formatSliderLabel(double value, int tabIndex) {
     SliderConfig config = getSliderConfig(tabIndex);
-    
+
     switch (tabIndex) {
       case 0: // 채용
         if (value == 0) {
@@ -231,16 +241,16 @@ class FilterController extends GetxController {
         if (value == 12) return '1년';
         if (value == 18) return '1.5년';
         if (value == 24) return '2년';
-        
+
         final List<double> steps = [1, 6, 12, 18, 24];
         final List<String> labels = ['1개월', '6개월', '1년', '1.5년', '2년'];
-        
+
         return _findClosestLabel(value, steps, labels);
-        
+
       case 3: // 교육/강연
         double range = config.max - config.min;
         double stepSize = range / 4;
-        
+
         if (value <= config.min + stepSize * 0.5) {
           return '1일';
         } else if (value <= config.min + stepSize * 1.5) {
@@ -252,7 +262,7 @@ class FilterController extends GetxController {
         } else {
           return '6개월';
         }
-        
+
       default:
         return '${value.round()}';
     }
@@ -264,10 +274,11 @@ class FilterController extends GetxController {
     selectedLocation.value = '';
     selectedEducation.value = '';
     selectedPeriod.value = '';
-    
+
     final config = getSliderConfig(tabIndex);
-    currentRangeValues.value = RangeValues(config.min, config.min + (config.max - config.min) / 4);
-    
+    currentRangeValues.value =
+        RangeValues(config.min, config.min + (config.max - config.min) / 4);
+
     resetFiltersForTab(tabIndex);
   }
 
@@ -331,7 +342,8 @@ class FilterController extends GetxController {
     String? onOffline,
     String? experience,
   }) {
-    bool isReset = job == null && location == null && education == null && period == null;
+    bool isReset =
+        job == null && location == null && education == null && period == null;
 
     if (isReset) {
       resetFiltersForTab(tabIndex);
@@ -416,7 +428,7 @@ class FilterController extends GetxController {
   void applyRangeFilter(int tabIndex, RangeValues values) {
     String filterValue;
     SliderConfig config = getSliderConfig(tabIndex);
-    
+
     switch (tabIndex) {
       case 0: // 채용 (경력)
         if (values.start == 0 && values.end == 0) {
@@ -426,11 +438,12 @@ class FilterController extends GetxController {
         } else if (values.start == values.end) {
           filterValue = formatSliderLabel(values.start, tabIndex);
         } else {
-          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+          filterValue =
+              '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
         _postController.getFilterByType(tabIndex, '신입~5년').value = filterValue;
         break;
-        
+
       case 1: // 인턴
       case 2: // 대외활동
         if (values.start == 1 && values.end == 1) {
@@ -440,16 +453,17 @@ class FilterController extends GetxController {
         } else if (values.start == values.end) {
           filterValue = formatSliderLabel(values.start, tabIndex);
         } else {
-          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+          filterValue =
+              '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
-        
+
         if (tabIndex == 1) {
           _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         } else {
           _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         }
         break;
-        
+
       case 3: // 교육/강연
         if (values.start == 1 && values.end == 1) {
           filterValue = '1일';
@@ -458,11 +472,12 @@ class FilterController extends GetxController {
         } else if (values.start == values.end) {
           filterValue = formatSliderLabel(values.start, tabIndex);
         } else {
-          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+          filterValue =
+              '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
         _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         break;
-        
+
       default:
         // 기존 로직을 유지하는 대체 로직
         if (values.start == values.end) {
@@ -478,37 +493,38 @@ class FilterController extends GetxController {
         } else if (values.end == config.max) {
           filterValue = '${formatSliderLabel(values.start, tabIndex)} 이상';
         } else {
-          filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
+          filterValue =
+              '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
         break;
     }
-    
+
     currentRangeValues.value = values;
   }
 
   // 선택한 필터 값 업데이트
   void updateFilterValue(int tabIndex, String title, String value) {
     switch (tabIndex) {
-      case 0: 
+      case 0:
         updateJobFilter(title, value);
         break;
-      case 1: 
+      case 1:
         updateInternFilter(title, value);
         break;
-      case 2: 
+      case 2:
         updateActivityFilter(title, value);
         break;
-      case 3: 
+      case 3:
         updateEducationFilter(title, value);
         break;
-      case 4: 
+      case 4:
         updateContestFilter(title, value);
         break;
     }
-    
+
     _postController.loadContests();
   }
-  
+
   // 채용 탭 필터 업데이트
   void updateJobFilter(String title, String value) {
     switch (title) {
@@ -530,7 +546,7 @@ class FilterController extends GetxController {
         break;
     }
   }
-  
+
   // 인턴 탭 필터 업데이트
   void updateInternFilter(String title, String value) {
     switch (title) {
@@ -541,7 +557,7 @@ class FilterController extends GetxController {
       case '지역':
         _postController.getFilterByType(1, '지역').value = value;
         selectedLocation.value = value;
-        break; 
+        break;
       case '기간':
         _postController.getFilterByType(1, '기간').value = value;
         selectedPeriod.value = value;
@@ -552,7 +568,7 @@ class FilterController extends GetxController {
         break;
     }
   }
-  
+
   // 대외활동 탭 필터 업데이트
   void updateActivityFilter(String title, String value) {
     switch (title) {
@@ -573,7 +589,7 @@ class FilterController extends GetxController {
         break;
     }
   }
-  
+
   // 교육/강연 탭 필터 업데이트
   void updateEducationFilter(String title, String value) {
     switch (title) {
@@ -594,7 +610,7 @@ class FilterController extends GetxController {
         break;
     }
   }
-  
+
   // 공모전 탭 필터 업데이트
   void updateContestFilter(String title, String value) {
     switch (title) {
@@ -615,16 +631,17 @@ class FilterController extends GetxController {
   }
 
   // 멀티 셀렉트 필터 값 업데이트
-  void updateMultiSelectValue(int tabIndex, String filterType, String option, bool isSelected) {
+  void updateMultiSelectValue(
+      int tabIndex, String filterType, String option, bool isSelected) {
     switch (filterType) {
       case '학력':
-        if (tabIndex == 0) { 
+        if (tabIndex == 0) {
           if (isSelected) {
             _postController.multiSelectJobEducation.remove(option);
           } else {
             _postController.multiSelectJobEducation.add(option);
           }
-        } else if (tabIndex == 1) { 
+        } else if (tabIndex == 1) {
           if (isSelected) {
             _postController.multiSelectInternEducation.remove(option);
           } else {
@@ -669,7 +686,7 @@ class FilterController extends GetxController {
         }
         break;
     }
-    
+
     _postController.loadContests();
   }
 
@@ -677,9 +694,9 @@ class FilterController extends GetxController {
   bool isOptionSelected(int tabIndex, String filterType, String option) {
     switch (filterType) {
       case '학력':
-        if (tabIndex == 0) { 
+        if (tabIndex == 0) {
           return _postController.multiSelectJobEducation.contains(option);
-        } else if (tabIndex == 1) { 
+        } else if (tabIndex == 1) {
           return _postController.multiSelectInternEducation.contains(option);
         }
         return false;
@@ -701,10 +718,11 @@ class FilterController extends GetxController {
   }
 
   // 가장 가까운 라벨 찾기 (중복 코드 제거)
-  String _findClosestLabel(double value, List<double> steps, List<String> labels) {
+  String _findClosestLabel(
+      double value, List<double> steps, List<String> labels) {
     double minDiff = double.infinity;
     int closestIndex = 0;
-    
+
     for (int i = 0; i < steps.length; i++) {
       double diff = (value - steps[i]).abs();
       if (diff < minDiff) {
@@ -712,7 +730,7 @@ class FilterController extends GetxController {
         closestIndex = i;
       }
     }
-    
+
     return labels[closestIndex];
   }
 }

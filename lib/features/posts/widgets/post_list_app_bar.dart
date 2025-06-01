@@ -23,7 +23,8 @@ class PostListAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
+                visualDensity:
+                    const VisualDensity(horizontal: -3.0, vertical: -3.0),
                 padding: EdgeInsets.zero,
                 icon: SvgPicture.asset(
                   'assets/icons/Search.svg',
@@ -32,7 +33,8 @@ class PostListAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () {},
               ),
               IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
+                visualDensity:
+                    const VisualDensity(horizontal: -3.0, vertical: -3.0),
                 padding: EdgeInsets.zero,
                 icon: SvgPicture.asset(
                   'assets/icons/bell.svg',
@@ -41,7 +43,8 @@ class PostListAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () {},
               ),
               IconButton(
-                visualDensity: const VisualDensity(horizontal: -3.0, vertical: -3.0),
+                visualDensity:
+                    const VisualDensity(horizontal: -3.0, vertical: -3.0),
                 padding: const EdgeInsets.only(left: -3.5, right: 5),
                 icon: SvgPicture.asset(
                   'assets/icons/user.svg',

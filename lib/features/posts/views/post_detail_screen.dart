@@ -36,8 +36,7 @@ class PostDetailScreen extends StatelessWidget {
         centerTitle: false, // 로고를 중앙 정렬하지 않고 왼쪽으로 정렬
       ),
       backgroundColor: Colors.white, // 배경색 추가
-      body: 
-      Stack(
+      body: Stack(
         children: [
           SingleChildScrollView(
             child: Column(
@@ -170,7 +169,8 @@ class PostDetailScreen extends StatelessWidget {
 
           const SectionTitle('지원 방법'),
           const SizedBox(height: 8),
-          const Text('이력서 및 포트폴리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
+          const Text(
+              '이력서 및 포트폴리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
           const SizedBox(height: 20),
         ],
       ),
@@ -205,15 +205,16 @@ class PostDetailScreen extends StatelessWidget {
               onTap: () {
                 // 자세히 보기 버튼 동작
               },
-              child: const Center(  // Center로 감싸서 텍스트 중앙 정렬
+              child: const Center(
+                // Center로 감싸서 텍스트 중앙 정렬
                 child: Text(
                   '자세히 보기',
-                  textAlign: TextAlign.center,  // 텍스트 정렬 추가
+                  textAlign: TextAlign.center, // 텍스트 정렬 추가
                   style: TextStyle(
-                    color: Color(0xFFF5F5F5),  // 색상 코드 정확히 적용
+                    color: Color(0xFFF5F5F5), // 색상 코드 정확히 적용
                     fontSize: 18,
-                    fontFamily: 'Pretendard',  // 폰트 패밀리 적용
-                    fontWeight: FontWeight.w700,  // FontWeight 700 적용
+                    fontFamily: 'Pretendard', // 폰트 패밀리 적용
+                    fontWeight: FontWeight.w700, // FontWeight 700 적용
                   ),
                 ),
               ),

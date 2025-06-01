@@ -13,13 +13,15 @@ class PostGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 64) / 2; // 좌우 마진 8*2 + 내부 패딩 16*2 + 카드 간 간격 16 = 64
+    final cardWidth =
+        (screenWidth - 64) / 2; // 좌우 마진 8*2 + 내부 패딩 16*2 + 카드 간 간격 16 = 64
 
     return Container(
       margin: const EdgeInsets.all(8.0),
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
           child: contests.isEmpty
               ? _buildEmptyState()
               : _buildContestGrid(cardWidth),
@@ -159,8 +161,8 @@ class ContestCard extends StatelessWidget {
   }
 
   String _getImageUrl() {
-    return contest.imageUrl.isNotEmpty 
-        ? contest.imageUrl 
+    return contest.imageUrl.isNotEmpty
+        ? contest.imageUrl
         : "https://placehold.co/600x400?text=No+Image";
   }
 
@@ -190,7 +192,8 @@ class ContestCard extends StatelessWidget {
         width: 24,
         height: 24,
         child: IconButton(
-          icon: const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+          icon:
+              const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {

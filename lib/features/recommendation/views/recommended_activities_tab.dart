@@ -19,7 +19,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
         builder: (controller) {
           if (controller.isLoading) {
             return const Center(child: CircularProgressIndicator());
-          } 
+          }
           return Column(
             children: [
               Container(
@@ -43,14 +43,12 @@ class RecommendedActivitiesTab extends StatelessWidget {
                       const SizedBox(height: 32),
                       Divider(color: Colors.grey[300], thickness: 1),
                       const SizedBox(height: 32),
-
                       _buildSectionHeader('맞춤 대외활동 추천', 2),
                       const SizedBox(height: 16),
                       _buildRecommendedActivity(controller),
                       const SizedBox(height: 32),
                       Divider(color: Colors.grey[300], thickness: 1),
                       const SizedBox(height: 32),
-
                       _buildSectionHeader('취업 준비 필수 강의', 3),
                       const SizedBox(height: 16),
                       _buildCoursesListView(controller),
@@ -96,7 +94,9 @@ class RecommendedActivitiesTab extends StatelessWidget {
           ),
           onPressed: () {
             // 해당 탭으로 이동
-            Get.toNamed(AppRoutes.postList, arguments: {'tabIndex': tabIndex}); // 정확히 말하면 해당 탭 인덱스에서 추천순 버튼 눌려서 추천순대로 나열한 페이지로 넘어감
+            Get.toNamed(AppRoutes.postList, arguments: {
+              'tabIndex': tabIndex
+            }); // 정확히 말하면 해당 탭 인덱스에서 추천순 버튼 눌려서 추천순대로 나열한 페이지로 넘어감
           },
         ),
       ],
@@ -107,8 +107,8 @@ class RecommendedActivitiesTab extends StatelessWidget {
   Widget _buildJobListView(RecommendationController controller) {
     final recruitmentContests = controller.recommendedContests.isNotEmpty
         ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('채용'), 
-                       orElse: () => ContestGroup(groupName: '', contests: []))
+            .firstWhere((group) => group.groupName.contains('채용'),
+                orElse: () => ContestGroup(groupName: '', contests: []))
             .contests
         : [];
 
@@ -139,8 +139,8 @@ class RecommendedActivitiesTab extends StatelessWidget {
   Widget _buildRecommendedActivity(RecommendationController controller) {
     final activityContests = controller.recommendedContests.isNotEmpty
         ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('대외활동'), 
-                     orElse: () => ContestGroup(groupName: '', contests: []))
+            .firstWhere((group) => group.groupName.contains('대외활동'),
+                orElse: () => ContestGroup(groupName: '', contests: []))
             .contests
         : [];
 
@@ -171,8 +171,8 @@ class RecommendedActivitiesTab extends StatelessWidget {
   Widget _buildCoursesListView(RecommendationController controller) {
     final lectureContests = controller.recommendedContests.isNotEmpty
         ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('강의'), 
-                     orElse: () => ContestGroup(groupName: '', contests: []))
+            .firstWhere((group) => group.groupName.contains('강의'),
+                orElse: () => ContestGroup(groupName: '', contests: []))
             .contests
         : [];
 
