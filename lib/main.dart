@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       // 시작 화면 설정 (원하는 시작 화면으로 변경하세요)
-      // initialRoute: AppRoutes.recommendationScreen, // 또는 기존 initialRoute 사용
-      initialRoute: AppRoutes.postList, // 또는 기존 initialRoute 사용
+      initialRoute: AppRoutes.recommendationScreen, // 또는 기존 initialRoute 사용
+      // initialRoute: AppRoutes.postList, // 또는 기존 initialRoute 사용
       getPages: AppRoutes.routes,
       debugShowCheckedModeBanner: false,
     );

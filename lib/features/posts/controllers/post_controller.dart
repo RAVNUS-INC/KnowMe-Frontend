@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import '../models/contest_model.dart';
@@ -9,6 +10,9 @@ class PostController extends GetxController {
   // 의존성
   final PostRepository repository;
   final _logger = Logger();
+  
+  // 서브 컨트롤러로 PageController 추가
+  late PageController pageController;
 
   // 생성자를 통해 repository 초기화 (의존성 주입)
   PostController({PostRepository? repository}) : repository = repository ?? PostRepository();
@@ -57,7 +61,7 @@ class PostController extends GetxController {
   final RxList<String> multiSelectTarget = <String>[].obs;
   final RxList<String> multiSelectHost = <String>[].obs;
   final RxList<String> multiSelectOrganizer = <String>[].obs;
-  final RxList<String> multiSelectBenefit = <String>[].obs;  
+  final RxList<String> multiSelectBenefit = <String>[].obs;
   final RxList<String> multiSelectOnOffline = <String>[].obs;
   final RxList<String> multiSelectJobEducation = <String>[].obs;
   final RxList<String> multiSelectInternEducation = <String>[].obs;
@@ -65,14 +69,58 @@ class PostController extends GetxController {
   // 호환성을 위한 getter
   RxInt get currentTabIndex => selectedTabIndex;
 
+  // 필터 접근 메서드 (리팩토링을 위한 새로운 접근 방식)
+  /// 현재 선택된 탭에서 특정 타입의 필터값 가져오기
+  Rx<String?> getFilter(String filterType) {
+    return filtersByTab[selectedTabIndex.value]?[filterType] ?? Rx<String?>(null);
+  }
+
+  /// 특정 탭의 특정 타입 필터값 가져오기
+  Rx<String?> getFilterByType(int tabIndex, String filterType) {
+    return filtersByTab[tabIndex]?[filterType] ?? Rx<String?>(null);
+  }
+
+  /// 탭 인덱스에 따른 모든 필터값 Map 가져오기
+  Map<String, Rx<String?>> getFiltersForTab(int tabIndex) {
+    return filtersByTab[tabIndex] ?? {};
+  }
+
+  /// 현재 탭의 모든 필터값 Map 가져오기
+  Map<String, Rx<String?>> getCurrentTabFilters() {
+    return filtersByTab[selectedTabIndex.value] ?? {};
+  }
+
   @override
   void onInit() {
     super.onInit();
+    // PageController 초기화
+    pageController = PageController(initialPage: selectedTabIndex.value);
     loadContests();
   }
+  
+  @override
+  void onClose() {
+    // PageController 자원 해제
+    pageController.dispose();
+    super.onClose();
+  }
 
-  /// 탭 변경 메서드
+  /// 탭 변경 메서드 - PageController와 탭 인덱스 동기화 포함
   void changeTab(int index) {
+    selectedTabIndex.value = index;
+    // PageController 페이지도 함께 변경
+    if (pageController.hasClients && pageController.page?.toInt() != index) {
+      pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+    loadContests();
+  }
+  
+  /// PageView에서 페이지 변경 시 호출하는 메서드
+  void onPageChanged(int index) {
     selectedTabIndex.value = index;
     loadContests();
   }
@@ -81,14 +129,14 @@ class PostController extends GetxController {
   void resetFiltersForTab(int tabIndex) {
     // 단일 선택 필터 초기화
     filtersByTab[tabIndex]?.forEach((_, value) => value.value = null);
-    
+
     // 다중 선택 필터 초기화
     _resetMultiSelectFilters(tabIndex);
-    
+
     // 데이터 다시 로드
     loadContests();
   }
-  
+
   /// 다중 선택 필터 초기화 메서드 (SRP 원칙 적용)
   void _resetMultiSelectFilters(int tabIndex) {
     switch (tabIndex) {
@@ -111,7 +159,7 @@ class PostController extends GetxController {
         break;
     }
   }
-  
+
   /// 현재 탭의 모든 필터 초기화 (FilterController와의 호환성 유지)
   void resetFilters() => resetFiltersForTab(selectedTabIndex.value);
 
@@ -124,7 +172,7 @@ class PostController extends GetxController {
   /// 데이터 로드 메서드
   Future<void> loadContests() async {
     isLoading.value = true;
-    
+
     try {
       final results = getFilteredContentsByCurrentTab();
       contests.assignAll(results);
@@ -188,40 +236,21 @@ class PostController extends GetxController {
     }
   }
 
-  // TODO: 추후 리팩토링 - 아래 Getter들은 filter_controller.dart 및 filter_row_widget.dart에서
-  // 직접 참조되고 있어 호환성을 위해 필요합니다. 이후 코드 리팩토링 시 filtersByTab을 직접 사용하도록 수정 필요
-  
-  /// 기존 코드와의 호환성 유지를 위한 Getter들
-  /// filter_controller.dart와 filter_row_widget.dart에서 직접 참조하고 있음
-  
-  // 채용 관련 필터 Getter
-  Rx<String?> get selectedJob => filtersByTab[0]!['직무']!;
-  Rx<String?> get selectedExperience => filtersByTab[0]!['신입~5년']!;
-  Rx<String?> get selectedLocation => filtersByTab[0]!['지역']!;
-  Rx<String?> get selectedEducation => filtersByTab[0]!['학력']!;
-  
-  // 인턴 관련 필터 Getter
-  Rx<String?> get selectedInternJob => filtersByTab[1]!['직무']!;
-  Rx<String?> get selectedPeriod => filtersByTab[1]!['기간']!;
-  Rx<String?> get selectedInternLocation => filtersByTab[1]!['지역']!;
-  Rx<String?> get selectedInternEducation => filtersByTab[1]!['학력']!;
-  
-  // 대외활동 관련 필터 Getter
-  Rx<String?> get selectedField => filtersByTab[2]!['분야']!;
-  Rx<String?> get selectedOrganization => filtersByTab[2]!['기관']!;
-  Rx<String?> get selectedActivityLocation => filtersByTab[2]!['지역']!;
-  Rx<String?> get selectedHost => filtersByTab[2]!['주최기관']!;
-  Rx<String?> get selectedActivityPeriod => filtersByTab[2]!['기간']!;
-  
-  // 교육/강연 관련 필터 Getter
-  Rx<String?> get selectedEduField => filtersByTab[3]!['분야']!;
-  Rx<String?> get selectedEduPeriod => filtersByTab[3]!['기간']!;
-  Rx<String?> get selectedEduLocation => filtersByTab[3]!['지역']!;
-  Rx<String?> get selectedOnOffline => filtersByTab[3]!['온/오프라인']!;
-  
-  // 공모전 관련 필터 Getter
-  Rx<String?> get selectedContestField => filtersByTab[4]!['분야']!;
-  Rx<String?> get selectedTarget => filtersByTab[4]!['대상']!;
-  Rx<String?> get selectedOrganizer => filtersByTab[4]!['주최기관']!;
-  Rx<String?> get selectedBenefit => filtersByTab[4]!['혜택']!;
+  /// 탭별 필터 매핑 정보 제공 (리팩토링에 활용)
+  static Map<String, Map<int, String>> getFilterMapping() {
+    return {
+      'job': {0: '직무', 1: '직무'},
+      'experience': {0: '신입~5년'},
+      'location': {0: '지역', 1: '지역', 2: '지역', 3: '지역'},
+      'education': {0: '학력', 1: '학력'},
+      'period': {1: '기간', 2: '기간', 3: '기간'},
+      'field': {2: '분야', 3: '분야', 4: '분야'},
+      'organization': {2: '기관'},
+      'host': {2: '주최기관'},
+      'onOffline': {3: '온/오프라인'},
+      'target': {4: '대상'},
+      'organizer': {4: '주최기관'},
+      'benefit': {4: '혜택'},
+    };
+  }
 }

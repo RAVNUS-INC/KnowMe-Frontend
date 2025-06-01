@@ -17,14 +17,16 @@ class PostListScreen extends StatefulWidget {
 class _PostListScreenState extends State<PostListScreen> with SingleTickerProviderStateMixin {
   final List<String> tabTitles = ['채용', '인턴', '대외활동', '교육/강연', '공모전'];
   late TabController _tabController;
-  final PageController _pageController = PageController();
-
-  // GetX Controller 인스턴스화
-  final PostController _postController = Get.put(PostController());
+  
+  // View에서 직접 생성하지 않고 routes에서 주입된 컨트롤러 사용
+  late PostController _postController;
 
   @override
   void initState() {
     super.initState();
+    // 컨트롤러 주입받기
+    _postController = Get.find<PostController>();
+    
     _tabController = TabController(
       length: tabTitles.length,
       vsync: this,
@@ -34,12 +36,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
     // TabBar와 PageView 연결
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        _pageController.animateToPage(
-          _tabController.index,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-        // GetX Controller에 현재 탭 인덱스 업데이트
+        // PageController는 postController 내부에 있으므로 접근하여 사용
         _postController.changeTab(_tabController.index);
       }
     });
@@ -48,7 +45,7 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
   @override
   void dispose() {
     _tabController.dispose();
-    _pageController.dispose();
+    // PageController는 PostController에서 관리하므로 여기서 dispose할 필요 없음
     super.dispose();
   }
 
@@ -67,18 +64,18 @@ class _PostListScreenState extends State<PostListScreen> with SingleTickerProvid
           
           // 필터 행 위젯
           FilterRowWidget(
-            postController: _postController,
             tabController: _tabController,
           ),
 
           // 스크롤 가능한 콘텐츠 영역
           Expanded(
             child: PageView.builder(
-              controller: _pageController,
+              // 직접 생성하지 않고 PostController의 pageController 사용
+              controller: _postController.pageController,
               onPageChanged: (index) {
                 _tabController.animateTo(index);
-                // GetX Controller에 현재 탭 인덱스 업데이트
-                _postController.changeTab(index);
+                // PageView에서의 페이지 변경을 컨트롤러에 알림
+                _postController.onPageChanged(index);
               },
               itemCount: tabTitles.length,
               itemBuilder: (context, index) {

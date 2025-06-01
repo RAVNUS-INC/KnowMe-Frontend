@@ -4,21 +4,22 @@ import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
 import 'package:knowme_frontend/features/posts/views/post_bottom_sheet.dart';
 
-/// 필터 버튼을 표시하는 위젯
 class FilterRowWidget extends StatelessWidget {
-  final PostController postController;
   final TabController tabController;
 
   const FilterRowWidget({
     super.key,
-    required this.postController,
     required this.tabController,
   });
 
   @override
   Widget build(BuildContext context) {
+    // View에서 컨트롤러를 직접 생성하지 않고 Get.find()로 가져옴
+    final PostController postController = Get.find<PostController>();
+
     return Obx(() {
-      final List<Widget> filterButtons = _getFilterButtonsByTabIndex();
+      // 클래스 메소드 호출 시 postController를 전달
+      final List<Widget> filterButtons = _getFilterButtonsByTabIndex(postController);
 
       return SizedBox(
         height: 50, // filter button row
@@ -119,54 +120,55 @@ class FilterRowWidget extends StatelessWidget {
   }
 
   /// 현재 선택된 탭 인덱스에 따라 필터 버튼 목록 반환
-  List<Widget> _getFilterButtonsByTabIndex() {
+  List<Widget> _getFilterButtonsByTabIndex(PostController postController) {
     List<Widget> filterButtons = [];
+    final currentTabIndex = postController.selectedTabIndex.value;
 
-    switch (postController.selectedTabIndex.value) {
+    switch (currentTabIndex) {
       case 0: // 채용
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton('직무', postController.selectedJob.value, defaultText: '직무'),
-          _buildFilterButton('경력', postController.selectedExperience.value, defaultText: '경력'),
-          _buildFilterButton('지역', postController.selectedLocation.value, defaultText: '지역'),
-          _buildMultiSelectFilterButton('학력', postController.multiSelectJobEducation, defaultText: '학력'),
+          _buildFilterButton(postController, '직무', postController.getFilterByType(currentTabIndex, '직무').value, defaultText: '직무'),
+          _buildFilterButton(postController, '경력', postController.getFilterByType(currentTabIndex, '신입~5년').value, defaultText: '경력'),
+          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
+          _buildMultiSelectFilterButton(postController, '학력', postController.multiSelectJobEducation, defaultText: '학력'),
         ];
         break;
       case 1: // 인턴
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton('직무', postController.selectedInternJob.value, defaultText: '직무'),
-          _buildFilterButton('기간', postController.selectedPeriod.value, defaultText: '기간'),
-          _buildFilterButton('지역', postController.selectedInternLocation.value, defaultText: '지역'),
-          _buildMultiSelectFilterButton('학력', postController.multiSelectInternEducation, defaultText: '학력'),
+          _buildFilterButton(postController, '직무', postController.getFilterByType(currentTabIndex, '직무').value, defaultText: '직무'),
+          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
+          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
+          _buildMultiSelectFilterButton(postController, '학력', postController.multiSelectInternEducation, defaultText: '학력'),
         ];
         break;
       case 2: // 대외활동
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton('분야', postController.selectedField.value, defaultText: '분야'),
-          _buildFilterButton('기간', postController.selectedActivityPeriod.value, defaultText: '기간'),
-          _buildFilterButton('지역', postController.selectedActivityLocation.value, defaultText: '지역'),
-          _buildMultiSelectFilterButton('주최기관', postController.multiSelectHost, defaultText: '주최기관'),
+          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
+          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
+          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
+          _buildMultiSelectFilterButton(postController, '주최기관', postController.multiSelectHost, defaultText: '주최기관'),
         ];
         break;
       case 3: // 교육/강연
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton('분야', postController.selectedEduField.value, defaultText: '분야'),
-          _buildFilterButton('기간', postController.selectedEduPeriod.value, defaultText: '기간'),
-          _buildFilterButton('지역', postController.selectedEduLocation.value, defaultText: '지역'),
-          _buildMultiSelectFilterButton('온/오프라인', postController.multiSelectOnOffline, defaultText: '온/오프라인'),
+          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
+          _buildFilterButton(postController, '기간', postController.getFilterByType(currentTabIndex, '기간').value, defaultText: '기간'),
+          _buildFilterButton(postController, '지역', postController.getFilterByType(currentTabIndex, '지역').value, defaultText: '지역'),
+          _buildMultiSelectFilterButton(postController, '온/오프라인', postController.multiSelectOnOffline, defaultText: '온/오프라인'),
         ];
         break;
       case 4: // 공모전
       default:
         filterButtons = [
           const SizedBox(height: 10),
-          _buildFilterButton('분야', postController.selectedContestField.value, defaultText: '분야'),
-          _buildMultiSelectFilterButton('대상', postController.multiSelectTarget, defaultText: '대상'),
-          _buildMultiSelectFilterButton('주최기관', postController.multiSelectOrganizer, defaultText: '주최기관'),
-          _buildMultiSelectFilterButton('혜택', postController.multiSelectBenefit, defaultText: '혜택'),
+          _buildFilterButton(postController, '분야', postController.getFilterByType(currentTabIndex, '분야').value, defaultText: '분야'),
+          _buildMultiSelectFilterButton(postController, '대상', postController.multiSelectTarget, defaultText: '대상'),
+          _buildMultiSelectFilterButton(postController, '주최기관', postController.multiSelectOrganizer, defaultText: '주최기관'),
+          _buildMultiSelectFilterButton(postController, '혜택', postController.multiSelectBenefit, defaultText: '혜택'),
         ];
         break;
     }
@@ -175,7 +177,7 @@ class FilterRowWidget extends StatelessWidget {
   }
 
   /// 일반 필터 버튼 위젯 생성 (단일 선택)
-  Widget _buildFilterButton(String filterType, String? selectedValue, {required String defaultText}) {
+  Widget _buildFilterButton(PostController postController, String filterType, String? selectedValue, {required String defaultText}) {
     final bool isSelected = selectedValue != null;
 
     // 선택된 값이 있으면 그 값을 표시하고, 없으면 기본 텍스트를 표시
@@ -223,7 +225,7 @@ class FilterRowWidget extends StatelessWidget {
   }
 
   /// 다중 선택 필터 버튼 위젯 생성
-  Widget _buildMultiSelectFilterButton(String filterType, RxList<String> selectedValues, {required String defaultText}) {
+  Widget _buildMultiSelectFilterButton(PostController postController, String filterType, RxList<String> selectedValues, {required String defaultText}) {
     // 선택된 값이 있는지 확인
     final bool isSelected = selectedValues.isNotEmpty;
 

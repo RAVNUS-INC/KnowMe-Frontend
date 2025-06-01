@@ -12,10 +12,8 @@ class RecommendationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 컨트롤러 초기화 - 앱 시작시 한 번만 실행되도록 수정
-    final controller = Get.put(RecommendationController(), permanent: true);
-
-    // 디버깅용 코드 제거 (print 문 삭제)
+    // 컨트롤러를 routes.dart의 Binding에서 주입받아 사용
+    final controller = Get.find<RecommendationController>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFEDEFF0),

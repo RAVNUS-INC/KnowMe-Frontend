@@ -76,38 +76,38 @@ class FilterController extends GetxController {
     switch (tabIndex) {
       case 0: // 채용
         return FilterValues(
-          job: _postController.selectedJob.value,
-          experience: _postController.selectedExperience.value,
-          location: _postController.selectedLocation.value,
-          education: _postController.selectedEducation.value,
+          job: _postController.getFilterByType(tabIndex, '직무').value,
+          experience: _postController.getFilterByType(tabIndex, '신입~5년').value,
+          location: _postController.getFilterByType(tabIndex, '지역').value,
+          education: _postController.getFilterByType(tabIndex, '학력').value,
           educationList: _postController.multiSelectJobEducation.toList(),
         );
       case 1: // 인턴
         return FilterValues(
-          job: _postController.selectedInternJob.value,
-          location: _postController.selectedInternLocation.value,
-          education: _postController.selectedInternEducation.value,
+          job: _postController.getFilterByType(tabIndex, '직무').value,
+          location: _postController.getFilterByType(tabIndex, '지역').value,
+          education: _postController.getFilterByType(tabIndex, '학력').value,
           educationList: _postController.multiSelectInternEducation.toList(),
-          period: _postController.selectedPeriod.value,
+          period: _postController.getFilterByType(tabIndex, '기간').value,
         );
       case 2: // 대외활동
         return FilterValues(
-          job: _postController.selectedField.value,
-          location: _postController.selectedActivityLocation.value,
-          period: _postController.selectedActivityPeriod.value,
+          job: _postController.getFilterByType(tabIndex, '분야').value,
+          location: _postController.getFilterByType(tabIndex, '지역').value,
+          period: _postController.getFilterByType(tabIndex, '기간').value,
           host: _postController.multiSelectHost.toList(),
         );
       case 3: // 교육/강연
         return FilterValues(
-          job: _postController.selectedEduField.value,
+          job: _postController.getFilterByType(tabIndex, '분야').value,
           onOffline: _postController.multiSelectOnOffline.toList(),
-          location: _postController.selectedEduLocation.value,
-          period: _postController.selectedEduPeriod.value,
+          location: _postController.getFilterByType(tabIndex, '지역').value,
+          period: _postController.getFilterByType(tabIndex, '기간').value,
         );
       case 4: // 공모전
       default:
         return FilterValues(
-          job: _postController.selectedContestField.value,
+          job: _postController.getFilterByType(tabIndex, '분야').value,
           target: _postController.multiSelectTarget.toList(),
           organizer: _postController.multiSelectOrganizer.toList(),
           benefit: _postController.multiSelectBenefit.toList(),
@@ -134,73 +134,73 @@ class FilterController extends GetxController {
 
     switch (tabIndex) {
       case 0: // 채용
-        if (_postController.selectedExperience.value != null) {
-          final exp = _postController.selectedExperience.value!;
-          if (exp == '신입') {
+        final expValue = _postController.getFilterByType(tabIndex, '신입~5년').value;
+        if (expValue != null) {
+          if (expValue == '신입') {
             return const RangeValues(0, 0);
-          } else if (exp == '5년 이하') {
+          } else if (expValue == '5년 이하') {
             return const RangeValues(0, 5);
-          } else if (exp == '5~10년') {
+          } else if (expValue == '5~10년') {
             return const RangeValues(5, 10);
-          } else if (exp == '10~15년') {
+          } else if (expValue == '10~15년') {
             return const RangeValues(10, 15);
-          } else if (exp == '15년 이상') {
+          } else if (expValue == '15년 이상') {
             return const RangeValues(15, 20);
-          } else if (exp == '20년 이상') {
+          } else if (expValue == '20년 이상') {
             return RangeValues(20, max);
           }
         }
         break;
       case 1: // 인턴
-        if (_postController.selectedPeriod.value != null) {
-          final period = _postController.selectedPeriod.value!;
-          if (period == '1개월 이하') {
+        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        if (periodValue != null) {
+          if (periodValue == '1개월 이하') {
             return const RangeValues(1, 1);
-          } else if (period == '1~6개월') {
+          } else if (periodValue == '1~6개월') {
             return const RangeValues(1, 6);
-          } else if (period == '6개월~1년') {
+          } else if (periodValue == '6개월~1년') {
             return const RangeValues(6, 12);
-          } else if (period == '1~1.5년') {
+          } else if (periodValue == '1~1.5년') {
             return const RangeValues(12, 18);
-          } else if (period == '1.5년 이상') {
+          } else if (periodValue == '1.5년 이상') {
             return const RangeValues(18, 24);
-          } else if (period == '2년 이상') {
+          } else if (periodValue == '2년 이상') {
             return RangeValues(24, max);
           }
         }
         break;
       case 2: // 대외활동
-        if (_postController.selectedActivityPeriod.value != null) {
-          final period = _postController.selectedActivityPeriod.value!;
-          if (period == '1개월 이하') {
+        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        if (periodValue != null) {
+          if (periodValue == '1개월 이하') {
             return const RangeValues(1, 1);
-          } else if (period == '1~6개월') {
+          } else if (periodValue == '1~6개월') {
             return const RangeValues(1, 6);
-          } else if (period == '6개월~1년') {
+          } else if (periodValue == '6개월~1년') {
             return const RangeValues(6, 12);
-          } else if (period == '1~1.5년') {
+          } else if (periodValue == '1~1.5년') {
             return const RangeValues(12, 18);
-          } else if (period == '1.5년 이상') {
+          } else if (periodValue == '1.5년 이상') {
             return const RangeValues(18, 24);
-          } else if (period == '2년 이상') {
+          } else if (periodValue == '2년 이상') {
             return RangeValues(24, max);
           }
         }
         break;
       case 3: // 교육/강연
-        if (_postController.selectedEduPeriod.value != null) {
-          final period = _postController.selectedEduPeriod.value!;
-          if (period == '1일') {
+        final periodValue = _postController.getFilterByType(tabIndex, '기간').value;
+        if (periodValue != null) {
+          if (periodValue == '1일') {
             return const RangeValues(1, 1);
-          } else if (period == '1일~1개월') {
+          } else if (periodValue == '1일~1개월') {
             return const RangeValues(1, 30);
-          } else if (period == '1~2개월') {
+          } else if (periodValue == '1~2개월') {
             return const RangeValues(30, 60);
-          } else if (period == '2~4개월') {
+          } else if (periodValue == '2~4개월') {
             return const RangeValues(60, 120);
-          } else if (period == '4~6개월') {
+          } else if (periodValue == '4~6개월') {
             return const RangeValues(120, 180);
-          } else if (period == '6개월 이상') {
+          } else if (periodValue == '6개월 이상') {
             return RangeValues(180, max);
           }
         }
@@ -275,38 +275,38 @@ class FilterController extends GetxController {
   void resetFiltersForTab(int tabIndex) {
     switch (tabIndex) {
       case 0:
-        _postController.selectedJob.value = null;
-        _postController.selectedExperience.value = null;
-        _postController.selectedLocation.value = null;
-        _postController.selectedEducation.value = null;
+        _postController.getFilterByType(tabIndex, '직무').value = null;
+        _postController.getFilterByType(tabIndex, '신입~5년').value = null;
+        _postController.getFilterByType(tabIndex, '지역').value = null;
+        _postController.getFilterByType(tabIndex, '학력').value = null;
         _postController.multiSelectJobEducation.clear();
         break;
       case 1:
-        _postController.selectedInternJob.value = null;
-        _postController.selectedPeriod.value = null;
-        _postController.selectedInternLocation.value = null;
-        _postController.selectedInternEducation.value = null;
+        _postController.getFilterByType(tabIndex, '직무').value = null;
+        _postController.getFilterByType(tabIndex, '기간').value = null;
+        _postController.getFilterByType(tabIndex, '지역').value = null;
+        _postController.getFilterByType(tabIndex, '학력').value = null;
         _postController.multiSelectInternEducation.clear();
         break;
       case 2:
-        _postController.selectedField.value = null;
-        _postController.selectedActivityPeriod.value = null;
-        _postController.selectedActivityLocation.value = null;
-        _postController.selectedHost.value = null;
+        _postController.getFilterByType(tabIndex, '분야').value = null;
+        _postController.getFilterByType(tabIndex, '기간').value = null;
+        _postController.getFilterByType(tabIndex, '지역').value = null;
+        _postController.getFilterByType(tabIndex, '주최기관').value = null;
         _postController.multiSelectHost.clear();
         break;
       case 3:
-        _postController.selectedEduField.value = null;
-        _postController.selectedEduPeriod.value = null;
-        _postController.selectedEduLocation.value = null;
-        _postController.selectedOnOffline.value = null;
+        _postController.getFilterByType(tabIndex, '분야').value = null;
+        _postController.getFilterByType(tabIndex, '기간').value = null;
+        _postController.getFilterByType(tabIndex, '지역').value = null;
+        _postController.getFilterByType(tabIndex, '온/오프라인').value = null;
         _postController.multiSelectOnOffline.clear();
         break;
       case 4:
-        _postController.selectedContestField.value = null;
-        _postController.selectedTarget.value = null;
-        _postController.selectedOrganizer.value = null;
-        _postController.selectedBenefit.value = null;
+        _postController.getFilterByType(tabIndex, '분야').value = null;
+        _postController.getFilterByType(tabIndex, '대상').value = null;
+        _postController.getFilterByType(tabIndex, '주최기관').value = null;
+        _postController.getFilterByType(tabIndex, '혜택').value = null;
         _postController.multiSelectTarget.clear();
         _postController.multiSelectOrganizer.clear();
         _postController.multiSelectBenefit.clear();
@@ -341,64 +341,64 @@ class FilterController extends GetxController {
     switch (tabIndex) {
       case 0:
         if (job != null) {
-          _postController.selectedJob.value = job;
+          _postController.getFilterByType(tabIndex, '직무').value = job;
         }
 
         applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
-          _postController.selectedLocation.value = location;
+          _postController.getFilterByType(tabIndex, '지역').value = location;
         }
 
         if (education != null) {
-          _postController.selectedEducation.value = education;
+          _postController.getFilterByType(tabIndex, '학력').value = education;
         }
         break;
 
       case 1:
         if (job != null) {
-          _postController.selectedInternJob.value = job;
+          _postController.getFilterByType(tabIndex, '직무').value = job;
         }
 
         applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
-          _postController.selectedInternLocation.value = location;
+          _postController.getFilterByType(tabIndex, '지역').value = location;
         }
 
         if (education != null) {
-          _postController.selectedInternEducation.value = education;
+          _postController.getFilterByType(tabIndex, '학력').value = education;
         }
         break;
 
       case 2:
         if (job != null) {
-          _postController.selectedField.value = job;
+          _postController.getFilterByType(tabIndex, '분야').value = job;
         }
 
         applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
-          _postController.selectedActivityLocation.value = location;
+          _postController.getFilterByType(tabIndex, '지역').value = location;
         }
         break;
 
       case 3:
         if (job != null) {
-          _postController.selectedEduField.value = job;
+          _postController.getFilterByType(tabIndex, '분야').value = job;
         }
 
         applyRangeFilter(tabIndex, rangeValues);
 
         if (location != null) {
-          _postController.selectedEduLocation.value = location;
+          _postController.getFilterByType(tabIndex, '지역').value = location;
         }
         break;
 
       case 4:
       default:
         if (job != null) {
-          _postController.selectedContestField.value = job;
+          _postController.getFilterByType(tabIndex, '분야').value = job;
         }
         break;
     }
@@ -428,7 +428,7 @@ class FilterController extends GetxController {
         } else {
           filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
-        _postController.selectedExperience.value = filterValue;
+        _postController.getFilterByType(tabIndex, '신입~5년').value = filterValue;
         break;
         
       case 1: // 인턴
@@ -444,9 +444,9 @@ class FilterController extends GetxController {
         }
         
         if (tabIndex == 1) {
-          _postController.selectedPeriod.value = filterValue;
+          _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         } else {
-          _postController.selectedActivityPeriod.value = filterValue;
+          _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         }
         break;
         
@@ -460,7 +460,7 @@ class FilterController extends GetxController {
         } else {
           filterValue = '${formatSliderLabel(values.start, tabIndex)}~${formatSliderLabel(values.end, tabIndex)}';
         }
-        _postController.selectedEduPeriod.value = filterValue;
+        _postController.getFilterByType(tabIndex, '기간').value = filterValue;
         break;
         
       default:
@@ -513,19 +513,19 @@ class FilterController extends GetxController {
   void updateJobFilter(String title, String value) {
     switch (title) {
       case '직무':
-        _postController.selectedJob.value = value;
+        _postController.getFilterByType(0, '직무').value = value;
         selectedJob.value = value;
         break;
       case '경력':
-        _postController.selectedExperience.value = value;
+        _postController.getFilterByType(0, '신입~5년').value = value;
         selectedPeriod.value = value;
         break;
       case '지역':
-        _postController.selectedLocation.value = value;
+        _postController.getFilterByType(0, '지역').value = value;
         selectedLocation.value = value;
         break;
       case '학력':
-        _postController.selectedEducation.value = value;
+        _postController.getFilterByType(0, '학력').value = value;
         selectedEducation.value = value;
         break;
     }
@@ -535,19 +535,19 @@ class FilterController extends GetxController {
   void updateInternFilter(String title, String value) {
     switch (title) {
       case '직무':
-        _postController.selectedInternJob.value = value;
+        _postController.getFilterByType(1, '직무').value = value;
         selectedJob.value = value;
         break;
       case '지역':
-        _postController.selectedInternLocation.value = value;
+        _postController.getFilterByType(1, '지역').value = value;
         selectedLocation.value = value;
         break; 
       case '기간':
-        _postController.selectedPeriod.value = value;
+        _postController.getFilterByType(1, '기간').value = value;
         selectedPeriod.value = value;
         break;
       case '학력':
-        _postController.selectedInternEducation.value = value;
+        _postController.getFilterByType(1, '학력').value = value;
         selectedEducation.value = value;
         break;
     }
@@ -557,19 +557,19 @@ class FilterController extends GetxController {
   void updateActivityFilter(String title, String value) {
     switch (title) {
       case '분야':
-        _postController.selectedField.value = value;
+        _postController.getFilterByType(2, '분야').value = value;
         selectedJob.value = value;
         break;
       case '지역':
-        _postController.selectedActivityLocation.value = value;
+        _postController.getFilterByType(2, '지역').value = value;
         selectedLocation.value = value;
         break;
       case '기간':
-        _postController.selectedActivityPeriod.value = value;
+        _postController.getFilterByType(2, '기간').value = value;
         selectedPeriod.value = value;
         break;
       case '주최기관':
-        _postController.selectedHost.value = value;
+        _postController.getFilterByType(2, '주최기관').value = value;
         break;
     }
   }
@@ -578,19 +578,19 @@ class FilterController extends GetxController {
   void updateEducationFilter(String title, String value) {
     switch (title) {
       case '분야':
-        _postController.selectedEduField.value = value;
+        _postController.getFilterByType(3, '분야').value = value;
         selectedJob.value = value;
         break;
       case '지역':
-        _postController.selectedEduLocation.value = value;
+        _postController.getFilterByType(3, '지역').value = value;
         selectedLocation.value = value;
         break;
       case '기간':
-        _postController.selectedEduPeriod.value = value;
+        _postController.getFilterByType(3, '기간').value = value;
         selectedPeriod.value = value;
         break;
       case '온/오프라인':
-        _postController.selectedOnOffline.value = value;
+        _postController.getFilterByType(3, '온/오프라인').value = value;
         break;
     }
   }
@@ -599,17 +599,17 @@ class FilterController extends GetxController {
   void updateContestFilter(String title, String value) {
     switch (title) {
       case '분야':
-        _postController.selectedContestField.value = value;
+        _postController.getFilterByType(4, '분야').value = value;
         selectedJob.value = value;
         break;
       case '대상':
-        _postController.selectedTarget.value = value;
+        _postController.getFilterByType(4, '대상').value = value;
         break;
       case '주최기관':
-        _postController.selectedOrganizer.value = value;
+        _postController.getFilterByType(4, '주최기관').value = value;
         break;
       case '혜택':
-        _postController.selectedBenefit.value = value;
+        _postController.getFilterByType(4, '혜택').value = value;
         break;
     }
   }
