@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
-import '../models/contest_model.dart';
+import '../models/contests_model.dart';
 import '../repositories/post_repository.dart';
 
 /// 게시물 데이터 관련 비즈니스 로직을 담당하는 Controller 클래스

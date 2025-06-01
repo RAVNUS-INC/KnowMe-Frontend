@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
 
 class PostGrid extends StatelessWidget {

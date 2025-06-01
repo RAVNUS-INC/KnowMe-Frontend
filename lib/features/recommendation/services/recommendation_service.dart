@@ -1,4 +1,4 @@
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import '../repositories/recommendation_repositories.dart';
 
 class RecommendationService {

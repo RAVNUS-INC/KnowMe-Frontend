@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../controllers/recommendation_controller.dart';
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/routes/routes.dart';
 import 'recommendation_postcard.dart';
 

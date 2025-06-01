@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_list_app_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';

@@ -1,4 +1,4 @@
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {

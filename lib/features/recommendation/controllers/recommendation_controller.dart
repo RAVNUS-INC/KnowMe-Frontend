@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../features/posts/models/contest_model.dart';
+import '../../../features/posts/models/contests_model.dart';
 import '../services/recommendation_service.dart';
 import 'package:flutter/foundation.dart';
 

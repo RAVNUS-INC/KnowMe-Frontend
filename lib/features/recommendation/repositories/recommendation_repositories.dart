@@ -1,4 +1,4 @@
-import 'package:knowme_frontend/features/posts/models/contest_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 
 class RecommendationRepository {
   List<CategoryContests> getJobCategoryContests() {
