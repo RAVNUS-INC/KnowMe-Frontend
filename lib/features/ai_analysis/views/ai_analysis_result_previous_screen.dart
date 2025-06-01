@@ -31,13 +31,13 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
 
             // 🔁 분석 카드 리스트 (컨트롤러 사용)
             Obx(() => Column(
-                children: controller.previousResults.map((result) {
-                      return AnalysisResultCard(
-                        date: result['date']!,
-                        recordInfo: result['record']!,
-                      );
-                    }).toList(),
-              )),
+                  children: controller.previousResults.map((result) {
+                    return AnalysisResultCard(
+                      date: result['date']!,
+                      recordInfo: result['record']!,
+                    );
+                  }).toList(),
+                )),
           ],
         ),
       ),
@@ -65,7 +65,7 @@ class AnalysisResultCard extends StatelessWidget {
         color: const Color(0xFFF6FAFF), // 밝은 푸른색 느낌
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFD0D0D0), 
+          color: const Color(0xFFD0D0D0),
           width: 0.5,
         ),
         boxShadow: [

@@ -228,8 +228,8 @@ class _RecommendationButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _RecommendationButton({
-    required this.label, 
-    required this.onTap
+    required this.label,
+    required this.onTap,
   });
 
   @override
@@ -258,8 +258,8 @@ class _RecommendationButton extends StatelessWidget {
           children: [
             Image.asset(
               'assets/images/icon-ai.png',
-              width: 16, 
-              height: 16
+              width: 16,
+              height: 16,
             ),
             const SizedBox(width: 8),
             Text(
@@ -275,7 +275,7 @@ class _RecommendationButton extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             const Icon(
-              Icons.chevron_right, 
+              Icons.chevron_right,
               size: 18,
               color: Color(0xFF0068E5),
             ),
