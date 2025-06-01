@@ -12,6 +12,8 @@ import '../features/membership/views/password_reset_success_screen.dart';
 import '../features/home/views/home_screen.dart';
 import '../features/ai_analysis/controllers/ai_analysis_controller.dart';
 import '../features/search/controllers/search_controller.dart';
+import '../features/search/controllers/search_result_controller.dart';
+import '../features/search/views/search_result_screen.dart';
 import '../features/search/views/search_screen.dart';
 import '../features/membership/controllers/login_controller.dart';
 import '../features/membership/controllers/find_id_passwd_controller.dart';
@@ -29,6 +31,8 @@ class AppRoutes {
   static const String passwordReset = '/password-reset';
   static const String passwordResetSuccess = '/password-reset-success';
   static const String search = '/search';
+  static const String searchResult = '/searchResult';
+
 
   // ✅ 새 라우트 추가
   static const String post = '/post';
@@ -110,5 +114,14 @@ class AppRoutes {
       }),
       transition: Transition.fadeIn,
     ),
+    GetPage(
+      name: AppRoutes.searchResult,
+      page: () => const SearchResultScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(SearchResultController());
+      }),
+      transition: Transition.fadeIn,
+    ),
+
   ];
 }
