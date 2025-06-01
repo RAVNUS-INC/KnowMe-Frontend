@@ -19,4 +19,13 @@ class ApiEndpoints {
   static String getOAuthUrl(String provider) {
     return '$oauthAuthorization/$provider';
   }
+
+  // 회원정보 조회
+  static String getUserInfoUrl(String userId) => '/api/users/$userId';
+
+  // 회원정보 수정
+  static String getUserEditUrl(String userId) => '/api/users/edit/$userId';
+
+  // 비밀번호 수정 (새로 추가)
+  static const String editPassword = '/api/user/editPassword';
 }

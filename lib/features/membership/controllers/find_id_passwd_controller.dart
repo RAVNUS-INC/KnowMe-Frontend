@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/signup_model.dart';
+import 'package:logger/logger.dart';
 
 class FindIdPasswdController extends GetxController {
   // Rx variables
@@ -18,6 +19,8 @@ class FindIdPasswdController extends GetxController {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController userIdController = TextEditingController();
+
+  final Logger _logger = Logger();
 
   @override
   void onInit() {
@@ -59,12 +62,12 @@ class FindIdPasswdController extends GetxController {
       // Email validation - check format
       final email = emailController.text.trim();
       final emailRegex =
-          RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
       canSubmitFindId.value = email.isNotEmpty && emailRegex.hasMatch(email);
     } else {
       // Phone validation - check format (Korean phone number format)
       final phone =
-          phoneController.text.trim().replaceAll('-', '').replaceAll(' ', '');
+      phoneController.text.trim().replaceAll('-', '').replaceAll(' ', '');
       final phoneRegex = RegExp(r'^01[0-9]{1}[0-9]{7,8}$');
       canSubmitFindId.value = phone.isNotEmpty && phoneRegex.hasMatch(phone);
     }
@@ -83,7 +86,7 @@ class FindIdPasswdController extends GetxController {
     canSubmitFindPw.value = userId.length >= 3;
   }
 
-  // Handle find ID submission
+  // Handle find ID submission (기존 로직 유지)
   Future<void> submitFindId() async {
     if (!canSubmitFindId.value) return;
 
@@ -132,43 +135,17 @@ class FindIdPasswdController extends GetxController {
     }
   }
 
-  // Handle find password submission
+  // Handle find password submission - 사용자 ID 검증 없이 바로 비밀번호 재설정 페이지로 이동
   Future<void> submitFindPassword() async {
     if (!canSubmitFindPw.value) return;
 
-    // Show loading state
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
+    String userId = userIdController.text.trim();
+    _logger.d('비밀번호 찾기 - 입력된 userId: $userId');
 
-    try {
-      // Simulate API delay
-      await Future.delayed(const Duration(milliseconds: 500));
+    // 사용자 ID 존재 여부 확인 없이 바로 비밀번호 재설정 페이지로 이동
+    // 실제 검증은 /api/user/editPassword API에서 수행
+    _logger.d('비밀번호 재설정 페이지로 이동 - userId: $userId');
 
-      String userId = userIdController.text.trim();
-      bool exists = SignupModel.isValidTestUserId(userId);
-
-      // Close loading dialog
-      Get.back();
-
-      if (exists) {
-        // Navigate to password reset screen
-        Get.offNamed('/password-reset');
-      } else {
-        // Show error message
-        showPasswordFindError.value = true;
-        passwordFindErrorMessage.value = '잘못된 회원정보입니다.';
-      }
-    } catch (e) {
-      // Close loading dialog if still open
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-
-      // Show general error
-      showPasswordFindError.value = true;
-      passwordFindErrorMessage.value = '오류가 발생했습니다. 다시 시도해주세요.';
-    }
+    Get.offNamed('/password-reset', arguments: {'userId': userId});
   }
 }
