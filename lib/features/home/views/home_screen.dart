@@ -55,19 +55,25 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // 🔹 아이콘 리스트
+              // 🔹 아이콘 리스트 여기에 수정해주세여
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: controller.iconItems.map((item) {
-                    return _IconLabelItem(
-                      imageName: item['image']!,
-                      label: item['label']!,
+                    return GestureDetector(
+                      onTap: () {
+                        // TODO: 여기에 onTap 기능을 넣으면 됩니다~
+                      },
+                      child: _IconLabelItem(
+                        imageName: item['image']!,
+                        label: item['label']!,
+                      ),
                     );
                   }).toList(),
                 ),
               ),
+
 
               const SizedBox(height: 24),
               Padding(
