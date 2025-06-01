@@ -180,7 +180,7 @@ class SignupThirdController extends GetxController {
           '회원가입 완료',
           response.data?.message ?? '회원가입이 성공적으로 완료되었습니다.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.blue,
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
         );

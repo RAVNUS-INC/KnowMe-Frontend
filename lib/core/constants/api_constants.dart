@@ -11,4 +11,12 @@ class ApiEndpoints {
 
   // 로그인
   static const String userLogin = '/api/user/login';
+
+  // OAuth 소셜 로그인
+  static const String oauthAuthorization = '/api/user/oauth2/authorization';
+
+  /// OAuth 제공자별 로그인 URL 생성
+  static String getOAuthUrl(String provider) {
+    return '$oauthAuthorization/$provider';
+  }
 }
