@@ -5,7 +5,7 @@ import '../../../core/utils/storage_utils.dart';
 import '../models/login_dtos.dart';
 import '../models/signup_dtos.dart';
 import '../models/password_reset_dtos.dart';
-// import '../models/oauth_dtos.dart'; // 이 줄 제거 - 파일이 없을 수 있음
+import '../models/find_id_dtos.dart';  // ✅ 추가
 import 'package:logger/logger.dart';
 
 /// 인증 관련 Repository
@@ -34,6 +34,32 @@ class AuthRepository {
       fromJson: (json) => SignupResponseDto.fromJson(json),
       requireAuth: false,
     );
+  }
+
+  // ================== 아이디 찾기 API 호출 (새로 추가) ==================
+
+  /// 아이디 찾기 API 호출
+  Future<ApiResponse<FindIdResponseDto>> findId(FindIdRequestDto request) async {
+    _logger.d('아이디 찾기 API 호출: ${request.toJson()}');
+
+    try {
+      final response = await _apiClient.post<FindIdResponseDto>(
+        ApiEndpoints.findId,
+        body: request.toJson(),
+        fromJson: (json) => FindIdResponseDto.fromJson(json),
+        requireAuth: false,
+      );
+
+      _logger.d('아이디 찾기 API 응답: ${response.data}');
+      return response;
+
+    } catch (e) {
+      _logger.e('아이디 찾기 API 오류: $e');
+      return ApiResponse.error(
+        message: 'API 호출 중 오류 발생: $e',
+        statusCode: 0,
+      );
+    }
   }
 
   // ================== 비밀번호 재설정 ==================

@@ -18,29 +18,34 @@ class LoginRequestDto {
   }
 }
 
-/// 로그인 응답 DTO
+/// 로그인 응답 DTO (✅ 서버 응답 형식에 맞춰 수정)
 class LoginResponseDto {
-  final String result;  // status -> result로 변경
-  final String message;
-  final String? data; // JWT 토큰 (성공시에만)
+  final String result;   // "login access"
+  final String message;  // "Authentication successful"
+  final String? access;  // JWT 토큰
 
   LoginResponseDto({
     required this.result,
     required this.message,
-    this.data,
+    this.access,
   });
 
   factory LoginResponseDto.fromJson(Map<String, dynamic> json) {
     return LoginResponseDto(
       result: json['result'] ?? '',
       message: json['message'] ?? '',
-      data: json['data'], // 실패시에는 null일 수 있음
+      access: json['access'], // 'data' 대신 'access' 사용
     );
   }
 
-  /// 로그인 성공 여부 확인
-  bool get isSuccess => result == 'success';
+  /// ✅ 수정: 로그인 성공 여부 확인
+  bool get isSuccess {
+    // 1. result가 "login access"이면 성공
+    // 2. 또는 access 토큰이 있으면 성공
+    return result == 'login access' ||
+        (access != null && access!.isNotEmpty);
+  }
 
-  /// JWT 토큰 반환 (성공시에만)
-  String get token => data ?? '';
+  /// ✅ 수정: JWT 토큰 반환 (success와 관계없이 access 필드 사용)
+  String get token => access ?? '';
 }

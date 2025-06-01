@@ -12,6 +12,9 @@ class ApiEndpoints {
   // 로그인
   static const String userLogin = '/api/user/login';
 
+  // 아이디 찾기 (새로 추가)
+  static const String findId = '/api/user/findId';
+
   // OAuth 소셜 로그인
   static const String oauthAuthorization = '/api/user/oauth2/authorization';
 
@@ -26,6 +29,6 @@ class ApiEndpoints {
   // 회원정보 수정
   static String getUserEditUrl(String userId) => '/api/users/edit/$userId';
 
-  // 비밀번호 수정 (새로 추가)
+  // 비밀번호 수정
   static const String editPassword = '/api/user/editPassword';
 }

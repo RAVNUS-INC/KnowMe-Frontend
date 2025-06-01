@@ -118,7 +118,7 @@ class PasswordResetController extends GetxController {
             '비밀번호 재설정 완료',
             message,
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
             colorText: Colors.white,
             duration: const Duration(seconds: 2),
           );
