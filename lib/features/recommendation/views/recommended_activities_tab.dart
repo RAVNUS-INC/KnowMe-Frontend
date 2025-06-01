@@ -178,7 +178,7 @@ class RecommendedActivitiesTab extends StatelessWidget {
 
     if (lectureContests.isEmpty) {
       return const Center(
-        child: Text('강의 정보를 불러오는 중��니다...'),
+        child: Text('강의 정보를 불러오는 중입니다...'),
       );
     }
 

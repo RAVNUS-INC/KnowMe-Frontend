@@ -188,24 +188,38 @@ class PostController extends GetxController {
     }
   }
 
-  // ✅ 호환성 유지용 Getter
+  // TODO: 추후 리팩토링 - 아래 Getter들은 filter_controller.dart 및 filter_row_widget.dart에서
+  // 직접 참조되고 있어 호환성을 위해 필요합니다. 이후 코드 리팩토링 시 filtersByTab을 직접 사용하도록 수정 필요
+  
+  /// 기존 코드와의 호환성 유지를 위한 Getter들
+  /// filter_controller.dart와 filter_row_widget.dart에서 직접 참조하고 있음
+  
+  // 채용 관련 필터 Getter
   Rx<String?> get selectedJob => filtersByTab[0]!['직무']!;
   Rx<String?> get selectedExperience => filtersByTab[0]!['신입~5년']!;
   Rx<String?> get selectedLocation => filtersByTab[0]!['지역']!;
   Rx<String?> get selectedEducation => filtersByTab[0]!['학력']!;
+  
+  // 인턴 관련 필터 Getter
   Rx<String?> get selectedInternJob => filtersByTab[1]!['직무']!;
   Rx<String?> get selectedPeriod => filtersByTab[1]!['기간']!;
   Rx<String?> get selectedInternLocation => filtersByTab[1]!['지역']!;
   Rx<String?> get selectedInternEducation => filtersByTab[1]!['학력']!;
+  
+  // 대외활동 관련 필터 Getter
   Rx<String?> get selectedField => filtersByTab[2]!['분야']!;
   Rx<String?> get selectedOrganization => filtersByTab[2]!['기관']!;
   Rx<String?> get selectedActivityLocation => filtersByTab[2]!['지역']!;
   Rx<String?> get selectedHost => filtersByTab[2]!['주최기관']!;
   Rx<String?> get selectedActivityPeriod => filtersByTab[2]!['기간']!;
+  
+  // 교육/강연 관련 필터 Getter
   Rx<String?> get selectedEduField => filtersByTab[3]!['분야']!;
   Rx<String?> get selectedEduPeriod => filtersByTab[3]!['기간']!;
   Rx<String?> get selectedEduLocation => filtersByTab[3]!['지역']!;
   Rx<String?> get selectedOnOffline => filtersByTab[3]!['온/오프라인']!;
+  
+  // 공모전 관련 필터 Getter
   Rx<String?> get selectedContestField => filtersByTab[4]!['분야']!;
   Rx<String?> get selectedTarget => filtersByTab[4]!['대상']!;
   Rx<String?> get selectedOrganizer => filtersByTab[4]!['주최기관']!;

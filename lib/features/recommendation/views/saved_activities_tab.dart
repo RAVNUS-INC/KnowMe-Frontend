@@ -25,7 +25,7 @@ class SavedActivitiesTab extends StatelessWidget {
     );
   }
 
-  /// 저장된 활동들을 ��류하고 UI로 렌더링
+  /// 저장된 활동들을 분류하고 UI로 렌더링
   Widget _buildContent(BuildContext context) {
     final savedContests = controller.savedContests;
 
