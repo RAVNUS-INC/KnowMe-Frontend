@@ -35,23 +35,24 @@ class HomeScreen extends StatelessWidget {
 
               // 🔸 인디케이터
               Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) {
-                      final isActive = controller.currentPage.value == index;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isActive
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey.shade300,
-                        ),
-                      );
-                    }),
-                  )),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (index) {
+                  final isActive = controller.currentPage.value == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isActive
+                          ? const Color(0xFF0068E5) // 선택된 인디케이터 색상
+                          : Colors.grey.shade300,     // 비활성 인디케이터 색상
+                    ),
+                  );
+                }),
+              )),
+
 
               const SizedBox(height: 30),
 
