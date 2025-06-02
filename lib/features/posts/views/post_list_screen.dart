@@ -71,6 +71,7 @@ class _PostListScreenState extends State<PostListScreen>
   Widget build(BuildContext context) {
     return BaseScaffold(
       currentIndex: 0, // '공고' 탭 인덱스
+      backgroundColor: const Color(0xFFEEEFF0), // 배경색을 #EEEFF0로 변경
       body: Column(
         children: [
           // 상단 고정 영역

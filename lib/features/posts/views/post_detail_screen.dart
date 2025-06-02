@@ -11,6 +11,7 @@ class PostDetailScreen extends StatelessWidget {
       currentIndex: 0, // 공고 탭 활성화
       showBackButton: true, // 뒤로가기 버튼 표시
       onBack: () => Navigator.of(context).pop(), // 뒤로가기 동작
+      backgroundColor: const Color(0xFFF5F5F5), // 배경색 변경
       body: Stack(
         children: [
           SingleChildScrollView(

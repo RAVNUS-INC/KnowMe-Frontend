@@ -32,7 +32,10 @@ import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
 import 'package:knowme_frontend/features/posts/views/post_list_screen.dart';
 
 import 'package:knowme_frontend/features/recommendation/views/recommendation_screen.dart';
-//
+
+// activity import 추가
+import '../features/activity/views/activity_screen.dart';
+import '../features/activity/controllers/activity_controller.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -179,6 +182,13 @@ class AppRoutes {
       transition: Transition.fadeIn,
     ),
 
+    // 내 활동 화면 라우트 추가
+    GetPage(
+      name: activity,
+      page: () => const ActivityScreen(),
+      binding: ActivityBinding(), // 활동 컨트롤러 바인딩 추가
+      transition: Transition.fadeIn,
+    ),
   ];
   //////////게시물 관련 라우트Add commentMore actions
 // 의존성 주입을 위한 공통 메서드
@@ -225,7 +235,11 @@ class PostBinding implements Bindings {
   @override
   void dependencies() {
     // 메인 컨트롤러 생성 및 주입 (PageController 포함)
-    Get.lazyPut<PostController>(() => PostController());
+    Get.lazyPut<PostController>(() => PostController(), fenix: true);
+    // FilterController 추가
+    Get.lazyPut<FilterController>(() => FilterController(), fenix: true);
+    // FilterOptionsService 추가
+    Get.lazyPut<FilterOptionsService>(() => FilterOptionsService(), fenix: true);
   }
 }
 
@@ -234,5 +248,13 @@ class RecommendationBinding implements Bindings {
   void dependencies() {
     Get.lazyPut<RecommendationController>(() => RecommendationController(),
         fenix: true);
+  }
+}
+
+// ActivityController 바인딩 클래스 추가
+class ActivityBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<ActivityController>(() => ActivityController(), fenix: true);
   }
 }

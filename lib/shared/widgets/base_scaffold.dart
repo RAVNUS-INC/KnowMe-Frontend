@@ -9,7 +9,8 @@ class BaseScaffold extends StatelessWidget {
   final bool showBackButton;
   final VoidCallback? onBack;
   final bool showBottomBar;
-  final String? activeIcon; // 활성 아이콘 매개변수 추가
+  final String? activeIcon;
+  final Color? backgroundColor; // 배경색 매개변수 추가
 
   const BaseScaffold({
     super.key,
@@ -18,13 +19,14 @@ class BaseScaffold extends StatelessWidget {
     this.showBackButton = false,
     this.onBack,
     this.showBottomBar = true,
-    this.activeIcon, // 활성 아이콘 매개변수 추가
+    this.activeIcon,
+    this.backgroundColor, // 배경색 매개변수 추가
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFD),
+      backgroundColor: backgroundColor ?? const Color(0xFFFDFDFD), // 배경색 적용
       body: Column(
         children: [
           _buildAppBar(context),
@@ -41,7 +43,7 @@ class BaseScaffold extends StatelessWidget {
       height: 100,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-        color: Color(0xFFF5F5F5), // #F5F5F5 색상으로 변경
+        color: Color(0xFFF5F5F5),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(16),
           bottomRight: Radius.circular(16),
@@ -73,7 +75,7 @@ class BaseScaffold extends StatelessWidget {
                 const SizedBox(width: 6),
                 GestureDetector(
                   onTap: () {
-                    Get.offAllNamed(AppRoutes.home);
+                    Get.toNamed(AppRoutes.home);
                   },
                   child: Image.asset(
                     'assets/images/knowme.png',
@@ -98,7 +100,8 @@ class BaseScaffold extends StatelessWidget {
                   'assets/icons/bell.svg',
                   isActive: activeIcon == 'bell',
                   onTap: () {
-                    Get.log('Bell tapped');
+                    // 알림 화면으로 이동
+                    Get.toNamed(AppRoutes.notification);
                   }
                 ),
                 const SizedBox(width: 16),
@@ -106,7 +109,8 @@ class BaseScaffold extends StatelessWidget {
                   'assets/icons/User.svg',
                   isActive: activeIcon == 'user',
                   onTap: () {
-                    Get.log('Profile tapped');
+                    // 프로필 화면으로 이동
+                    Get.toNamed(AppRoutes.profile);
                   }
                 ),
               ],
@@ -135,24 +139,33 @@ class BaseScaffold extends StatelessWidget {
         children: [
           _BottomNavItem(
             iconPath: 'assets/bottom_nav_svgs/icon-공고.svg',
-            activeIcon: 'assets/bottom_nav_svgs/icon-공고_blue.svg', // activeIcon 매개변수 추가
+            activeIcon: 'assets/bottom_nav_svgs/icon-공고_blue.svg', 
             label: '공고',
             isActive: currentIndex == 0,
             activeColor: activeColor,
             inactiveColor: inactiveColor,
             onTap: () {
-              if (currentIndex != 0) Get.offAllNamed(AppRoutes.post);
+              if (currentIndex != 0) {
+                // 디버그 로깅 추가
+                Get.log('공고 탭 클릭: ${AppRoutes.post}');
+                // Get.offAllNamed 대신 Get.toNamed 사용
+                Get.toNamed(AppRoutes.home);
+              }
             },
           ),
           _BottomNavItem(
             iconPath: 'assets/bottom_nav_svgs/icon-내활동.svg',
-            activeIcon: 'assets/bottom_nav_svgs/icon-내활동_blue.svg', // activeIcon 매개변수 추가
+            activeIcon: 'assets/bottom_nav_svgs/icon-내활동_blue.svg',
             label: '내 활동',
             isActive: currentIndex == 1,
             activeColor: activeColor,
             inactiveColor: inactiveColor,
             onTap: () {
-              if (currentIndex != 1) Get.offAllNamed(AppRoutes.activity);
+              if (currentIndex != 1) {
+                // 디버깅 로그 추가
+                Get.log('내 활동 탭 클릭: ${AppRoutes.activity}');
+                Get.toNamed(AppRoutes.activity);
+              }
             },
           ),
           _BottomNavItem(
@@ -163,7 +176,9 @@ class BaseScaffold extends StatelessWidget {
             activeColor: activeColor,
             inactiveColor: inactiveColor,
             onTap: () {
-              if (currentIndex != 2) Get.offAllNamed(AppRoutes.recommendation);
+              if (currentIndex != 2) {
+                Get.toNamed(AppRoutes.recommendation);
+              }
             },
           ),
           _BottomNavItem(
@@ -174,7 +189,9 @@ class BaseScaffold extends StatelessWidget {
             activeColor: activeColor,
             inactiveColor: inactiveColor,
             onTap: () {
-              if (currentIndex != 3) Get.offAllNamed(AppRoutes.aiAnalysis);
+              if (currentIndex != 3) {
+                Get.toNamed(AppRoutes.aiAnalysis);
+              }
             },
           ),
         ],

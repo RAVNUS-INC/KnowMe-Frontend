@@ -14,7 +14,7 @@ class PostTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 53,
-      decoration: const BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
       child: TabBar(
         controller: tabController,
         isScrollable: false,
