@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
                 child: PageView.builder(
                   controller: controller.pageController,
                   itemCount: 3,
-                  itemBuilder: (context, index) => controller.buildPage(index),
+                  itemBuilder: (context, index) => controller.buildSliderCard(index),
                 ),
               ),
 

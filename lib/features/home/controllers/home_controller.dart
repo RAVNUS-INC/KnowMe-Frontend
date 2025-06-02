@@ -65,15 +65,24 @@ class HomeController extends GetxController {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(
-          child: Text(
-            'Card ${index + 1}',
-            style: const TextStyle(fontSize: 16, color: Colors.black54),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: index == 0
+              ? Image.asset(
+            'assets/images/banner-1.png',
+            fit: BoxFit.cover,
+          )
+              : Center(
+            child: Text(
+              'Card ${index + 1}',
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
+            ),
           ),
         ),
       ),
     );
   }
+
 
   // 🔸 AI 분석으로 이동
   void goToAiAnalysis() {
