@@ -1,0 +1,49 @@
+name: Discord PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+  workflow_dispatch:
+
+jobs:
+  discord_notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Discord Notification for PR Update
+        if: github.event.pull_request.merged != true
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "📢 새로운 PR이 생성/업데이트 되었습니다!"
+          description: |
+            **PR 제목:** ${{ github.event.pull_request.title }}
+            **작성자:** ${{ github.event.pull_request.user.login }}
+            **브랜치:** ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
+          color: 0x5865F2
+          url: ${{ github.event.pull_request.html_url }}
+          username: GitHub PR Bot - Frontend
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          nodetail: true
+          nofooter: true
+
+      - name: Discord Notification for PR Merge
+        if: github.event.pull_request.merged == true
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          title: "✅ PR이 성공적으로 병합되었습니다!"
+          description: |
+            **PR 제목:** ${{ github.event.pull_request.title }}
+            **작성자:** ${{ github.event.pull_request.user.login }}
+            **브랜치:** ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
+            **병합자:** ${{ github.actor }}
+          color: 0x2ECC71
+          url: ${{ github.event.pull_request.html_url }}
+          username: GitHub PR Bot - Frontend
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          nodetail: true
+          nofooter: true
