@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/features/search/views/search_screen.dart';
+import 'package:knowme_frontend/features/search/views/search_screen.dart';
 import '../../../shared/widgets/base_scaffold.dart';
 import '../controllers/search_result_controller.dart';
 import 'package:knowme_frontend/features/search/models/contest_model.dart';
