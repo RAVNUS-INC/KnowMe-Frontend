@@ -193,9 +193,7 @@ class LoginController extends GetxController {
     // 성공 메시지 표시
     Get.snackbar(
       '로그인 성공',
-      loginResponse.message.isNotEmpty
-          ? loginResponse.message
-          : '환영합니다!',
+      '환영합니다!',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.blue,
       colorText: Colors.white,
