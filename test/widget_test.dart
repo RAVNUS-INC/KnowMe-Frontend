@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import '../lib/main.dart';
-import '../lib/features/membership/views/profile_screen.dart';
+import 'package:knowme_frontend/main.dart'; // 절대 경로로 수정
+import 'package:knowme_frontend/features/membership/views/profile_screen.dart'; // 절대 경로로 수정
 
 void main() {
   testWidgets('TestHome에 "프로필로 이동" 버튼이 보이고, 누르면 동작한다', (

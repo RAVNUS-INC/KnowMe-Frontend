@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/contest_model.dart';
+import 'package:knowme_frontend/features/search/models/contest_model.dart';
 
 class SearchResultController extends GetxController {
   // 🔍 검색어
@@ -62,12 +62,13 @@ class SearchResultController extends GetxController {
     searchController.text = query;
 
     final lowerQuery = query.toLowerCase();
-    results.value = allContests.where((contest) =>
-    contest.title.toLowerCase().contains(lowerQuery) ||
-        contest.reward.toLowerCase().contains(lowerQuery) ||
-        contest.eligibility.toLowerCase().contains(lowerQuery) ||
-        contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery))
-    ).toList();
+    results.value = allContests
+        .where((contest) =>
+            contest.title.toLowerCase().contains(lowerQuery) ||
+            contest.reward.toLowerCase().contains(lowerQuery) ||
+            contest.eligibility.toLowerCase().contains(lowerQuery) ||
+            contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery)))
+        .toList();
   }
 
   /// ⭐ 저장 또는 저장 취소

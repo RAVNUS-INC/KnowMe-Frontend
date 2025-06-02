@@ -7,6 +7,13 @@ class FindIdResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ 수정: 이전 페이지에서 전달받은 아이디 가져오기
+    String foundLoginId = SignupModel.testUserId; // 기본값
+
+    if (Get.arguments != null && Get.arguments['foundLoginId'] != null) {
+      foundLoginId = Get.arguments['foundLoginId'];
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
@@ -87,8 +94,9 @@ class FindIdResultScreen extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
+                            // ✅ 수정: 전달받은 실제 아이디 표시
                             Text(
-                              SignupModel.testUserId,
+                              foundLoginId,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
