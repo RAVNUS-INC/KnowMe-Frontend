@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/ai_analysis/controllers/previous_result_controller.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../controllers/previous_result_controller.dart';
 
 class AiAnalysisResultPreviousScreen extends StatelessWidget {
   const AiAnalysisResultPreviousScreen({super.key});
@@ -30,17 +30,14 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // 🔁 분석 카드 리스트 (컨트롤러 사용)
-            Obx(
-              () => Column(
-                children:
-                    controller.previousResults.map((result) {
-                      return AnalysisResultCard(
-                        date: result['date']!,
-                        recordInfo: result['record']!,
-                      );
-                    }).toList(),
-              ),
-            ),
+            Obx(() => Column(
+                  children: controller.previousResults.map((result) {
+                    return AnalysisResultCard(
+                      date: result['date']!,
+                      recordInfo: result['record']!,
+                    );
+                  }).toList(),
+                )),
           ],
         ),
       ),
@@ -67,7 +64,10 @@ class AnalysisResultCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF6FAFF), // 밝은 푸른색 느낌
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD0D0D0), width: 0.5),
+        border: Border.all(
+          color: const Color(0xFFD0D0D0),
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),

@@ -1,41 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/routes/routes.dart'; // ✅ AppRoutes 사용
+import '../../../routes/routes.dart'; // ✅ AppRoutes 사용
+// 홈, 검색 등 실제 페이지는 AppRoutes 통해 관리되므로 직접 import 불필요
 
 class BaseScaffold extends StatelessWidget {
   final Widget body;
-  final int? currentIndex;
-  final String? activeIcon;
-  final bool showBottomNavBar;
-  final Widget? bottomNavigationBar;
-  final bool showBottomBar;
+  final int currentIndex;
 
   const BaseScaffold({
     super.key,
     required this.body,
-    this.currentIndex,
-    this.activeIcon,
-    this.showBottomNavBar = true,
-    this.bottomNavigationBar,
-    this.showBottomBar = true,
+    this.currentIndex = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(children: [_buildAppBar(), Expanded(child: body)]),
-      bottomNavigationBar: showBottomBar ? _buildBottomNavBar() : null,
+      backgroundColor: const Color(0xFFFDFDFD),
+      body: Column(
+        children: [
+          _buildAppBar(),
+          Expanded(child: body),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
   Widget _buildAppBar() {
     return Container(
       width: double.infinity,
-      height: 110,
+      height: 100,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xCCF5F5F5),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(16),
           bottomRight: Radius.circular(16),
@@ -57,43 +55,26 @@ class BaseScaffold extends StatelessWidget {
                   },
                   child: Image.asset(
                     'assets/images/knowme.png',
-                    width: 190,
+                    width: 100,
                     fit: BoxFit.contain,
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 10),
             // 오른쪽 아이콘
             Row(
               children: [
-                _AppIconButton(
-                  activeIcon == 'search'
-                      ? 'assets/images/search_on.png'
-                      : 'assets/images/search.png',
-                  onTap: () => Get.toNamed(AppRoutes.search),
-                ),
+                _AppIconButton('assets/images/Search.png', onTap: () {
+                  Get.toNamed(AppRoutes.search); // ✅ binding 적용됨
+                }),
                 const SizedBox(width: 16),
-                _AppIconButton(
-                  activeIcon == 'bell'
-                      ? 'assets/images/bellon.png'
-                      : 'assets/images/bell.png',
-                  onTap: () {
-                    Get.toNamed(AppRoutes.notification);
-                    debugPrint('Bell tapped');
-                  },
-                ),
+                _AppIconButton('assets/images/bell.png', onTap: () {
+                  print('Bell tapped');
+                }),
                 const SizedBox(width: 16),
-                _AppIconButton(
-                  activeIcon == 'user'
-                      ? 'assets/images/useron.png'
-                      : 'assets/images/user.png',
-                  onTap: () {
-                    Get.toNamed(AppRoutes.profile);
-                    debugPrint('Profile tapped');
-                  },
-                ),
+                _AppIconButton('assets/images/User.png', onTap: () {
+                  print('Profile tapped');
+                }),
               ],
             ),
           ],
@@ -109,15 +90,11 @@ class BaseScaffold extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          // ✅ 스크롤 겹침 대비용 그림자 효과
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, -2),
-          ),
-        ],
+        color: Color(0xFFFDFDFD),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50),
+          topRight: Radius.circular(50),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -149,9 +126,8 @@ class BaseScaffold extends StatelessWidget {
             activeColor: activeColor,
             inactiveColor: inactiveColor,
             onTap: () {
-              if (currentIndex != 2) {
+              if (currentIndex != 2)
                 Get.offAllNamed(AppRoutes.recommendation); // ✅
-              }
             },
           ),
           _BottomNavItem(
@@ -181,7 +157,7 @@ class _AppIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Image.asset(assetPath, width: 28, height: 28, fit: BoxFit.contain),
+      child: Image.asset(assetPath, width: 24, height: 24, fit: BoxFit.contain),
     );
   }
 }
@@ -212,7 +188,7 @@ class _BottomNavItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(iconPath, width: 40, height: 40, color: color),
+          Image.asset(iconPath, width: 26, height: 26, color: color),
           const SizedBox(height: 4),
           Text(
             label,

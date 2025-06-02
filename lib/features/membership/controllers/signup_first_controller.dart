@@ -38,8 +38,7 @@ class SignupFirstController extends GetxController {
 
   // Helper method to check if all terms are agreed
   void _updateAllTermsStatus() {
-    signupModel.agreeToAllTerms =
-        signupModel.agreeToServiceTerms &&
+    signupModel.agreeToAllTerms = signupModel.agreeToServiceTerms &&
         signupModel.agreeToPrivacyPolicy &&
         signupModel.agreeToMarketingInfo;
   }
@@ -47,10 +46,8 @@ class SignupFirstController extends GetxController {
   // Method to handle navigation to next screen
   void navigateToSecondPage() {
     if (signupModel.isFirstNextButtonEnabled) {
-      Get.toNamed(
-        '/signup/second',
-        arguments: {'marketingConsent': signupModel.agreeToMarketingInfo},
-      );
+      Get.toNamed('/signup/second',
+        arguments: {'marketingConsent': signupModel.agreeToMarketingInfo});
     }
   }
 

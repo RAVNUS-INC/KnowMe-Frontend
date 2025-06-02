@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/activity/models/activity_record.dart';
-import 'package:knowme_final_new/features/activity/views/activity_common.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../models/activity_record.dart';
+import '../views/activity_common.dart';
 
 ///상세페이지
 class ActivityDetailScreen extends StatelessWidget {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/activity/models/activity_record.dart';
-import 'package:knowme_final_new/features/activity/controllers/activity_controller.dart';
-import 'package:knowme_final_new/features/activity/views/activity_detail_screen.dart';
-import 'package:knowme_final_new/features/activity/views/activity_add_screen.dart';
-import 'package:knowme_final_new/features/activity/views/activity_common.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../models/activity_record.dart';
+import '../controllers/activity_controller.dart';
+import '../views/activity_detail_screen.dart';
+import '../views/activity_add_screen.dart';
+import '../views/activity_common.dart';
 
 class ActivityScreen extends StatelessWidget {
   const ActivityScreen({super.key});

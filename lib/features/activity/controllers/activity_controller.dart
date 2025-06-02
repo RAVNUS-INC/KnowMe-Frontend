@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:knowme_final_new/features/activity/models/activity_record.dart';
+import '../models/activity_record.dart';
 import 'package:flutter/material.dart';
 
 class ActivityController extends GetxController {

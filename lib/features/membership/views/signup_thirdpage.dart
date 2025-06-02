@@ -58,32 +58,31 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GetBuilder<SignupThirdController>(
-                  builder:
-                      (controller) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 이름 필드
-                          _buildNameField(),
-                          const SizedBox(height: 10),
-                          _buildDivider(), // 구분선 추가
-                          const SizedBox(height: 10),
+                  builder: (controller) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 이름 필드
+                      _buildNameField(),
+                      const SizedBox(height: 10),
+                      _buildDivider(), // 구분선 추가
+                      const SizedBox(height: 10),
 
-                          // 이메일 필드
-                          _buildEmailField(),
-                          const SizedBox(height: 10),
-                          _buildDivider(), // 구분선 추가
-                          const SizedBox(height: 10),
+                      // 이메일 필드
+                      _buildEmailField(),
+                      const SizedBox(height: 10),
+                      _buildDivider(), // 구분선 추가
+                      const SizedBox(height: 10),
 
-                          // 학력 정보
-                          _buildEducationFields(),
-                          const SizedBox(height: 10),
-                          _buildDivider(), // 구분선 추가
-                          const SizedBox(height: 10),
+                      // 학력 정보
+                      _buildEducationFields(),
+                      const SizedBox(height: 10),
+                      _buildDivider(), // 구분선 추가
+                      const SizedBox(height: 10),
 
-                          // 희망직종 선택
-                          _buildDesiredPositionField(),
-                        ],
-                      ),
+                      // 희망직종 선택
+                      _buildDesiredPositionField(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -103,7 +102,10 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
       elevation: 0,
       title: const Text(
         '회원가입',
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
       ),
       centerTitle: true,
       leading: TextButton(
@@ -114,7 +116,10 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
         ),
         child: const Text(
           '이전',
-          style: TextStyle(color: Colors.blue, fontSize: 17),
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 17,
+          ),
         ),
       ),
       actions: [
@@ -208,10 +213,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Colors.blue),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           ),
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.next,
@@ -270,10 +273,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
-                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -314,23 +315,18 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                           controller.updateEmailDomain(selectedDomain);
                         } else {
                           controller.updateEmailDomain(
-                            controller.emailDomainController.text,
-                          );
+                              controller.emailDomainController.text);
                         }
                       });
                     },
-                    items:
-                        SignupModel.emailDomains.map<DropdownMenuItem<String>>((
-                          String value,
-                        ) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          );
-                        }).toList(),
+                    items: SignupModel.emailDomains
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child:
+                            Text(value, style: const TextStyle(fontSize: 14)),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -357,10 +353,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(color: Colors.blue),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
@@ -424,10 +418,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
-                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 textInputAction: TextInputAction.next,
                 enableInteractiveSelection: true,
@@ -450,10 +442,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
-                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 textInputAction: TextInputAction.next,
                 enableInteractiveSelection: true,
@@ -487,15 +477,13 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                   controller.updateGrade(selectedGrade);
                 });
               },
-              items:
-                  SignupModel.grades.map<DropdownMenuItem<String>>((
-                    String value,
-                  ) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value, style: const TextStyle(fontSize: 14)),
-                    );
-                  }).toList(),
+              items: SignupModel.grades
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value, style: const TextStyle(fontSize: 14)),
+                );
+              }).toList(),
             ),
           ),
         ),
@@ -596,10 +584,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                 ),
                 // 상단 헤더
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -637,10 +623,9 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                           Navigator.pop(context);
                         },
                         // 현재 선택된 항목 표시
-                        trailing:
-                            selectedPosition == position
-                                ? const Icon(Icons.check, color: Colors.blue)
-                                : null,
+                        trailing: selectedPosition == position
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
                       );
                     },
                   ),
@@ -658,39 +643,40 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GetBuilder<SignupThirdController>(
-        builder:
-            (controller) => SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed:
-                    controller.model.isThirdNextButtonEnabled
-                        ? () => controller.completeSignup()
-                        : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      controller.model.isThirdNextButtonEnabled
-                          ? Colors.blue
-                          : Colors.grey[400],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: const Text(
-                  '완료',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+        builder: (controller) => SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            onPressed: controller.model.isThirdNextButtonEnabled
+                ? () => controller.completeSignup()
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: controller.model.isThirdNextButtonEnabled
+                  ? Colors.blue
+                  : Colors.grey[400],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
+            child: const Text(
+              '완료',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 Widget _buildDivider() {
-  return Container(height: 1, color: Colors.blue, width: double.infinity);
+  return Container(
+    height: 1,
+    color: Colors.blue,
+    width: double.infinity,
+  );
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/features/membership/models/membership_model.dart';
-import 'package:knowme_final_new/features/membership/controllers/membership_controller.dart';
+import '../models/membership_model.dart';
+import '../controllers/membership_controller.dart';
 
 /// 새로 만든 Subscription 화면
 class MembershipScreen extends StatelessWidget {

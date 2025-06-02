@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_final_new/shared/widgets/base_scaffold.dart';
-import 'package:knowme_final_new/features/activity/models/activity_record.dart';
-import 'package:knowme_final_new/features/activity/controllers/activity_controller.dart';
+import '../../../shared/widgets/base_scaffold.dart';
+import '../models/activity_record.dart';
+import '../controllers/activity_controller.dart';
 
 ///활동 수정 페이지
 class AddProjectPage extends StatefulWidget {
@@ -96,7 +96,6 @@ class _AddProjectPageState extends State<AddProjectPage> {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      showBottomBar: false, // ✅ 하단 바 제거
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
@@ -226,7 +225,6 @@ class ActivityAddScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      showBottomBar: false,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
