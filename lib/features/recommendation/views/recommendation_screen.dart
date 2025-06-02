@@ -16,19 +16,22 @@ class RecommendationScreen extends StatelessWidget {
 
     return BaseScaffold(
       currentIndex: 2, // '활동 추천' 탭 인덱스
-      body: Column(
-        children: [
-          RecommendationTabBar(),
-          Expanded(
-            child: TabBarView(
-              controller: controller.tabController,
-              children: const [
-                RecommendedActivitiesTab(),
-                SavedActivitiesTab(),
-              ],
+      body: Container(
+        color: const Color(0xFFEEEFF0), // #EEEFF0 배경색 적용
+        child: Column(
+          children: [
+            RecommendationTabBar(),
+            Expanded(
+              child: TabBarView(
+                controller: controller.tabController,
+                children: const [
+                  RecommendedActivitiesTab(),
+                  SavedActivitiesTab(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

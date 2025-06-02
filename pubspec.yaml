@@ -1,4 +1,4 @@
-name: knowme_final_new
+name: knowme_frontend
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -62,6 +62,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/icons/
+    - assets/bottom_nav_svgs/
+    - assets/logos/
+    - assets/posts_images/
   fonts:
     - family: Pretendard
       fonts:

@@ -15,7 +15,7 @@ class RecommendationTabBar extends StatelessWidget {
       builder: (controller) {
         return Container(
           height: 53,
-          decoration: const BoxDecoration(color: Colors.white),
+          decoration: const BoxDecoration(color: Color(0xFFF5F5F5),),
           child: TabBar(
             controller: controller.tabController,
             isScrollable: false,
