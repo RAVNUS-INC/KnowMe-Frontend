@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/signup_model.dart';
 import '../models/find_id_dtos.dart';  // ✅ 추가
 import '../repositories/auth_repository.dart';  // ✅ 추가
 import 'package:logger/logger.dart';
