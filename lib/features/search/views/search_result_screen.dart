@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:knowme_frontend/features/search/views/search_screen.dart';
 import '../../../shared/widgets/base_scaffold.dart';
 import '../controllers/search_result_controller.dart';
-import '../models/contest_model.dart';
+import 'package:knowme_frontend/features/search/models/contest_model.dart';
 
 class SearchResultScreen extends StatefulWidget {
   const SearchResultScreen({super.key});
@@ -55,13 +55,13 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) {
+                (context, index) {
                   final item = controller.results[index];
                   return Obx(() => _ContestCard(
-                    contest: item,
-                    onSave: () => controller.toggleSave(item),
-                    isSaved: controller.isSaved(item),
-                  ));
+                        contest: item,
+                        onSave: () => controller.toggleSave(item),
+                        isSaved: controller.isSaved(item),
+                      ));
                 },
                 childCount: controller.results.length.clamp(0, visibleCount),
               ),
@@ -82,7 +82,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     visibleCount += 4;
                   }),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: ShapeDecoration(
                       color: const Color(0xFFB7C4D4),
                       shape: RoundedRectangleBorder(
@@ -138,13 +139,13 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) {
+                (context, index) {
                   final item = controller.savedContests[index];
                   return Obx(() => _ContestCard(
-                    contest: item,
-                    onSave: () => controller.toggleSave(item),
-                    isSaved: controller.isSaved(item),
-                  ));
+                        contest: item,
+                        onSave: () => controller.toggleSave(item),
+                        isSaved: controller.isSaved(item),
+                      ));
                 },
                 childCount: controller.savedContests.length,
               ),

@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/profile_model.dart';
-import '../views/profile_screen.dart';
-import '../models/profile_model.dart';
+// import '../views/profile_screen.dart';
 
 class ProfileController extends GetxController {
   final userProfile = dummyProfile.obs;
