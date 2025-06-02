@@ -106,7 +106,7 @@ class BaseScaffold extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
                 _AppIconButton(
-                  'assets/icons/User.svg',
+                  'assets/icons/user.svg',
                   isActive: activeIcon == 'user',
                   onTap: () {
                     // 프로필 화면으로 이동
