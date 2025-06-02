@@ -7,7 +7,8 @@ import 'package:logger/logger.dart';
 class PasswordResetController extends GetxController {
   // Text controllers
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   // Rx variables
   final RxBool showNewPassword = false.obs;
@@ -174,6 +175,7 @@ class PasswordResetController extends GetxController {
     }
   }
 
+
   /// 서버 응답에서 성공 여부 확인 (다양한 형태 지원)
   bool _checkServerSuccess(Map<String, dynamic> data) {
     // 가능한 성공 필드들 확인
@@ -216,3 +218,4 @@ class PasswordResetController extends GetxController {
     );
   }
 }
+

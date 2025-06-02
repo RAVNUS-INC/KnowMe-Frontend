@@ -22,13 +22,13 @@ class SearchScreen extends StatelessWidget {
                   isSearching: controller.isSearching.value,
                   onSearch: controller.handleSearch,
                   onCancel: () => Navigator.pop(context),
+                  readOnly: false, // 🔑 SearchScreen에서는 입력 가능
                 )),
             const SizedBox(height: 20),
             _SearchHeader(onClearAll: controller.clearRecentSearches),
             const SizedBox(height: 6),
             Container(height: 1, color: const Color(0xFFE5E5E5)),
             const SizedBox(height: 8),
-            // ✅ 여기서 타입도 search.SearchController로 명시
             Obx(() => Expanded(child: _buildRecentSearchList(controller))),
           ],
         ),
@@ -53,12 +53,12 @@ class SearchScreen extends StatelessWidget {
   }
 }
 
-// ✅ 검색창과 오른쪽 '검색/취소' 버튼
 class SearchBarWithAction extends StatelessWidget {
   final TextEditingController controller;
   final bool isSearching;
   final VoidCallback onSearch;
   final VoidCallback onCancel;
+  final bool readOnly;
 
   const SearchBarWithAction({
     super.key,
@@ -66,6 +66,7 @@ class SearchBarWithAction extends StatelessWidget {
     required this.isSearching,
     required this.onSearch,
     required this.onCancel,
+    this.readOnly = false,
   });
 
   @override
@@ -88,6 +89,7 @@ class SearchBarWithAction extends StatelessWidget {
                 Expanded(
                   child: TextField(
                     controller: controller,
+                    readOnly: readOnly, // ✅ 입력 가능 여부 제어
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: '검색어를 입력해 주세요',
@@ -113,7 +115,7 @@ class SearchBarWithAction extends StatelessWidget {
           child: Text(
             isSearching ? '검색' : '취소',
             style: const TextStyle(
-              color: Color(0xFF72787F),
+              color: Color(0xFF0068E5),
               fontSize: 14,
               fontFamily: 'Pretendard',
               fontWeight: FontWeight.w500,
@@ -126,7 +128,6 @@ class SearchBarWithAction extends StatelessWidget {
   }
 }
 
-// ✅ 최근 검색어 헤더
 class _SearchHeader extends StatelessWidget {
   final VoidCallback onClearAll;
 
@@ -166,7 +167,6 @@ class _SearchHeader extends StatelessWidget {
   }
 }
 
-// ✅ 최근 검색어 아이템
 class RecentSearchItem extends StatelessWidget {
   final String text;
   final VoidCallback onRemove;
