@@ -4,6 +4,7 @@ import '../controllers/home_controller.dart';
 import '../../../shared/widgets/base_scaffold.dart';
 import '../../../routes/routes.dart'; // AppRoutes를 임포트합니다
 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -23,11 +24,11 @@ class HomeScreen extends StatelessWidget {
 
               // 🔹 카드 슬라이더
               SizedBox(
-                height: 157,
+                height: 175,
                 child: PageView.builder(
                   controller: controller.pageController,
                   itemCount: 3,
-                  itemBuilder: (context, index) => controller.buildPage(index),
+                  itemBuilder: (context, index) => controller.buildSliderCard(index),
                 ),
               ),
 
@@ -35,23 +36,24 @@ class HomeScreen extends StatelessWidget {
 
               // 🔸 인디케이터
               Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) {
-                      final isActive = controller.currentPage.value == index;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isActive
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey.shade300,
-                        ),
-                      );
-                    }),
-                  )),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (index) {
+                  final isActive = controller.currentPage.value == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isActive
+                          ? const Color(0xFF0068E5) // 선택된 인디케이터 색상
+                          : Colors.grey.shade300,     // 비활성 인디케이터 색상
+                    ),
+                  );
+                }),
+              )),
+
 
               const SizedBox(height: 30),
 
@@ -195,13 +197,14 @@ class HomeScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // 좌측: 직무 적합도 + 막대그래프
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           '이한양 님의 직무 적합도',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -212,22 +215,65 @@ class HomeScreen extends StatelessWidget {
                             letterSpacing: -0.48,
                           ),
                         ),
+                        const SizedBox(height: 30),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 40,
+                              decoration: ShapeDecoration(
+                                color: const Color(0xFFDEE3E7),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 24,
+                              height: 82,
+                              decoration: ShapeDecoration(
+                                color: const Color(0xFF89C1EF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 24,
+                              height: 62,
+                              decoration: ShapeDecoration(
+                                color: const Color(0xFFC4DBEE),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
+
+                // 중간 구분선
                 Container(
                   width: 1,
                   margin: const EdgeInsets.symmetric(vertical: 24),
                   color: const Color(0xFFE5E5E5),
                 ),
+
+                // 우측: 추천 활동 + 첨부파일 식 블록
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           '추천 활동',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -238,6 +284,18 @@ class HomeScreen extends StatelessWidget {
                             letterSpacing: -0.48,
                           ),
                         ),
+                        const SizedBox(height: 30),
+                        // 첨부파일 스타일 블록 (2x2)
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _fileBox(color: const Color(0xFF89C1EF)),
+                            _fileBox(color: const Color(0xFFC4DBEE)),
+                            _fileBox(color: const Color(0xFFC4DBEE)),
+                            _fileBox(color: const Color(0xFF89C1EF)),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -246,6 +304,8 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
+
+        // 하단 진회색 바
         Container(
           width: 311,
           height: 15,
@@ -260,6 +320,21 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
+
+// 🔸 재사용 가능한 박스 위젯
+  Widget _fileBox({required Color color}) {
+    return Container(
+      width: 58,
+      height: 24,
+      decoration: ShapeDecoration(
+        color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+
 }
 
 class _IconLabelItem extends StatelessWidget {

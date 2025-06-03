@@ -1,3 +1,4 @@
+// ✅ View
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/base_scaffold.dart';
@@ -11,9 +12,9 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
     final controller = Get.put(PreviousResultController());
 
     return BaseScaffold(
-      currentIndex: 3, // AI 분석 탭
+      currentIndex: 3,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -27,17 +28,19 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
                 letterSpacing: -0.72,
               ),
             ),
-            const SizedBox(height: 20),
-
-            // 🔁 분석 카드 리스트 (컨트롤러 사용)
-            Obx(() => Column(
-                  children: controller.previousResults.map((result) {
-                    return AnalysisResultCard(
-                      date: result['date']!,
-                      recordInfo: result['record']!,
-                    );
-                  }).toList(),
-                )),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Obx(() => ListView.builder(
+                itemCount: controller.previousResults.length,
+                itemBuilder: (context, index) {
+                  final result = controller.previousResults[index];
+                  return AnalysisResultCard(
+                    date: result['date']!,
+                    recordInfo: result['record']!,
+                  );
+                },
+              )),
+            ),
           ],
         ),
       ),
@@ -45,7 +48,6 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
   }
 }
 
-// ✅ 재사용 가능한 분석 카드 위젯
 class AnalysisResultCard extends StatelessWidget {
   final String date;
   final String recordInfo;
@@ -62,7 +64,7 @@ class AnalysisResultCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF6FAFF), // 밝은 푸른색 느낌
+        color: const Color(0xFFF6FAFF),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: const Color(0xFFD0D0D0),
@@ -70,7 +72,7 @@ class AnalysisResultCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withAlpha(20),
             offset: const Offset(0, 2),
             blurRadius: 6,
           ),
@@ -90,10 +92,7 @@ class AnalysisResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-
-          // 구분선
-          Container(height: 1, color: const Color(0xFFE5E5E5)),
-
+          Container(height: 1, color: Color(0xFFE5E5E5)),
           const SizedBox(height: 12),
           Text(
             recordInfo,
