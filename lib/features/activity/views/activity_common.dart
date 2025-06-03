@@ -128,39 +128,32 @@ class MenuPopup extends StatelessWidget {
                 // 다이얼로그 결과에 관계없이 메뉴 팝업 닫기
                 if (Navigator.canPop(context)) {
                   Navigator.pop(context);
-                }
-
-                if (confirmed) {
+                }                if (confirmed) {
                   // ActivityController를 사용하여 삭제 실행
                   final controller = Get.find<ActivityController>();
                   final success = await controller.removeProject(project);
                   if (success) {
                     // 성공 메시지 표시
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('활동이 삭제되었습니다.'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                    Get.snackbar(
+                      '성공',
+                      '활동이 삭제되었습니다.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                    );
 
-                      // 상세 화면에서 호출된 경우 목록 화면으로 돌아가기
-                      // 현재 화면을 포함하여 이전 화면들을 모두 제거하고 activity 화면으로 이동
-                      int count = 0;
-                      Navigator.of(context).popUntil((route) {
-                        return count++ >= 1; // 메뉴팝업과 상세화면 두 개를 제거
-                      });
-                    }
+                    // 상세 화면에서 호출된 경우 내 활동 화면으로 이동
+                    // Get.back()을 여러 번 호출하여 상세 화면을 벗어나고 내 활동 화면으로 이동
+                    Get.until((route) => route.settings.name == '/activity');
                   } else {
                     // 실패 메시지 표시
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('활동 삭제에 실패했습니다.'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
+                    Get.snackbar(
+                      '실패',
+                      '활동 삭제에 실패했습니다.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
                   }
                 }
               },
