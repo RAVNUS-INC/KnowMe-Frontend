@@ -11,7 +11,8 @@ class PostRepository {
   // API를 통한 전체 게시물 조회
   Future<List<PostModel>> fetchAllPosts() async {
     try {
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsAll,
         requireAuth: true,
       );
@@ -58,7 +59,8 @@ class PostRepository {
       if (location != null && location.isNotEmpty) queryParams['location'] = location;
       if (education != null && education.isNotEmpty) queryParams['education'] = education;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsEmployee,
         queryParameters: queryParams,
         requireAuth: true,
@@ -106,7 +108,8 @@ class PostRepository {
       if (location != null && location.isNotEmpty) queryParams['location'] = location;
       if (education != null && education.isNotEmpty) queryParams['education'] = education;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsIntern,
         queryParameters: queryParams,
         requireAuth: true,
@@ -115,7 +118,6 @@ class PostRepository {
       if (response.isSuccess && response.data != null) {
         _logger.i('인턴 공고 조회 성공');
 
-        // Map<String, dynamic> 타입으로 변환 후 fromJson 적용
         List<PostModel> posts = [];
         for (var item in response.data!) {
           if (item is Map<String, dynamic>) {
@@ -154,7 +156,8 @@ class PostRepository {
       if (location != null && location.isNotEmpty) queryParams['location'] = location;
       if (host != null && host.isNotEmpty) queryParams['host'] = host;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsExternal,
         queryParameters: queryParams,
         requireAuth: true,
@@ -163,7 +166,6 @@ class PostRepository {
       if (response.isSuccess && response.data != null) {
         _logger.i('대외활동 공고 조회 성공');
 
-        // Map<String, dynamic> 타입으로 변환 후 fromJson 적용
         List<PostModel> posts = [];
         for (var item in response.data!) {
           if (item is Map<String, dynamic>) {
@@ -202,7 +204,8 @@ class PostRepository {
       if (location != null && location.isNotEmpty) queryParams['location'] = location;
       if (onOffline != null && onOffline.isNotEmpty) queryParams['onOffline'] = onOffline;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsLecture,
         queryParameters: queryParams,
         requireAuth: true,
@@ -211,7 +214,6 @@ class PostRepository {
       if (response.isSuccess && response.data != null) {
         _logger.i('교육/강연 공고 조회 성공');
 
-        // Map<String, dynamic> 타입으로 변환 후 fromJson 적용
         List<PostModel> posts = [];
         for (var item in response.data!) {
           if (item is Map<String, dynamic>) {
@@ -250,7 +252,8 @@ class PostRepository {
       if (organizer != null && organizer.isNotEmpty) queryParams['organizer'] = organizer;
       if (benefit != null && benefit.isNotEmpty) queryParams['benefit'] = benefit;
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsContest,
         queryParameters: queryParams,
         requireAuth: true,
@@ -259,7 +262,6 @@ class PostRepository {
       if (response.isSuccess && response.data != null) {
         _logger.i('공모전 공고 조회 성공');
 
-        // Map<String, dynamic> 타입으로 변환 후 fromJson 적용
         List<PostModel> posts = [];
         for (var item in response.data!) {
           if (item is Map<String, dynamic>) {
@@ -285,7 +287,8 @@ class PostRepository {
         'query': query,
       };
 
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.postsAll,  // 검색 엔드포인트가 명확하지 않아 임시로 전체 엔드포인트 사용
         queryParameters: queryParams,
         requireAuth: true,
@@ -294,7 +297,6 @@ class PostRepository {
       if (response.isSuccess && response.data != null) {
         _logger.i('게시물 검색 성공: $query');
 
-        // Map<String, dynamic> 타입으로 변환 후 fromJson 적용
         List<PostModel> posts = [];
         for (var item in response.data!) {
           if (item is Map<String, dynamic>) {

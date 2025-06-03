@@ -165,7 +165,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           const SubSectionTitle('담당 업무'),
           const SizedBox(height: 8),
           BulletList(post.requirements ?? const [
-            '자사 웹 서비스 및 클라이언트 프로젝트의 프���트엔드 개발',
+            '자사 웹 서비스 및 클라이언트 프로젝트의 프론트엔드 개발',
             '디자이너 및 백엔드 개발자와의 협업을 통한 UI 구현',
             '사용자 경험 개선 및 퍼포먼스 최적화',
           ]),

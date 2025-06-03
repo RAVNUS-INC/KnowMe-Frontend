@@ -35,6 +35,16 @@ class PostModel {
   
   bool isSaved;
 
+  /*
+  * job -> jobTitle,
+    experience-> experience
+      educationList -> activityField,
+      period -> activityDuration,
+      host,organizer -> hostingOrganization,
+      target -> targetAudience,
+      benefit -> contestBenefits,
+      onOffline -> onlineOrOffline
+      * */
   // 저장된 공고 관련 필드
   final UserModel? savedByUser;
 

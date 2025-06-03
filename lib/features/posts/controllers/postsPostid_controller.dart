@@ -58,7 +58,7 @@ class PostDetailController extends GetxController {
     super.onClose();
   }
 
-  // 게시물 상세 조회
+  // 게시물 상세 조회 - getWithPostApi로 수정
   Future<void> fetchPostDetail(int postId) async {
     // 유효하지 않은 ID 체크
     if (postId <= 0) {
@@ -72,7 +72,8 @@ class PostDetailController extends GetxController {
       _hasError.value = false;
       
       final endpoint = PostApiEndpoints.postsPostid.replaceFirst('{postid}', postId.toString());
-      final response = await _apiClient.get<Map<String, dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<Map<String, dynamic>>(
         endpoint,
         requireAuth: true, // 인증 필요
       );
@@ -95,14 +96,15 @@ class PostDetailController extends GetxController {
     }
   }
   
-  // 게시물 생성
+  // 게시물 생성 - postWithPostApi로 수정
   Future<bool> createPost(PostModel post) async {
     try {
       _isLoading.value = true;
       _hasError.value = false;
       
       final requestDto = post.toRequestDto();
-      final response = await _apiClient.post<Map<String, dynamic>>(
+      // postWithPostApi 사용으로 변경
+      final response = await _apiClient.postWithPostApi<Map<String, dynamic>>(
         PostApiEndpoints.postsPostid.replaceFirst('/{postid}', ''),
         body: requestDto.toJson(),
         requireAuth: true,
@@ -119,7 +121,7 @@ class PostDetailController extends GetxController {
       }
     } catch (e) {
       _hasError.value = true;
-      _errorMessage.value = '게시��� 생성 중 오류가 발생했습니다: $e';
+      _errorMessage.value = '게시물 생성 중 오류가 발생했습니다: $e';
       _logger.e(_errorMessage.value);
       return false;
     } finally {
@@ -225,7 +227,7 @@ class PostDetailController extends GetxController {
     }
   }
   
-  // 에러 상태 초���화
+  // 에러 상태 초기화
   void clearError() {
     _hasError.value = false;
     _errorMessage.value = '';

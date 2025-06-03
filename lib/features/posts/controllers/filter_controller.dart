@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-import 'package:knowme_frontend/features/posts/models/filter_model.dart';
+import 'package:knowme_frontend/features/posts/models/filter_model.dart' as filter;
 
 /// 필터 관련 비즈니스 로직을 담당하는 Controller 클래스
 class FilterController extends GetxController {
@@ -16,10 +16,10 @@ class FilterController extends GetxController {
   final RxString selectedPeriod = ''.obs;
 
   // 슬라이더 설정 가져오기
-  SliderConfig getSliderConfig(int tabIndex) {
+  filter.SliderConfig getSliderConfig(int tabIndex) {
     switch (tabIndex) {
       case 0: // 채용
-        return SliderConfig(
+        return filter.SliderConfig(
           min: 0,
           max: 20,
           divisions: 4,
@@ -29,7 +29,7 @@ class FilterController extends GetxController {
         );
       case 1: // 인턴
       case 2: // 대외활동
-        return SliderConfig(
+        return filter.SliderConfig(
           min: 1,
           max: 24,
           divisions: 4,
@@ -39,7 +39,7 @@ class FilterController extends GetxController {
           isMonth: true,
         );
       case 3: // 교육/강연
-        return SliderConfig(
+        return filter.SliderConfig(
           min: 1,
           max: 180,
           divisions: 4,
@@ -48,7 +48,7 @@ class FilterController extends GetxController {
           endLabel: '6개월',
         );
       default:
-        return SliderConfig(
+        return filter.SliderConfig(
           min: 0,
           max: 20,
           divisions: 4,
@@ -78,45 +78,45 @@ class FilterController extends GetxController {
   }
 
   // 현재 필터 값 가져오기
-  FilterValues getFilterValues(int tabIndex) {
+  filter.FilterValues getFilterValues(int tabIndex) {
     switch (tabIndex) {
       case 0: // 채용
-        return FilterValues(
-          job: _postController.getFilterByType(tabIndex, '직무').value,
+        return filter.FilterValues(
+          jobTitle: _postController.getFilterByType(tabIndex, '직무').value,
           experience: _postController.getFilterByType(tabIndex, '신입~5년').value,
           location: _postController.getFilterByType(tabIndex, '지역').value,
           education: _postController.getFilterByType(tabIndex, '학력').value,
-          educationList: _postController.multiSelectJobEducation.toList(),
+          activityField: _postController.multiSelectJobEducation.toList(),
         );
       case 1: // 인턴
-        return FilterValues(
-          job: _postController.getFilterByType(tabIndex, '직무').value,
+        return filter.FilterValues(
+          jobTitle: _postController.getFilterByType(tabIndex, '직무').value,
           location: _postController.getFilterByType(tabIndex, '지역').value,
           education: _postController.getFilterByType(tabIndex, '학력').value,
-          educationList: _postController.multiSelectInternEducation.toList(),
-          period: _postController.getFilterByType(tabIndex, '기간').value,
+          activityField: _postController.multiSelectInternEducation.toList(),
+          activityDuration: _postController.getFilterByType(tabIndex, '기간').value,
         );
       case 2: // 대외활동
-        return FilterValues(
-          job: _postController.getFilterByType(tabIndex, '분야').value,
+        return filter.FilterValues(
+          jobTitle: _postController.getFilterByType(tabIndex, '분야').value,
           location: _postController.getFilterByType(tabIndex, '지역').value,
-          period: _postController.getFilterByType(tabIndex, '기간').value,
-          host: _postController.multiSelectHost.toList(),
+          activityDuration: _postController.getFilterByType(tabIndex, '기간').value,
+          hostingOrganization: _postController.multiSelectHost.toList(),
         );
       case 3: // 교육/강연
-        return FilterValues(
-          job: _postController.getFilterByType(tabIndex, '분야').value,
-          onOffline: _postController.multiSelectOnOffline.toList(),
+        return filter.FilterValues(
+          jobTitle: _postController.getFilterByType(tabIndex, '분야').value,
+          onlineOrOffline: _postController.multiSelectOnOffline.toList(),
           location: _postController.getFilterByType(tabIndex, '지역').value,
-          period: _postController.getFilterByType(tabIndex, '기간').value,
+          activityDuration: _postController.getFilterByType(tabIndex, '기간').value,
         );
       case 4: // 공모전
       default:
-        return FilterValues(
-          job: _postController.getFilterByType(tabIndex, '분야').value,
-          target: _postController.multiSelectTarget.toList(),
-          organizer: _postController.multiSelectOrganizer.toList(),
-          benefit: _postController.multiSelectBenefit.toList(),
+        return filter.FilterValues(
+          jobTitle: _postController.getFilterByType(tabIndex, '분야').value,
+          targetAudience: _postController.multiSelectTarget.toList(),
+          hostingOrganization: _postController.multiSelectOrganizer.toList(),
+          contestBenefits: _postController.multiSelectBenefit.toList(),
         );
     }
   }
@@ -124,16 +124,16 @@ class FilterController extends GetxController {
   // View에서 사용할 초기값을 설정하는 메소드
   void initializeFilterValues(int tabIndex) {
     final filterValues = getFilterValues(tabIndex);
-    selectedJob.value = filterValues.job ?? '';
+    selectedJob.value = filterValues.jobTitle ?? '';
     selectedLocation.value = filterValues.location ?? '';
     selectedEducation.value = filterValues.education ?? '';
-    selectedPeriod.value = filterValues.period ?? '';
+    selectedPeriod.value = filterValues.activityDuration ?? '';
     currentRangeValues.value = getSliderValues(tabIndex);
   }
 
   // 슬라이더 값 가져오기
   RangeValues getSliderValues(int tabIndex) {
-    SliderConfig config = getSliderConfig(tabIndex);
+    filter.SliderConfig config = getSliderConfig(tabIndex);
     double min = config.min;
     double max = config.max;
     double stepSize = (max - min) / 4; // 4 divisions = 5 steps
@@ -223,7 +223,7 @@ class FilterController extends GetxController {
 
   // 슬라이더 라벨 포맷 - 통합된 메서드 (외부 및 내부 참조용)
   String formatSliderLabel(double value, int tabIndex) {
-    SliderConfig config = getSliderConfig(tabIndex);
+    filter.SliderConfig config = getSliderConfig(tabIndex);
 
     switch (tabIndex) {
       case 0: // 채용
@@ -436,7 +436,7 @@ class FilterController extends GetxController {
   // 모든 슬라이더 필터(경력, 기간)를 처리하는 통합된 메서드
   void applyRangeFilter(int tabIndex, RangeValues values) {
     String filterValue;
-    SliderConfig config = getSliderConfig(tabIndex);
+    filter.SliderConfig config = getSliderConfig(tabIndex);
 
     switch (tabIndex) {
       case 0: // 채용 (경력)
@@ -771,9 +771,6 @@ class FilterController extends GetxController {
 
   // 교육 필터 적용
   void applyJobEducationFilters() {
-    // 교육 필터 적용 로직
-    // ...
-
     // 데이터 새로 로드
     _postController.loadPosts();
   }

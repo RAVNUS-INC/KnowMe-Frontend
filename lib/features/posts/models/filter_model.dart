@@ -1,28 +1,26 @@
 class FilterValues {
-  final String? job;
+  final String? jobTitle;
   final String? experience;
   final String? location;
-  final String? education; // 단일 선택용
-  final List<String>? educationList; // 다중 선택용
-  final String? period;
-  final List<String>? host; // 항상 List<String> 타입 사용
-  final List<String>? target; // 항상 List<String> 타입 사용
-  final List<String>? organizer; // 항상 List<String> 타입 사용
-  final List<String>? benefit; // 항상 List<String> 타입 사용
-  final List<String>? onOffline; // 항상 List<String> 타입 사용
+  final String? education;
+  final List<String>? activityField;
+  final String? activityDuration;
+  final List<String>? hostingOrganization;
+  final List<String>? targetAudience;
+  final List<String>? contestBenefits;
+  final List<String>? onlineOrOffline;
 
   FilterValues({
-    this.job,
+    this.jobTitle,
     this.experience,
     this.location,
     this.education,
-    this.educationList,
-    this.period,
-    this.host,
-    this.target,
-    this.organizer,
-    this.benefit,
-    this.onOffline,
+    this.activityField,
+    this.activityDuration,
+    this.hostingOrganization,
+    this.targetAudience,
+    this.contestBenefits,
+    this.onlineOrOffline,
   });
 }
 

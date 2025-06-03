@@ -11,7 +11,8 @@ class RecommendationRepository {
   /// 사용자가 저장한 게시물 목록 조회
   Future<List<PostModel>> getSavedPosts() async {
     try {
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.savedPosts,
         requireAuth: true,
       );
@@ -41,7 +42,8 @@ class RecommendationRepository {
   /// 사용자를 위한 추천 게시물 목록 조회
   Future<List<PostModel>> getRecommendedPosts() async {
     try {
-      final response = await _apiClient.get<List<dynamic>>(
+      // getWithPostApi 사용으로 변경
+      final response = await _apiClient.getWithPostApi<List<dynamic>>(
         PostApiEndpoints.recommendedPosts,
         requireAuth: true,
       );
@@ -68,7 +70,7 @@ class RecommendationRepository {
     }
   }
 
-  /// 게시물 북마크 토글
+  /// 게시물 북마크 토글 - postWithPostApi와 deleteWithPostApi 사용으로 수정
   Future<bool> togglePostBookmark(int postId, bool isBookmarked) async {
     try {
       final endpoint = isBookmarked
@@ -79,8 +81,8 @@ class RecommendationRepository {
               .replaceFirst('{savedpost_id}', '1_$postId'); // 임시로 userId 1로 설정
 
       final response = isBookmarked
-          ? await _apiClient.post(endpoint, requireAuth: true)
-          : await _apiClient.delete(endpoint, requireAuth: true);
+          ? await _apiClient.postWithPostApi(endpoint, requireAuth: true)
+          : await _apiClient.deleteWithPostApi(endpoint, requireAuth: true);
 
       if (response.isSuccess) {
         _logger.i('북마크 ${isBookmarked ? '추가' : '제거'} 성공: postId=$postId');
