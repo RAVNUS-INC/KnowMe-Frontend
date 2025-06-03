@@ -5,7 +5,7 @@ import '../../../shared/widgets/base_scaffold.dart';
 import '../models/activity_record.dart';
 import '../views/activity_common.dart';
 
-/// 활동 상세 페이지 (정적 UI 버전 / SVG 시안과 1:1 대응)
+// 활동 상세 페이지 (정적 UI 버전 / SVG 시안과 1:1 대응)
 class ActivityDetailScreen extends StatelessWidget {
   final Project project;
   const ActivityDetailScreen({super.key, required this.project});

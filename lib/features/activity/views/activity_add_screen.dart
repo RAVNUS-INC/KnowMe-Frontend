@@ -409,6 +409,7 @@ class ActivityAddScreen extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).pop(); // 다이얼로그만 닫기
+                        Navigator.of(context).pop(); // 이전 페이지로 돌아가기
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF0066FF)),

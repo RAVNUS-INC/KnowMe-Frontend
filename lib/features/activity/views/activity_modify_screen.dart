@@ -16,6 +16,8 @@ class AddProjectPage extends StatefulWidget {
 }
 
 class _AddProjectPageState extends State<AddProjectPage> {
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
   void _showCancelDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -90,6 +92,8 @@ class _AddProjectPageState extends State<AddProjectPage> {
   @override
   void initState() {
     super.initState();
+    _titleController = TextEditingController(text: 'MyPlanner – 일정 관리 웹앱');
+    _descriptionController = TextEditingController(text: 'React와 Firebase로 만든 개인 일정 관리 서비스');
     controller.loadProjectForEdit(widget.project); // 새로 추가/수정 시
   }
 
@@ -133,7 +137,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
                   SizedBox(
                     height: 44,
                     child: TextField(
-                      controller: TextEditingController(text: 'MyPlanner – 일정 관리 웹앱'),
+                      controller: _titleController,
                       readOnly: true,
                       decoration: InputDecoration(
                         filled: true,
@@ -156,8 +160,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
                   SizedBox(
                     height: 44,
                     child: TextField(
-                      controller: TextEditingController(
-                          text: 'React와 Firebase로 만든 개인 일정 관리 서비스'),
+                      controller: _descriptionController,
                       readOnly: true,
                       decoration: InputDecoration(
                         filled: true,
@@ -480,6 +483,12 @@ class _AddProjectPageState extends State<AddProjectPage> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 }
 
