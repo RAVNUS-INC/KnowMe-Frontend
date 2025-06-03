@@ -282,6 +282,15 @@ class FilterController extends GetxController {
     resetFiltersForTab(tabIndex);
   }
 
+  // 모든 필터 초기화
+  void resetAllFilters() {
+    // 모든 필터 초기화
+    _postController.resetFilters();
+
+    // 데이터 새로 로드
+    _postController.loadPosts();
+  }
+
   // 탭별 필터 초기화 메서드
   void resetFiltersForTab(int tabIndex) {
     switch (tabIndex) {
@@ -324,7 +333,7 @@ class FilterController extends GetxController {
         break;
     }
 
-    _postController.loadContests();
+    _postController.loadPosts();
   }
 
   // 필터 적용 메서드 - 통합된 필터 적용 로직
@@ -415,13 +424,13 @@ class FilterController extends GetxController {
         break;
     }
 
-    _postController.loadContests();
+    _postController.loadPosts();
   }
 
   // 슬라이더 필터링 적용 - 통합된 메서드
   void applyRangeSliderFilter(int tabIndex, RangeValues values) {
     applyRangeFilter(tabIndex, values);
-    _postController.loadContests();
+    _postController.loadPosts();
   }
 
   // 모든 슬라이더 필터(경력, 기간)를 처리하는 통합된 메서드
@@ -522,7 +531,25 @@ class FilterController extends GetxController {
         break;
     }
 
-    _postController.loadContests();
+    _postController.loadPosts();
+  }
+
+  // 선택된 필터 업데이트
+  void selectFilter(String type, String value) {
+    // 선택된 필터 업데이트
+    _postController.updateFilter(type, value);
+
+    // 데이터 새로 로드
+    _postController.loadPosts();
+  }
+
+  // 필터 클리어
+  void clearFilter(String type) {
+    // 필터 클리어
+    _postController.updateFilter(type, null);
+
+    // 데이터 새로 로드
+    _postController.loadPosts();
   }
 
   // 채용 탭 필터 업데이트
@@ -687,7 +714,7 @@ class FilterController extends GetxController {
         break;
     }
 
-    _postController.loadContests();
+    _postController.loadPosts();
   }
 
   // 옵션이 선택되었는지 확인
@@ -732,5 +759,22 @@ class FilterController extends GetxController {
     }
 
     return labels[closestIndex];
+  }
+
+  // 필터 적용 메서드
+  void applyFilter() {
+    Get.back(); // 필터 다이얼로그 닫기
+
+    // PostController의 loadPosts 메서드 호출
+    _postController.loadPosts();
+  }
+
+  // 교육 필터 적용
+  void applyJobEducationFilters() {
+    // 교육 필터 적용 로직
+    // ...
+
+    // 데이터 새로 로드
+    _postController.loadPosts();
   }
 }

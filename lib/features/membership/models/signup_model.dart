@@ -51,7 +51,8 @@ class SignupModel {
 
   static final List<String> grades = ['1학년', '2학년', '3학년', '4학년'];
 
-  static final List<String> mainCategories = [
+  static final List<String> positions = [
+    '전체',
     '개발',
     '마케팅/광고',
     '경영/비즈니스',
@@ -71,12 +72,12 @@ class SignupModel {
     '기타'
   ];
 
-  static final List<String> developmentSubCategories = [
-    '개발 전체',
-    '프론트엔드 개발자',
-    '백엔드 개발자',
-    'AI 개발자'
-  ];
+  // 테스트 사용자 정보 - 개발용
+  static const String testEmail = 'test@gmail.com';
+  static const String testPhone = '01012345678';
+  static const String testUserId = 'testuser';
+  static const String testPassword = 'testuser1!';
+  static const String testName = '테스트유저';
 
   // Getters for button states
   bool get isFirstNextButtonEnabled =>
@@ -105,5 +106,19 @@ class SignupModel {
       'desiredPosition': desiredPosition,
       'marketingConsent': agreeToMarketingInfo,
     };
+  }
+
+  // 테스트 사용자 검증 메서드들
+  static bool isValidTestEmail(String email) {
+    return email.toLowerCase().trim() == testEmail;
+  }
+
+  static bool isValidTestPhone(String phone) {
+    String cleanPhone = phone.replaceAll('-', '').replaceAll(' ', '');
+    return cleanPhone == testPhone;
+  }
+
+  static bool isValidTestUserId(String userId) {
+    return userId.toLowerCase().trim() == testUserId;
   }
 }

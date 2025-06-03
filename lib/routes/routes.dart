@@ -169,8 +169,15 @@ class AppRoutes {
     ),
     GetPage(
       name: postDetail,
-      page: () => const PostDetailScreen(),
-      binding: PostBinding(), // 필요한 경우 상세 페이지에도 바인딩
+      page: () {
+        // null 체크를 추가하여 안전하게 postId 추출
+        final arguments = Get.arguments;
+        final postId = arguments != null && arguments['postId'] is int 
+            ? arguments['postId'] as int 
+            : 0; // 기본값 또는 오류 처리
+        return PostDetailScreen(postId: postId);
+      },
+      binding: PostBinding(),
       transition: Transition.rightToLeft,
     ),
 

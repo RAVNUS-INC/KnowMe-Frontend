@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/filter_row_widget.dart';
@@ -99,9 +98,38 @@ class _PostListScreenState extends State<PostListScreen>
               itemBuilder: (context, index) {
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
-                  List<Contest> filteredContests =
-                      _postController.getFilteredContentsByTabIndex(index);
-                  return PostGrid(contests: filteredContests);
+                  if (_postController.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  if (_postController.hasError.value) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _postController.errorMessage.value,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => _postController.loadPosts(),
+                            child: const Text('다시 시도'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  // API로부터 가져온 PostModel 리스트 사용
+                  if (_postController.posts.isNotEmpty) {
+                    return PostGrid(posts: _postController.posts);
+                  }
+                  
+                  // 데이터가 없을 경우 빈 화면 표시
+                  return const Center(
+                    child: Text("조건에 맞는 게시물이 없습니다."),
+                  );
                 });
               },
             ),

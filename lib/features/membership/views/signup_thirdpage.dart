@@ -18,7 +18,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
   // 선택 상태 변수
   String selectedDomain = SignupModel.emailDomains[0]; // '직접입력'
   String selectedGrade = SignupModel.grades[0]; // '1학년'
-  String selectedPosition = ''; // ✅ 수정: 빈 문자열로 초기화
+  String selectedPosition = SignupModel.positions[0]; // '전체'
   bool _isCurrentlyEnrolled = false;
 
   @override
@@ -38,7 +38,6 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
   void dispose() {
     // 포커스 해제
     FocusManager.instance.primaryFocus?.unfocus();
-    // ✅ GetX 컨트롤러는 자동으로 dispose되므로 별도 처리 불필요
     super.dispose();
   }
 
@@ -215,7 +214,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
               borderSide: const BorderSide(color: Colors.blue),
             ),
             contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           ),
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.next,
@@ -275,7 +274,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
                   contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -325,7 +324,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                       return DropdownMenuItem<String>(
                         value: value,
                         child:
-                        Text(value, style: const TextStyle(fontSize: 14)),
+                            Text(value, style: const TextStyle(fontSize: 14)),
                       );
                     }).toList(),
                   ),
@@ -355,7 +354,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                   borderSide: const BorderSide(color: Colors.blue),
                 ),
                 contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.next,
@@ -420,7 +419,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
                   contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 textInputAction: TextInputAction.next,
                 enableInteractiveSelection: true,
@@ -444,7 +443,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
                   contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 textInputAction: TextInputAction.next,
                 enableInteractiveSelection: true,
@@ -493,7 +492,7 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
     );
   }
 
-  // ✅ 수정: 계층형 희망직종 선택 위젯
+  // 희망직종 선택 위젯 (바텀 시트 방식)
   Widget _buildDesiredPositionField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,10 +520,11 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
           ),
         ),
         const SizedBox(height: 8),
-        // 메인 카테고리 선택 버튼
+        // 바텀 시트를 열기 위한 버튼 스타일의 컨테이너
         GestureDetector(
           onTap: () {
-            _showMainCategoryBottomSheet(context);
+            // 바텀 시트 열기
+            _showPositionBottomSheet(context);
           },
           child: Container(
             width: double.infinity,
@@ -538,10 +538,11 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  selectedPosition.isEmpty ? '희망직종 선택' : selectedPosition,
+                  selectedPosition == '전체' ? '희망직종 선택' : selectedPosition,
                   style: TextStyle(
                     fontSize: 14,
-                    color: selectedPosition.isEmpty ? Colors.grey : Colors.black,
+                    color:
+                        selectedPosition == '전체' ? Colors.grey : Colors.black,
                   ),
                 ),
                 const Icon(Icons.keyboard_arrow_down, size: 24),
@@ -553,25 +554,25 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
     );
   }
 
-  // ✅ 새로 추가: 메인 카테고리 바텀 시트
-  void _showMainCategoryBottomSheet(BuildContext context) {
+  // 바텀 시트를 표시하는 메서드
+  void _showPositionBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      isScrollControlled: true, // 스크롤 가능하도록 설정
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
       ),
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
+          initialChildSize: 0.7, // 화면의 70%까지 확장 가능
+          minChildSize: 0.5, // 최소 50%
+          maxChildSize: 0.9, // 최대 90%
           expand: false,
           builder: (context, scrollController) {
             return Column(
               children: [
-                // 상단 핸들
+                // 상단 핸들 (드래그 가능한 작대기)
                 Container(
                   margin: const EdgeInsets.only(top: 10),
                   width: 40,
@@ -583,7 +584,8 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                 ),
                 // 상단 헤더
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -604,124 +606,24 @@ class _SignupThirdPageState extends State<SignupThirdPage> {
                   ),
                 ),
                 const Divider(),
-                // 메인 카테고리 목록
+                // 목록 (스크롤 가능)
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
-                    itemCount: SignupModel.mainCategories.length,
+                    itemCount: SignupModel.positions.length,
                     itemBuilder: (context, index) {
-                      final category = SignupModel.mainCategories[index];
+                      final position = SignupModel.positions[index];
                       return ListTile(
-                        title: Text(category),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                        onTap: () {
-                          Navigator.pop(context);
-                          if (category == '개발') {
-                            // 개발 카테고리인 경우 세부 분야 선택 바텀 시트 표시
-                            _showDevelopmentSubCategoryBottomSheet(context);
-                          } else {
-                            // 다른 카테고리는 바로 선택
-                            setState(() {
-                              selectedPosition = category;
-                              controller.updateDesiredPosition(category);
-                            });
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // ✅ 새로 추가: 개발 세부 분야 바텀 시트
-  void _showDevelopmentSubCategoryBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-      ),
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.5,
-          minChildSize: 0.3,
-          maxChildSize: 0.7,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                // 상단 핸들
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[600],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                // 상단 헤더
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios, size: 20),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showMainCategoryBottomSheet(context);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '개발 분야',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // 개발 세부 분야 목록
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: SignupModel.developmentSubCategories.length,
-                    itemBuilder: (context, index) {
-                      final subCategory = SignupModel.developmentSubCategories[index];
-                      return ListTile(
-                        title: Text(subCategory),
+                        title: Text(position),
                         onTap: () {
                           setState(() {
-                            selectedPosition = subCategory;
-                            controller.updateDesiredPosition(subCategory);
+                            selectedPosition = position;
+                            controller.updateDesiredPosition(position);
                           });
                           Navigator.pop(context);
                         },
                         // 현재 선택된 항목 표시
-                        trailing: selectedPosition == subCategory
+                        trailing: selectedPosition == position
                             ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                       );

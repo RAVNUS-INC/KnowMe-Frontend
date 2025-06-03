@@ -1,7 +1,7 @@
 import 'package:url_launcher/url_launcher.dart';
-import '../../../shared/services/api_client.dart';
-import '../../../core/constants/api_constants.dart';
-import '../../../core/utils/storage_utils.dart';
+import '../../../shared/services/api_client.dart'; /// API 클라이언트 - 인증 헤더 지원
+import '../../../core/constants/api_constants.dart'; /// API 관련 상수 정의
+import '../../../core/utils/storage_utils.dart'; /// 로컬 저장소 관련 유틸리티
 import '../models/login_dtos.dart';
 import '../models/signup_dtos.dart';
 import '../models/password_reset_dtos.dart';

@@ -20,7 +20,7 @@ class FilterRowWidget extends StatelessWidget {
     return Obx(() {
       // 클래스 메소드 호출 시 postController를 전달
       final List<Widget> filterButtons =
-          _getFilterButtonsByTabIndex(postController);
+      _getFilterButtonsByTabIndex(postController);
 
       return SizedBox(
         height: 50, // filter button row
@@ -61,12 +61,12 @@ class FilterRowWidget extends StatelessWidget {
 
                   // 정렬 옵션 버튼의 위치 계산을 위한 RenderBox 가져오기
                   final RenderBox button =
-                      context.findRenderObject() as RenderBox;
+                  context.findRenderObject() as RenderBox;
                   final RenderBox overlay = Overlay.of(context)
                       .context
                       .findRenderObject() as RenderBox;
                   final buttonPosition =
-                      button.localToGlobal(Offset.zero, ancestor: overlay);
+                  button.localToGlobal(Offset.zero, ancestor: overlay);
 
                   // 팝업 메뉴 표시
                   showDialog(
@@ -283,7 +283,7 @@ class FilterRowWidget extends StatelessWidget {
 
     // 다중 선택의 경우, 선택된 항목 수를 표시 (예: "학력 (3)")
     String displayText =
-        isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
+    isSelected ? "$defaultText (${selectedValues.length})" : defaultText;
 
     // 선택된 값이 하나인 경우, 해당 값을 직접 표시
     if (selectedValues.length == 1) {

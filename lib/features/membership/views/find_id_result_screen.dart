@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../models/signup_model.dart';
 
 class FindIdResultScreen extends StatelessWidget {
   const FindIdResultScreen({super.key});
@@ -7,7 +8,7 @@ class FindIdResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ✅ 수정: 이전 페이지에서 전달받은 아이디 가져오기
-    String foundLoginId = ''; // 기본값을 빈 문자열로 변경
+    String foundLoginId = SignupModel.testUserId; // 기본값
 
     if (Get.arguments != null && Get.arguments['foundLoginId'] != null) {
       foundLoginId = Get.arguments['foundLoginId'];
@@ -95,7 +96,7 @@ class FindIdResultScreen extends StatelessWidget {
                           children: [
                             // ✅ 수정: 전달받은 실제 아이디 표시
                             Text(
-                              foundLoginId.isNotEmpty ? foundLoginId : '아이디를 찾을 수 없습니다',
+                              foundLoginId,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

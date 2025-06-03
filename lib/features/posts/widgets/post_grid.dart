@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
+import 'package:get/get.dart';
+import 'package:knowme_frontend/routes/routes.dart';
+import 'package:knowme_frontend/features/posts/models/postsPostid_model.dart';
 
 class PostGrid extends StatelessWidget {
-  final List<Contest> contests;
+  final List<PostModel> posts;
 
   const PostGrid({
     super.key,
-    required this.contests,
+    required this.posts,
   });
 
   @override
@@ -21,25 +22,25 @@ class PostGrid extends StatelessWidget {
       child: SingleChildScrollView(
         child: Container(
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
-          child: contests.isEmpty
+          const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
+          child: posts.isEmpty
               ? _buildEmptyState()
-              : _buildContestGrid(cardWidth),
+              : _buildPostGrid(cardWidth),
         ),
       ),
     );
   }
 
-  Widget _buildContestGrid(double cardWidth) {
+  Widget _buildPostGrid(double cardWidth) {
     return Wrap(
       spacing: 16, // 가로 간격
       runSpacing: 16, // 세로 간격
       alignment: WrapAlignment.spaceBetween,
-      children: contests
-          .map((contest) => ContestCard(
-                contest: contest,
-                width: cardWidth,
-              ))
+      children: posts
+          .map((post) => PostCard(
+        post: post,
+        width: cardWidth,
+      ))
           .toList(),
     );
   }
@@ -54,7 +55,7 @@ class PostGrid extends StatelessWidget {
             Icon(Icons.search_off, size: 64, color: Color(0xFFB7C4D4)),
             SizedBox(height: 16),
             Text(
-              '조건에 맞는 공모전이 없습니다.',
+              '조건에 맞는 게시물이 없습니다.',
               style: TextStyle(
                 color: Color(0xFF454C53),
                 fontSize: 16,
@@ -69,23 +70,34 @@ class PostGrid extends StatelessWidget {
   }
 }
 
-class ContestCard extends StatelessWidget {
-  final Contest contest;
+class PostCard extends StatelessWidget {
+  final PostModel post;
   final double width;
   static const double _cardHeight = 232.0;
   static const double _imageHeight = 164.0;
   static const double _contentHeight = 68.0;
 
-  const ContestCard({
+  const PostCard({
     super.key,
-    required this.contest,
+    required this.post,
     this.width = 164, // 기본값을 Card1의 너비와 유사하게 설정
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _navigateToDetailScreen(context),
+      onTap: () {
+        // null 체크 추가
+        if (post.post_id != null && post.post_id! > 0) {
+          Get.toNamed(AppRoutes.postDetail, arguments: {'postId': post.post_id});
+        } else {
+          Get.snackbar(
+            '오류',
+            '유효하지 않은 게시물입니다',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      },
       child: Container(
         width: width,
         height: _cardHeight,
@@ -98,13 +110,6 @@ class ContestCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _navigateToDetailScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PostDetailScreen()),
     );
   }
 
@@ -161,8 +166,9 @@ class ContestCard extends StatelessWidget {
   }
 
   String _getImageUrl() {
-    return contest.imageUrl.isNotEmpty
-        ? contest.imageUrl
+    // 첨부 파일이 있으면 첫 번째 첨부파일의 URL 사용, 없으면 기본 이미지
+    return (post.attachments != null && post.attachments!.isNotEmpty)
+        ? post.attachments![0].url
         : "https://placehold.co/600x400?text=No+Image";
   }
 
@@ -192,12 +198,15 @@ class ContestCard extends StatelessWidget {
         width: 24,
         height: 24,
         child: IconButton(
-          icon:
-              const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+          icon: Icon(
+            post.isSaved ? Icons.bookmark : Icons.bookmark_border,
+            color: Colors.white,
+            size: 20
+          ),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {
-            // 북마크 기능
+            // 북마크 기능 - 컨트롤러에 연결 필요
           },
         ),
       ),
@@ -230,7 +239,7 @@ class ContestCard extends StatelessWidget {
     return SizedBox(
       width: width - 16, // 좌우 패딩 8*2 제외
       child: Text(
-        contest.title,
+        post.title,
         style: const TextStyle(
           color: Color(0xFF454C53),
           fontSize: 14,
@@ -252,7 +261,7 @@ class ContestCard extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            contest.benefit,
+            post.company,
             style: const TextStyle(
               color: Color(0xFF454C53),
               fontSize: 10,
@@ -267,7 +276,7 @@ class ContestCard extends StatelessWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            contest.target,
+            post.category,
             style: const TextStyle(
               color: Color(0xFF72787F),
               fontSize: 10,

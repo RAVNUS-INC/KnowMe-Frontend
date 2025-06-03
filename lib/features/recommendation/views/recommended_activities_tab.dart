@@ -1,200 +1,236 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:knowme_frontend/features/posts/models/postsPostid_model.dart';
+import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
+import 'package:knowme_frontend/features/recommendation/controllers/recommendation_controller.dart';
 
-import '../controllers/recommendation_controller.dart';
-import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/routes/routes.dart';
-import 'recommendation_postcard.dart';
-
-/// 추천 활동 탭 화면 - 추천 채용, 대외활동, 강의를 섹션별로 보여주는 UI
 class RecommendedActivitiesTab extends StatelessWidget {
-  const RecommendedActivitiesTab({super.key}); // const 추가, key 파라미터 확인
+  const RecommendedActivitiesTab({super.key});
+
+  // GetX로 주입된 RecommendationController 사용
+  RecommendationController get controller =>
+      Get.find<RecommendationController>();
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: GetBuilder<RecommendationController>(
-        builder: (controller) {
-          if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Column(
-            children: [
-              Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(color: Color(0xFFEEEFF0)),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 16,
-                    left: 16,
-                    right: 16,
-                    bottom: 100,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionHeader('이한양 님을 위한 채용 공고', 0),
-                      const SizedBox(height: 16),
-                      _buildJobListView(controller),
-                      const SizedBox(height: 32),
-                      Divider(color: Colors.grey[300], thickness: 1),
-                      const SizedBox(height: 32),
-                      _buildSectionHeader('맞춤 대외활동 추천', 2),
-                      const SizedBox(height: 16),
-                      _buildRecommendedActivity(controller),
-                      const SizedBox(height: 32),
-                      Divider(color: Colors.grey[300], thickness: 1),
-                      const SizedBox(height: 32),
-                      _buildSectionHeader('취업 준비 필수 강의', 3),
-                      const SizedBox(height: 16),
-                      _buildCoursesListView(controller),
+    return GetBuilder<RecommendationController>(
+      builder: (controller) {
+        return RefreshIndicator(
+          onRefresh: controller.refreshData,
+          child: controller.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _buildContent(context),
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    // 추천된 활동 목록
+    final recommendedPosts = controller.recommendedPosts;
+
+    // 활동을 카테고리별로 분류
+    final groupedPosts = _groupPostsByCategory(recommendedPosts);
+
+    // 모든 카테고리 이름 목록 정의
+    final allCategories = ['채용', '인턴십', '대외 활동', '교육/강연', '공모전'];
+
+    return recommendedPosts.isEmpty
+        ? _buildEmptyState()
+        : SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Container(
+              padding: const EdgeInsets.only(
+                  top: 16, left: 16, right: 16, bottom: 100),
+              decoration: const BoxDecoration(color: Color(0xFFEDEFF0)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 모든 카테고리를 순회하면서 섹션 빌드
+                  for (int i = 0; i < allCategories.length; i++) ...[
+                    if (groupedPosts[allCategories[i]]?.isNotEmpty == true) ...[
+                      _buildCategorySection(context, allCategories[i],
+                          groupedPosts[allCategories[i]] ?? []),
+                      if (i < allCategories.length - 1) ...[
+                        const SizedBox(height: 20),
+                        Divider(color: Colors.grey[300], thickness: 1),
+                        const SizedBox(height: 20),
+                      ],
                     ],
-                  ),
-                ),
+                  ],
+                ],
               ),
-            ],
+            ),
           );
-        },
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 64, color: Color(0xFFB7C4D4)),
+          SizedBox(height: 16),
+          Text(
+            '추천할 활동이 없습니다.\n활동을 더 많이 탐색해보세요!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFF454C53),
+              fontSize: 16,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// 섹션 제목과 오른쪽 화살표 버튼 UI
-  Widget _buildSectionHeader(String title, int tabIndex) {
+  /// 활동들을 카테고리에 따라 그룹화
+  Map<String, List<PostModel>> _groupPostsByCategory(List<PostModel> posts) {
+    Map<String, List<PostModel>> groupedPosts = {};
+
+    for (var post in posts) {
+      final category = _getCategoryName(post.category);
+      groupedPosts.putIfAbsent(category, () => []);
+      groupedPosts[category]!.add(post);
+    }
+
+    return groupedPosts;
+  }
+
+  /// 카테고리 타입을 한글 카테고리명으로 변환
+  String _getCategoryName(String category) {
+    switch (category.toLowerCase()) {
+      case 'job':
+        return '채용';
+      case 'internship':
+        return '인턴십';
+      case 'activity':
+        return '대외 활동';
+      case 'course':
+        return '교육/강연';
+      case 'contest':
+        return '공모전';
+      default:
+        return '기타';
+    }
+  }
+
+  /// 카테고리 섹션 UI 빌드
+  Widget _buildCategorySection(
+      BuildContext context, String title, List<PostModel> posts) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle(title),
+          const SizedBox(height: 16),
+          _buildPostGrid(context, posts),
+        ],
+      ),
+    );
+  }
+
+  /// 섹션 제목 텍스트 스타일
+  Widget _buildSectionTitle(String title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF232323),
-              fontSize: 18,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.72,
-            ),
-            overflow: TextOverflow.ellipsis,
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(0xFF232323),
+            fontSize: 18,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.72,
           ),
         ),
-        IconButton(
-          visualDensity: VisualDensity.comfortable,
-          padding: const EdgeInsets.all(8.0),
-          constraints: const BoxConstraints(minWidth: 44.0, minHeight: 44.0),
-          iconSize: 24.0,
-          icon: SvgPicture.asset(
-            'assets/icons/right_arrow.svg',
-            width: 16,
-            height: 16,
+        Text(
+          '${controller.recommendedPosts.where((c) => _getCategoryName(c.category) == title).length}개',
+          style: const TextStyle(
+            color: Color(0xFF989FAA),
+            fontSize: 14,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w500,
           ),
-          onPressed: () {
-            // 해당 탭으로 이동
-            Get.toNamed(AppRoutes.postList, arguments: {
-              'tabIndex': tabIndex
-            }); // 정확히 말하면 해당 탭 인덱스에서 추천순 버튼 눌려서 추천순대로 나열한 페이지로 넘어감
-          },
         ),
       ],
     );
   }
 
-  /// 추천 채용 공고 리스트 가로 스크롤 뷰
-  Widget _buildJobListView(RecommendationController controller) {
-    final recruitmentContests = controller.recommendedContests.isNotEmpty
-        ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('채용'),
-                orElse: () => ContestGroup(groupName: '', contests: []))
-            .contests
-        : [];
+  /// 그리드 형태로 활동 카드 배치
+  Widget _buildPostGrid(BuildContext context, List<PostModel> posts) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 48) / 2; // 전체 너비에서 padding, margin 감안
 
-    if (recruitmentContests.isEmpty) {
-      return const Center(
-        child: Text('채용 정보를 불러오는 중입니다...'),
-      );
-    }
+    return Wrap(
+      spacing: 16, // 가로 간격
+      runSpacing: 16, // 세로 간격
+      children: posts
+          .map((post) => _createCustomPostCard(post, cardWidth))
+          .toList(),
+    );
+  }
 
+  /// 각 PostModel 데이터를 위젯으로 만들어 반환 (북마크 버튼 포함된 카드)
+  Widget _createCustomPostCard(PostModel post, double width) {
+    return _CustomPostCard(
+      key: ValueKey(post.post_id), // 고유 키 추가
+      post: post,
+      width: width,
+      onBookmarkTap: () => controller.toggleBookmark(post),
+    );
+  }
+}
+
+/// PostCard에 북마크 버튼이 포함된 사용자 정의 위젯
+class _CustomPostCard extends StatelessWidget {
+  final PostModel post;
+  final double width;
+  final VoidCallback? onBookmarkTap;
+
+  const _CustomPostCard({
+    super.key,
+    required this.post,
+    required this.width,
+    this.onBookmarkTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-      height: 232,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: recruitmentContests.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final recruitment = recruitmentContests[index];
-          return RecommendationPostCard(
-            contest: recruitment,
-            onBookmarkTap: () => controller.toggleBookmark(recruitment),
-          );
-        },
+      width: width,
+      child: Stack(
+        children: [
+          PostCard(
+            post: post,
+            width: width,
+          ),
+          _buildBookmarkButton(),
+        ],
       ),
     );
   }
 
-  /// 추천 대외활동 모두 표시 (수평 리스트뷰)
-  Widget _buildRecommendedActivity(RecommendationController controller) {
-    final activityContests = controller.recommendedContests.isNotEmpty
-        ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('대외활동'),
-                orElse: () => ContestGroup(groupName: '', contests: []))
-            .contests
-        : [];
-
-    if (activityContests.isEmpty) {
-      return const Center(
-        child: Text('대외활동 정보를 불러오는 중입니다...'),
-      );
-    }
-
-    return SizedBox(
-      height: 232,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: activityContests.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final activity = activityContests[index];
-          return RecommendationPostCard(
-            contest: activity,
-            onBookmarkTap: () => controller.toggleBookmark(activity),
-          );
-        },
-      ),
-    );
-  }
-
-  /// 취업 관련 추천 강의 가로 스크롤 뷰
-  Widget _buildCoursesListView(RecommendationController controller) {
-    final lectureContests = controller.recommendedContests.isNotEmpty
-        ? controller.recommendedContests
-            .firstWhere((group) => group.groupName.contains('강의'),
-                orElse: () => ContestGroup(groupName: '', contests: []))
-            .contests
-        : [];
-
-    if (lectureContests.isEmpty) {
-      return const Center(
-        child: Text('강의 정보를 불러오는 중입니다...'),
-      );
-    }
-
-    return SizedBox(
-      height: 232,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: lectureContests.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final lecture = lectureContests[index];
-          return RecommendationPostCard(
-            contest: lecture,
-            onBookmarkTap: () => controller.toggleBookmark(lecture),
-          );
-        },
+  Widget _buildBookmarkButton() {
+    return Positioned(
+      right: 4,
+      top: 7,
+      child: SizedBox(
+        width: 24,
+        height: 24,
+        child: IconButton(
+          icon: Icon(
+              post.isSaved ? Icons.bookmark : Icons.bookmark_border,
+              color: Colors.white,
+              size: 20),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          onPressed: onBookmarkTap,
+        ),
       ),
     );
   }

@@ -1,102 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../features/posts/models/contests_model.dart';
-import '../services/recommendation_service.dart';
-import 'package:flutter/foundation.dart';
+import 'package:knowme_frontend/features/posts/models/postsPostid_model.dart';
+import 'package:knowme_frontend/features/recommendation/repositories/recommendation_repository.dart';
+import 'package:logger/logger.dart';
 
-class RecommendationController extends GetxController
-    with GetSingleTickerProviderStateMixin {
-  final RecommendationService _service = RecommendationService();
-  // 사용되지 않는 _repository 필드 제거
-
-  List<ContestGroup> recommendedContests = [];
-  List<Contest> savedContests = [];
-  bool isLoading = false;
-
-  // 탭 관련 변수
+class RecommendationController extends GetxController with GetSingleTickerProviderStateMixin {
+  final RecommendationRepository repository;
+  final _logger = Logger();
+  
+  // 탭 컨트롤러
   late TabController tabController;
-  List<String> tabTitles = ['추천 활동', '저장한 활동'];
+  
+  // 탭 제목 추가
+  final List<String> tabTitles = ['추천 활동', '저장한 활동'];
+  
+  // 생성자 주입
+  RecommendationController({RecommendationRepository? repository}) 
+      : repository = repository ?? RecommendationRepository();
+
+  // 상태 변수
+  final RxBool _isLoading = false.obs;
+  final RxList<PostModel> _savedPosts = <PostModel>[].obs;
+  final RxList<PostModel> _recommendedPosts = <PostModel>[].obs;
+
+  // 게터
+  bool get isLoading => _isLoading.value;
+  List<PostModel> get savedPosts => _savedPosts;
+  List<PostModel> get recommendedPosts => _recommendedPosts;
 
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 2, vsync: this);
-    fetchRecommendedContests();
-    fetchSavedContests();
+    // 탭 컨트롤러 초기화
+    tabController = TabController(length: tabTitles.length, vsync: this);
+    loadData();
   }
-
+  
   @override
   void onClose() {
     tabController.dispose();
     super.onClose();
   }
 
-  void changeTab(int index) {
-    tabController.animateTo(index);
+  // 데이터 로드
+  Future<void> loadData() async {
+    _isLoading.value = true;
     update();
-  }
-
-  Future<void> fetchRecommendedContests() async {
-    isLoading = true;
-    update();
-
+    
     try {
-      recommendedContests = await _service.getRecommendedContests();
+      final saved = await repository.getSavedPosts();
+      final recommended = await repository.getRecommendedPosts();
+      
+      _savedPosts.assignAll(saved);
+      _recommendedPosts.assignAll(recommended);
     } catch (e) {
-      // print 대신 디버그 모드에서만 로그를 출력
-      if (kDebugMode) {
-        debugPrint('Error fetching recommended contests: $e');
-      }
-      // 오류 처리 (예: 스낵바 표시)
+      _logger.e('Error loading data: $e');
     } finally {
-      isLoading = false;
+      _isLoading.value = false;
       update();
     }
   }
 
-  Future<void> fetchSavedContests() async {
-    try {
-      savedContests = await _service.getSavedContests();
-      update();
-    } catch (e) {
-      // print 대신 디버그 모드에서만 로그를 출력
-      if (kDebugMode) {
-        debugPrint('Error fetching saved contests: $e');
-      }
-      // 오류 처리
-    }
-  }
-
-  Future<void> toggleBookmark(Contest contest) async {
-    try {
-      final result = await _service.toggleBookmark(contest.id);
-      if (result) {
-        // 북마크 상태 토글
-        contest.isBookmarked = !contest.isBookmarked;
-
-        // 저장된 활동 목록 업데이트
-        if (contest.isBookmarked) {
-          if (!savedContests.any((a) => a.id == contest.id)) {
-            savedContests.add(contest);
-          }
-        } else {
-          savedContests.removeWhere((a) => a.id == contest.id);
-        }
-
-        update();
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error toggling bookmark: $e');
-      }
-      // 오류 처리
-    }
-  }
-
+  // 새로고침
   Future<void> refreshData() async {
-    await Future.wait([
-      fetchRecommendedContests(),
-      fetchSavedContests(),
-    ]);
+    return loadData();
+  }
+
+  // 북마크 토글
+  void toggleBookmark(PostModel post) {
+    if (post.post_id == null) return;
+    
+    try {
+      // 북마크 상태 토글
+      final updatedPost = post.copyWith(isSaved: !post.isSaved);
+      
+      // 로컬 상태 업데이트
+      final index = _savedPosts.indexWhere((p) => p.post_id == post.post_id);
+      if (index >= 0) {
+        if (!updatedPost.isSaved) {
+          // 북마크 해제된 경우 리스트에서 제거
+          _savedPosts.removeAt(index);
+        } else {
+          // 북마크된 경우 업데이트
+          _savedPosts[index] = updatedPost;
+        }
+      } else if (updatedPost.isSaved) {
+        // 새로 북마크된 경우 리스트에 추가
+        _savedPosts.add(updatedPost);
+      }
+      
+      // 추천 목록에서도 북마크 상태 업데이트
+      final recIndex = _recommendedPosts.indexWhere((p) => p.post_id == post.post_id);
+      if (recIndex >= 0) {
+        _recommendedPosts[recIndex] = updatedPost;
+      }
+      
+      // 서버에 변경사항 반영 (비동기 호출)
+      repository.togglePostBookmark(post.post_id!, updatedPost.isSaved);
+      
+      update();
+    } catch (e) {
+      _logger.e('Error toggling bookmark: $e');
+    }
   }
 }

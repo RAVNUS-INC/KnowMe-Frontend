@@ -2,6 +2,12 @@
 class PostApiConstants {
   // Base URL
   static const String baseUrl = 'http://server.tunnel.jaram.net';
+
+  // 추천 관련 엔드포인트
+  static const String savedPosts = '/api/users/me/bookmarks';
+  static const String recommendedPosts = '/api/recommendations/posts';
+  static const String bookmarkPost = '/api/posts/bookmark';
+  static const String unbookmarkPost = '/api/posts/unbookmark';
 }
 
 // 서현 - 활동 조회, 활동 기입하기
