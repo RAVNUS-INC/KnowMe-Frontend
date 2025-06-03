@@ -152,7 +152,7 @@ class ContestCard extends StatelessWidget {
         height: _imageHeight,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(_getImageUrl()),
+            image: _getImageProvider(), // NetworkImage 대신 변경
             fit: BoxFit.cover,
           ),
         ),
@@ -160,28 +160,36 @@ class ContestCard extends StatelessWidget {
     );
   }
 
+  /// 이미지 경로에 따라 적절한 ImageProvider 반환
+  ImageProvider _getImageProvider() {
+    final imageUrl = contest.imageUrl;
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+    }
+
+    // assets 경로인지 확인
+    if (imageUrl.startsWith('assets/')) {
+      return AssetImage(imageUrl);
+    }
+
+    // HTTP/HTTPS URL인지 확인
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return NetworkImage(imageUrl);
+    }
+
+    // 그 외의 경우 기본 플레이스홀더
+    return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+  }
+
   String _getImageUrl() {
-    return contest.imageUrl.isNotEmpty
-        ? contest.imageUrl
+    return contest.imageUrl?.isNotEmpty == true
+        ? contest.imageUrl!
         : "https://placehold.co/600x400?text=No+Image";
   }
 
   Widget _buildGradientOverlay() {
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: Container(
-        width: width,
-        height: _imageHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(0.50, 1.00),
-            end: Alignment(0.50, -0.00),
-            colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
-          ),
-        ),
-      ),
-    );
+    return const SizedBox.shrink(); // 빈 위젯으로 대체
   }
 
   Widget _buildBookmarkButton() {
