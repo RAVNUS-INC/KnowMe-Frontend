@@ -1,9 +1,143 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../shared/widgets/base_scaffold.dart';
+import '../controllers/activity_controller.dart';
 
 ///활동 추가 페이지
-class ActivityAddScreen extends StatelessWidget {
+class ActivityAddScreen extends StatefulWidget {
   const ActivityAddScreen({super.key});
+
+  @override
+  State<ActivityAddScreen> createState() => _ActivityAddScreenState();
+}
+
+class _ActivityAddScreenState extends State<ActivityAddScreen> {
+  DateTime? selectedDate;
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
+  final TextEditingController summaryController = TextEditingController();
+  final TextEditingController tagController = TextEditingController();
+  // ActivityController 인스턴스 가져오기 (없으면 생성)
+  late final ActivityController activityController;
+
+  @override
+  void initState() {
+    super.initState();
+    // ActivityController 초기화 (없으면 생성)
+    try {
+      activityController = Get.find<ActivityController>();
+    } catch (e) {
+      activityController = Get.put(ActivityController());
+    }
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    titleController.dispose();
+    contentController.dispose();
+    summaryController.dispose();
+    tagController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      locale: const Locale('ko', 'KR'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF1565C0),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dateController.text =
+            '${picked.year}.${picked.month.toString().padLeft(2, '0')}.${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
+  }
+
+  /// 활동을 생성합니다
+  Future<void> _createActivity() async {
+    // 입력 검증
+    if (titleController.text.trim().isEmpty) {
+      _showErrorDialog('제목을 입력해주세요.');
+      return;
+    }
+
+    if (contentController.text.trim().isEmpty) {
+      _showErrorDialog('내용을 입력해주세요.');
+      return;
+    }
+
+    if (summaryController.text.trim().isEmpty) {
+      _showErrorDialog('요약을 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 태그 파싱
+      final tags = activityController.parseTagsFromString(tagController.text);
+
+      // 활동 생성 API 호출
+      final success = await activityController.createActivity(
+        title: titleController.text.trim(),
+        description: summaryController.text.trim(),
+        content: contentController.text.trim(),
+        tags: tags,
+      );
+
+      if (success) {
+        // 성공 시 이전 페이지로 돌아가기
+        Navigator.of(context).pop();
+
+        // 성공 메시지 표시 (옵션)
+        Get.snackbar(
+          '성공',
+          '활동이 성공적으로 추가되었습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        _showErrorDialog('활동 생성에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      _showErrorDialog('오류가 발생했습니다: $e');
+    }
+  }
+
+  /// 에러 다이얼로그를 표시합니다
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('알림'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +165,11 @@ class ActivityAddScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  // 제목 입력창
+                  const SizedBox(height: 12), // 제목 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
+                      controller: titleController,
                       decoration: InputDecoration(
                         hintText: '제목',
                         hintStyle: const TextStyle(
@@ -44,59 +178,62 @@ class ActivityAddScreen extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFD2DAE6)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFD2DAE6)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFF1565C0)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF1565C0)),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12),
                         fillColor: Colors.white,
                         filled: true,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  // 설명 입력창
+                  const SizedBox(height: 10), // 날짜 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
+                      controller: dateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
                       decoration: InputDecoration(
-                        hintText: '설명',
+                        hintText: '날짜 (YYYY.MM.DD)',
                         hintStyle: const TextStyle(
                           color: Color(0xFFB7C4D4),
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFD2DAE6)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFD2DAE6)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFF1565C0)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF1565C0)),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12),
                         fillColor: Colors.white,
                         filled: true,
+                        suffixIcon: const Icon(
+                          Icons.calendar_today,
+                          color: Color(0xFFB7C4D4),
+                          size: 20,
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  // 날짜
-                  const Text(
-                    '2025.04.17',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF232323),
-                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 40),
 
             Divider(
               thickness: 3,
@@ -104,6 +241,70 @@ class ActivityAddScreen extends StatelessWidget {
               height: 24,
             ),
 
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Stack(
+                children: [
+                  // 본문
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '내용',
+                        style: TextStyle(
+                          color: Color(0xFF1565C0),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16), // 내용 입력창 (높이 크게)
+                      Container(
+                        width: double.infinity,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFD2DAE6)),
+                        ),
+                        child: TextField(
+                          controller: contentController,
+                          maxLines: null,
+                          expands: true,
+                          decoration: InputDecoration(
+                            hintText: '직접 입력',
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFB7C4D4),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(12),
+                          ),
+                          style: const TextStyle(
+                            color: Color(0xFF232323),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            Divider(
+              thickness: 3,
+              color: Colors.grey[50],
+              height: 24,
+            ),
+
+            // 요약 섹션 추가
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -125,34 +326,43 @@ class ActivityAddScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // 입력창 (힌트: 직접 입력)
+                      // 요약 입력창 (높이 작게)
                       SizedBox(
                         height: 44,
                         child: TextField(
+                          controller: summaryController,
                           decoration: InputDecoration(
-                            hintText: '직접 입력',
+                            hintText: '활동 내용을 요약해서 입력해주세요',
                             hintStyle: const TextStyle(
                               color: Color(0xFFB7C4D4),
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Color(0xFFD2DAE6)),
+                              borderSide:
+                                  const BorderSide(color: Color(0xFFD2DAE6)),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Color(0xFF1565C0)),
+                              borderSide:
+                                  const BorderSide(color: Color(0xFF1565C0)),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12),
                             fillColor: Colors.white,
                             filled: true,
+                          ),
+                          style: const TextStyle(
+                            color: Color(0xFF232323),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  // 오른쪽 위 동그란 배경+ai.png 아이콘
+                  // 오른쪽 위 AI 아이콘
                   Positioned(
                     top: 0,
                     right: 0,
@@ -182,7 +392,7 @@ class ActivityAddScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 40),
 
             Divider(
               thickness: 3,
@@ -219,12 +429,11 @@ class ActivityAddScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // 빈 태그 리스트 (Wrap, children: [] 로 아무것도 없음)
-
-                  // 입력창
+                  // 빈 태그 리스트 (Wrap, children: [] 로 아무것도 없음)                  // 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
+                      controller: tagController,
                       decoration: InputDecoration(
                         hintText: '직접 입력 후 엔터',
                         hintStyle: const TextStyle(
@@ -233,14 +442,17 @@ class ActivityAddScreen extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFD2DAE6)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFD2DAE6)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFF1565C0)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF1565C0)),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 14),
                         fillColor: Colors.white,
                         filled: true,
                       ),
@@ -249,7 +461,7 @@ class ActivityAddScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 40),
 
             Divider(
               thickness: 3,
@@ -281,7 +493,7 @@ class ActivityAddScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 5),
 
             Divider(
               thickness: 3,
@@ -334,7 +546,8 @@ class ActivityAddScreen extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
                       ),
                       style: const TextStyle(
                         color: Color(0xFF232323),
@@ -346,115 +559,30 @@ class ActivityAddScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 80),
 
             const SizedBox(height: 40),
-
             Center(
-              child: GestureDetector(
-                onTap: () {
-                  _showCancelConfirmDialog(context); // '취소' 눌렀을 때 알림창
-                },
-                child: Image.asset(
-                  'assets/images/wrapper-btn.png',
-                  width: 300,
-                  fit: BoxFit.contain,
-                ),
-              ),
+              child: Obx(() => GestureDetector(
+                    onTap: activityController.isCreatingActivity.value
+                        ? null // 로딩 중에는 비활성화
+                        : _createActivity,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/wrapper-btn.png',
+                          width: 300,
+                          fit: BoxFit.contain,
+                        ),
+                        if (activityController.isCreatingActivity.value)
+                          const CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                      ],
+                    ),
+                  )),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _showCancelConfirmDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // 외부 터치로 닫히지 않게
-      builder:
-          (_) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '활동 작성을 취소할까요?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                '지금까지 작성한 내용이 저장되지 않습니다.',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF5C5C5C),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // 다이얼로그만 닫기
-                        Navigator.of(context).pop(); // 이전 페이지로 돌아가기
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF0066FF)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        '확인',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF0066FF),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // 다이얼로그 닫기
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0066FF),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        '취소',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );
