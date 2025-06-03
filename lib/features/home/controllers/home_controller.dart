@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/routes.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeController extends GetxController {
   // 🔹 현재 카드 인덱스 (슬라이더)
@@ -67,9 +68,9 @@ class HomeController extends GetxController {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: index == 0
+          child: (index == 0 || index == 1 || index == 2)
               ? Image.asset(
-            'assets/images/banner-1.png',
+            'assets/images/banner-${index + 1}.png',
             fit: BoxFit.cover,
           )
               : Center(
@@ -82,7 +83,6 @@ class HomeController extends GetxController {
       ),
     );
   }
-
 
   // 🔸 AI 분석으로 이동
   void goToAiAnalysis() {

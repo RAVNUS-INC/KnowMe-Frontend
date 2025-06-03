@@ -13,7 +13,7 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
     return BaseScaffold(
       currentIndex: 3, // AI 분석 탭
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -27,20 +27,25 @@ class AiAnalysisResultPreviousScreen extends StatelessWidget {
                 letterSpacing: -0.72,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-            // 🔁 분석 카드 리스트 (컨트롤러 사용)
-            Obx(() => Column(
-                  children: controller.previousResults.map((result) {
-                    return AnalysisResultCard(
-                      date: result['date']!,
-                      recordInfo: result['record']!,
-                    );
-                  }).toList(),
-                )),
+            // 🔁 분석 결과 스크롤 가능하게 변경
+            Expanded(
+              child: Obx(() => ListView.builder(
+                itemCount: controller.previousResults.length,
+                itemBuilder: (context, index) {
+                  final result = controller.previousResults[index];
+                  return AnalysisResultCard(
+                    date: result['date']!,
+                    recordInfo: result['record']!,
+                  );
+                },
+              )),
+            ),
           ],
         ),
       ),
+
     );
   }
 }
