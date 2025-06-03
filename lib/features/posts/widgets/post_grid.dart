@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
+import 'package:knowme_frontend/routes/routes.dart';
 
 class PostGrid extends StatelessWidget {
   final List<Contest> contests;
@@ -21,7 +22,7 @@ class PostGrid extends StatelessWidget {
       child: SingleChildScrollView(
         child: Container(
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
+          const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
           child: contests.isEmpty
               ? _buildEmptyState()
               : _buildContestGrid(cardWidth),
@@ -37,9 +38,9 @@ class PostGrid extends StatelessWidget {
       alignment: WrapAlignment.spaceBetween,
       children: contests
           .map((contest) => ContestCard(
-                contest: contest,
-                width: cardWidth,
-              ))
+        contest: contest,
+        width: cardWidth,
+      ))
           .toList(),
     );
   }
@@ -102,9 +103,12 @@ class ContestCard extends StatelessWidget {
   }
 
   void _navigateToDetailScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PostDetailScreen()),
+    // ✅ 변경: postId를 arguments로 전달
+    Get.toNamed(
+      AppRoutes.postDetail,
+      arguments: {
+        'postId': int.tryParse(contest.id) ?? 0, // String ID를 int로 변환
+      },
     );
   }
 
@@ -201,7 +205,7 @@ class ContestCard extends StatelessWidget {
         height: 24,
         child: IconButton(
           icon:
-              const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+          const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {

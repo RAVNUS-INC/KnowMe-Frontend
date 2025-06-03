@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:knowme_frontend/features/posts/controllers/post_detail_controller.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_text_widgets.dart';
 import 'package:knowme_frontend/shared/widgets/base_scaffold.dart';
 
@@ -7,169 +9,380 @@ class PostDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 컨트롤러 인스턴스 가져오기 (바인딩에서 주입됨)
+    final controller = Get.find<PostDetailController>();
+
     return BaseScaffold(
       currentIndex: 0, // 공고 탭 활성화
       showBackButton: true, // 뒤로가기 버튼 표시
       onBack: () => Navigator.of(context).pop(), // 뒤로가기 동작
       backgroundColor: const Color(0xFFF5F5F5), // 배경색 변경
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+      body: Obx(() {
+        // 로딩 상태
+        if (controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        // 에러 상태
+        if (controller.errorMessage.value.isNotEmpty) {
+          return Center(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildHeaderImage(),
-                _buildPostContent(context),
-                const SizedBox(height: 70), // 플로팅 버튼을 위한 추가 공간
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  controller.errorMessage.value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: controller.refresh,
+                  child: const Text('다시 시도'),
+                ),
               ],
             ),
-          ),
-          _buildFloatingActionButton(context),
-        ],
+          );
+        }
+
+        // 데이터가 없는 경우
+        final postDetail = controller.postDetail.value;
+        if (postDetail == null) {
+          return const Center(
+            child: Text('공고 정보를 찾을 수 없습니다.'),
+          );
+        }
+
+        // 정상 상태 - 상세 화면 표시
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeaderImage(postDetail),
+                  _buildPostContent(context, postDetail, controller),
+                  const SizedBox(height: 70), // 플로팅 버튼을 위한 추가 공간
+                ],
+              ),
+            ),
+            _buildFloatingActionButton(context, controller),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildHeaderImage(dynamic postDetail) {
+    return Container(
+      width: double.infinity,
+      height: 250,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: _getImageProvider(postDetail.validImageUrl),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
 
-  Widget _buildHeaderImage() {
-    return Image.asset(
-      'assets/posts_images/image.png',
-      width: double.infinity,
-      height: 250,
-      fit: BoxFit.cover,
-    );
+  /// 이미지 프로바이더 결정
+  ImageProvider _getImageProvider(String imageUrl) {
+    if (imageUrl.startsWith('assets/')) {
+      return AssetImage(imageUrl);
+    } else if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return NetworkImage(imageUrl);
+    } else {
+      return const AssetImage('assets/images/whitepage.svg');
+    }
   }
 
-  Widget _buildPostContent(BuildContext context) {
+  Widget _buildPostContent(BuildContext context, dynamic postDetail, PostDetailController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderRow(),
+          _buildHeaderRow(postDetail, controller),
           const SizedBox(height: 4),
-          const Text(
-            '코드웨이브 신입 채용공고 - 프론트엔드 개발자',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20), // 피그마 상으론 32
-          Divider(color: Colors.grey[300], thickness: 1),
-          const SizedBox(height: 20), // 피그마 상으론 32
-
-          const SectionTitle('회사 소개'),
-          const SizedBox(height: 8),
-          const Text(
-            '코드웨이브는 웹/앱 개발, B2B SaaS 플랫폼, 데이터 기반 UI/UX 개선 등 다양한 프로젝트를 통해 빠르게 성장 중인 스타트업으로, 기술을 통해 더 나은 일상을 만드는 디지털 솔루션 기업입니다.\n\n우리는 “기술로 연결된 가치”를 믿습니다. 함께 성장하고 싶은 당신을 기다립니다.',
+          Text(
+            postDetail.title,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/posts_images/unsplash_JdcJn85xD2k.png',
-              width: double.infinity,
-              height: 200,
-              fit: BoxFit.cover,
+          // 카테고리와 기본 정보 표시
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '${controller.getCategoryDisplayName()} • ${postDetail.primaryInfo}',
+              style: TextStyle(
+                color: Colors.blue[700],
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey[300], thickness: 1),
-          const SizedBox(height: 20),
-          const SectionTitle('모집 부문'),
-          const SizedBox(height: 8),
-          const Text('프론트엔드 개발자 (신입/경력)'),
-
-          const SizedBox(height: 24),
-          const SubSectionTitle('담당 업무'),
-          const SizedBox(height: 8),
-          const BulletList([
-            '자사 웹 서비스 및 클라이언트 프로젝트의 프론트엔드 개발',
-            '디자이너 및 백엔드 개발자와의 협업을 통한 UI 구현',
-            '사용자 경험 개선 및 퍼포먼스 최적화',
-          ]),
-
-          const SizedBox(height: 24),
-          const SubSectionTitle('자격 요건'),
-          const SizedBox(height: 8),
-          const BulletList([
-            'React, Vue 등 프론트엔드 프레임워크에 대한 이해',
-            'HTML/CSS/JavaScript 기반 마크업 및 인터랙션 구현 가능자',
-            'Git을 활용한 협업 경험',
-          ]),
-
-          const SizedBox(height: 24),
-          const SubSectionTitle('우대 사항'),
-          const SizedBox(height: 8),
-          const BulletList([
-            'TypeScript 활용 경험',
-            '디자인 시스템 활용 경험',
-            '개인 포트폴리오 또는 GitHub 링크 제출 가능자',
-          ]),
-
           const SizedBox(height: 20),
           Divider(color: Colors.grey[300], thickness: 1),
           const SizedBox(height: 20),
 
-          const SectionTitle('근무 조건'),
+          // 회사/기관 소개
+          if (postDetail.companyIntro.isNotEmpty) ...[
+            const SectionTitle('회사 소개'),
+            const SizedBox(height: 8),
+            Text(postDetail.companyIntro),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // ✅ 새로 추가: 모집 부문 (구조화된 정보)
+          if (postDetail.parsedContent?.recruitmentPart?.isNotEmpty == true) ...[
+            _buildRecruitmentSection(postDetail.parsedContent!.recruitmentPart!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // ✅ 새로 추가: 근무 조건
+          if (postDetail.parsedContent?.workConditions != null) ...[
+            _buildWorkConditionsSection(postDetail.parsedContent!.workConditions!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // ✅ 새로 추가: 복지
+          if (postDetail.parsedContent?.benefits?.isNotEmpty == true) ...[
+            _buildBenefitsSection(postDetail.parsedContent!.benefits!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // ✅ 새로 추가: 전형 절차
+          if (postDetail.parsedContent?.recruitmentProcess?.isNotEmpty == true) ...[
+            _buildRecruitmentProcessSection(postDetail.parsedContent!.recruitmentProcess!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // ✅ 새로 추가: 지원 방법
+          if (postDetail.parsedContent?.applicationMethod?.isNotEmpty == true) ...[
+            _buildApplicationMethodSection(postDetail.parsedContent!.applicationMethod!),
+            const SizedBox(height: 20),
+          ],
+
+          // 기본 정보는 항상 표시
+          const SectionTitle('기본 정보'),
           const SizedBox(height: 8),
-          const BulletList([
-            '고용 형태: 정규직 (수습 3개월)',
-            '근무 형태: 주 2회 재택 / 자율 출퇴근제 (10~19시 코어타임)',
-            '근무지: 서울 성수동 (뚝섬역 도보 5분)',
-          ]),
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey[300], thickness: 1),
-          const SizedBox(height: 20),
-
-          const SectionTitle('복지'),
-          const SizedBox(height: 8),
-          const BulletList([
-            '매달 기술도서 지원비',
-            '자율과 책임 중심의 유연 근무제',
-            '업무에 필요한 교육 및 컨퍼런스 지원',
-            '맥북 프로 + 듀얼 모니터 기본 지급',
-            '생일 반차 & 기념일 상품권 지급',
-            '1년 근속 시 리프레시 휴가 5일 + 여행 지원비',
-          ]),
-
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey[300], thickness: 1),
-          const SizedBox(height: 20),
-
-          const SectionTitle('전형 절차'),
-          const SizedBox(height: 8),
-          const Text('1. 서류 접수 → 2. 온라인 과제 → 3. 인터뷰(1회) → 4. 최종 합격'),
-
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey[300], thickness: 1),
-          const SizedBox(height: 20),
-
-          const SectionTitle('지원 방법'),
-          const SizedBox(height: 8),
-          const Text(
-              '이력서 및 포트폴리오 제출: recruit@codewave.co.kr\n지원 마감: 2025년 5월 20일(월) 23:59까지'),
+          _buildInfoSection(postDetail),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _buildFloatingActionButton(BuildContext context) {
+  /// ✅ 새로 추가: 모집 부문 섹션 (List로 변경)
+  Widget _buildRecruitmentSection(List<dynamic> recruitmentParts) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('모집 부문'),
+        const SizedBox(height: 8),
+
+        // 여러 모집 부문이 있을 수 있으므로 반복 처리
+        ...recruitmentParts.map((part) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (part.role?.isNotEmpty == true) ...[
+                Text(
+                  part.role!,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              if (part.jobResponsibilities?.isNotEmpty == true) ...[
+                const SubSectionTitle('담당 업무'),
+                const SizedBox(height: 8),
+                _buildBulletText(part.jobResponsibilities!),
+                const SizedBox(height: 16),
+              ],
+
+              if (part.qualifications?.isNotEmpty == true) ...[
+                const SubSectionTitle('자격 요건'),
+                const SizedBox(height: 8),
+                _buildBulletText(part.qualifications!),
+                const SizedBox(height: 16),
+              ],
+
+              if (part.preferredSkills?.isNotEmpty == true) ...[
+                const SubSectionTitle('우대 사항'),
+                const SizedBox(height: 8),
+                _buildBulletText(part.preferredSkills!),
+                const SizedBox(height: 16),
+              ],
+            ],
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  /// ✅ 새로 추가: 근무 조건 섹션 (서버 응답에 맞춰 수정)
+  Widget _buildWorkConditionsSection(dynamic workConditions) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('근무 조건'),
+        const SizedBox(height: 8),
+
+        if (workConditions.employmentType?.isNotEmpty == true)
+          Text('• 고용 형태: ${workConditions.employmentType}'),
+        if (workConditions.workType?.isNotEmpty == true)
+          Text('• 근무 형태: ${workConditions.workType}'),
+        if (workConditions.location?.isNotEmpty == true)
+          Text('• 근무지: ${workConditions.location}'),
+      ],
+    );
+  }
+
+  /// ✅ 새로 추가: 복지 섹션 (String으로 수정)
+  Widget _buildBenefitsSection(String benefits) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('복지'),
+        const SizedBox(height: 8),
+        _buildBulletText(benefits),
+      ],
+    );
+  }
+
+  /// ✅ 새로 추가: 전형 절차 섹션 (String으로 수정)
+  Widget _buildRecruitmentProcessSection(String recruitmentProcess) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('전형 절차'),
+        const SizedBox(height: 8),
+        Text(recruitmentProcess),
+      ],
+    );
+  }
+
+  /// ✅ 새로 추가: 지원 방법 섹션 (String으로 수정)
+  Widget _buildApplicationMethodSection(String applicationMethod) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle('지원 방법'),
+        const SizedBox(height: 8),
+        _buildBulletText(applicationMethod),
+      ],
+    );
+  }
+
+  /// ✅ 새로 추가: 개행 문자를 기준으로 불릿 리스트 생성
+  Widget _buildBulletText(String text) {
+    final lines = text.split('\n').where((line) => line.trim().isNotEmpty).toList();
+
+    if (lines.length == 1) {
+      return Text(text);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: lines.map((line) => Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('• ', style: TextStyle(height: 1.5)),
+            Expanded(
+              child: Text(
+                line.trim(),
+                style: const TextStyle(height: 1.5),
+              ),
+            ),
+          ],
+        ),
+      )).toList(),
+    );
+  }
+
+  Widget _buildInfoSection(dynamic postDetail) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (postDetail.location.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 지역: ${postDetail.location}'),
+          ),
+        if (postDetail.jobTitle.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 직무/분야: ${postDetail.jobTitle}'),
+          ),
+        if (postDetail.formattedExperience.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 경력: ${postDetail.formattedExperience}'),
+          ),
+        if (postDetail.formattedActivityDuration.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 기간: ${postDetail.formattedActivityDuration}'),
+          ),
+        if (postDetail.hostingOrganization.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 주최기관: ${postDetail.hostingOrganization}'),
+          ),
+        if (postDetail.onlineOrOffline.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 진행방식: ${postDetail.onlineOrOffline}'),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context, PostDetailController controller) {
     return Positioned(
       bottom: 20,
       left: 0,
       right: 0,
       child: Center(
         child: Container(
-          width: 300, // 피그마: 300.dp
-          height: 45, // 피그마: 45.dp
+          width: 300,
+          height: 45,
           decoration: BoxDecoration(
-            color: const Color(0xFF0068E5), // 피그마: 0xFF0068E5
-            borderRadius: BorderRadius.circular(8), // 피그마: 8.dp
+            color: const Color(0xFF0068E5),
+            borderRadius: BorderRadius.circular(8),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x33184273), // 피그마: 0x33184273
+                color: Color(0x33184273),
                 offset: Offset(0, 2),
-                blurRadius: 4, // 피그마: 4.dp
+                blurRadius: 4,
                 spreadRadius: 0,
               ),
             ],
@@ -178,19 +391,16 @@ class PostDetailScreen extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                // 자세히 보기 버튼 동작
-              },
+              onTap: controller.navigateToExternalLink,
               child: const Center(
-                // Center로 감싸서 텍스트 중앙 정렬
                 child: Text(
                   '자세히 보기',
-                  textAlign: TextAlign.center, // 텍스트 정렬 추가
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFFF5F5F5), // 색상 코드 정확히 적용
+                    color: Color(0xFFF5F5F5),
                     fontSize: 18,
-                    fontFamily: 'Pretendard', // 폰트 패밀리 적용
-                    fontWeight: FontWeight.w700, // FontWeight 700 적용
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -201,20 +411,29 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderRow() {
+  Widget _buildHeaderRow(dynamic postDetail, PostDetailController controller) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          '코드웨이브',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Expanded(
+          child: Text(
+            postDetail.company.isNotEmpty ? postDetail.company : postDetail.hostingOrganization,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
         Transform.translate(
           offset: const Offset(5, 0),
-          child: IconButton(
-            icon: const Icon(Icons.bookmark_border),
-            onPressed: () {},
-          ),
+          child: Obx(() => IconButton(
+            icon: Icon(
+              controller.isBookmarked.value
+                  ? Icons.bookmark
+                  : Icons.bookmark_border,
+              color: controller.isBookmarked.value
+                  ? Colors.blue
+                  : Colors.grey,
+            ),
+            onPressed: controller.toggleBookmark,
+          )),
         ),
       ],
     );

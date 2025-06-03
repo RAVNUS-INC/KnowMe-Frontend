@@ -35,6 +35,6 @@ class ApiEndpoints {
   // 채용 공고 관련
   static const String employeePosts = '/api/posts/employee';
 
-  /// 특정 채용 공고 상세 URL 생성
-  static String getEmployeePostDetailUrl(int postId) => '/api/posts/employee/$postId';
+  /// ✅ 새로 추가: 모든 공고 상세 URL 생성 (채용, 인턴, 대외활동, 교육/강연, 공모전 통합)
+  static String getPostDetailUrl(int postId) => '/api/posts/$postId';
 }
