@@ -13,8 +13,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      showBottomBar: false,
-      activeIcon: 'user',
       body: ListView(
         padding: EdgeInsets.zero,
         children: [

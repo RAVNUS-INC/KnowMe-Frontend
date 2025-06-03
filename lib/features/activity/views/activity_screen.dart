@@ -24,13 +24,15 @@ class ActivityScreen extends StatelessWidget {
         child: Column(
           children: [
             _tagFilterRow(controller),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
             _projectList(context, controller),
           ],
         ),
       ),
     );
   }
+
+
 
   // 필터 UI
   Widget _tagFilterRow(ActivityController controller) => Obx(() =>

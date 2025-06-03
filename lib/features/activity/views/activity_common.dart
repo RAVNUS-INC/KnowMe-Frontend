@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/activity_record.dart';
-import '../views/activity_add_screen.dart';
+import '../views/activity_modify_screen.dart';
 
 class ActivityColor {
   static const primaryBlue = Color(0xFF0066FF);
