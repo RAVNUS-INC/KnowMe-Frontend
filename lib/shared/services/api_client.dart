@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/constants/post_api_constants.dart';  // 추가된 import
 
 /// API 클라이언트 - 인증 헤더 지원
 class ApiClient {
@@ -165,6 +166,143 @@ class ApiClient {
       final headers = await _getHeaders(requireAuth: requireAuth);
 
       _logger.d('DELETE 요청: $uri');
+      _logger.d('요청 헤더: $headers');
+
+      final response = await _client.delete(
+        uri,
+        headers: headers,
+      ).timeout(const Duration(seconds: 30));
+
+      _logger.d('응답 상태: ${response.statusCode}');
+      _logger.d('응답 본문: ${response.body}');
+
+      return _handleResponse<T>(response, fromJson);
+    } catch (e) {
+      _logger.e('DELETE 요청 오류: $e');
+      return ApiResponse.error(
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        statusCode: 0,
+      );
+    }
+  }
+
+  /// POST 요청 - PostApiConstants 사용
+  Future<ApiResponse<T>> postWithPostApi<T>(
+      String endpoint, {
+        Object? body,
+        T Function(Map<String, dynamic>)? fromJson,
+        bool requireAuth = false,
+      }) async {
+    try {
+      final uri = Uri.parse('${PostApiConstants.baseUrl}$endpoint');
+      final headers = await _getHeaders(requireAuth: requireAuth);
+      final requestBody = body != null ? jsonEncode(body) : null;
+
+      _logger.d('POST 요청 (PostAPI): $uri');
+      _logger.d('요청 헤더: $headers');
+      _logger.d('요청 본문: $requestBody');
+
+      final response = await _client.post(
+        uri,
+        headers: headers,
+        body: requestBody,
+      ).timeout(const Duration(seconds: 30));
+
+      _logger.d('응답 상태: ${response.statusCode}');
+      _logger.d('응답 본문: ${response.body}');
+
+      return _handleResponse<T>(response, fromJson);
+    } catch (e) {
+      _logger.e('POST 요청 오류: $e');
+      return ApiResponse.error(
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        statusCode: 0,
+      );
+    }
+  }
+
+  /// GET 요청 - PostApiConstants 사용
+  Future<ApiResponse<T>> getWithPostApi<T>(
+      String endpoint, {
+        Map<String, String>? queryParameters,
+        T Function(Map<String, dynamic>)? fromJson,
+        bool requireAuth = true,
+      }) async {
+    try {
+      Uri uri = Uri.parse('${PostApiConstants.baseUrl}$endpoint');
+      if (queryParameters != null) {
+        uri = uri.replace(queryParameters: queryParameters);
+      }
+
+      final headers = await _getHeaders(requireAuth: requireAuth);
+
+      _logger.d('GET 요청 (PostAPI): $uri');
+      _logger.d('요청 헤더: $headers');
+
+      final response = await _client.get(
+        uri,
+        headers: headers,
+      ).timeout(const Duration(seconds: 30));
+
+      _logger.d('응답 상태: ${response.statusCode}');
+      _logger.d('응답 본문: ${response.body}');
+
+      return _handleResponse<T>(response, fromJson);
+    } catch (e) {
+      _logger.e('GET 요청 오류: $e');
+      return ApiResponse.error(
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        statusCode: 0,
+      );
+    }
+  }
+
+  /// PUT 요청 - PostApiConstants 사용
+  Future<ApiResponse<T>> putWithPostApi<T>(
+      String endpoint, {
+        Object? body,
+        T Function(Map<String, dynamic>)? fromJson,
+        bool requireAuth = true,
+      }) async {
+    try {
+      final uri = Uri.parse('${PostApiConstants.baseUrl}$endpoint');
+      final headers = await _getHeaders(requireAuth: requireAuth);
+      final requestBody = body != null ? jsonEncode(body) : null;
+
+      _logger.d('PUT 요청 (PostAPI): $uri');
+      _logger.d('요청 헤더: $headers');
+      _logger.d('요청 본문: $requestBody');
+
+      final response = await _client.put(
+        uri,
+        headers: headers,
+        body: requestBody,
+      ).timeout(const Duration(seconds: 30));
+
+      _logger.d('응답 상태: ${response.statusCode}');
+      _logger.d('응답 본문: ${response.body}');
+
+      return _handleResponse<T>(response, fromJson);
+    } catch (e) {
+      _logger.e('PUT 요청 오류: $e');
+      return ApiResponse.error(
+        message: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
+        statusCode: 0,
+      );
+    }
+  }
+
+  /// DELETE 요청 - PostApiConstants 사용
+  Future<ApiResponse<T>> deleteWithPostApi<T>(
+      String endpoint, {
+        T Function(Map<String, dynamic>)? fromJson,
+        bool requireAuth = true,
+      }) async {
+    try {
+      final uri = Uri.parse('${PostApiConstants.baseUrl}$endpoint');
+      final headers = await _getHeaders(requireAuth: requireAuth);
+
+      _logger.d('DELETE 요청 (PostAPI): $uri');
       _logger.d('요청 헤더: $headers');
 
       final response = await _client.delete(
