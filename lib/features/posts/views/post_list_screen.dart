@@ -56,7 +56,10 @@ class _PostListScreenState extends State<PostListScreen>
 
     // PostController의 pageController도 해당 페이지로 이동시킴
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _postController.pageController.jumpToPage(initialIndex);
+      // PageController가 연결된 후에 안전하게 이동
+      if (_postController.pageController.hasClients) {
+        _postController.pageController.jumpToPage(initialIndex);
+      }
     });
   }
 
@@ -99,9 +102,33 @@ class _PostListScreenState extends State<PostListScreen>
               itemBuilder: (context, index) {
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
-                  List<Contest> filteredContests =
-                      _postController.getFilteredContentsByTabIndex(index);
-                  return PostGrid(contests: filteredContests);
+                  // 로딩 상태 확인
+                  if (_postController.isLoading.value) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  // 현재 탭 인덱스가 맞는 경우에만 데이터 표시
+                  if (_postController.selectedTabIndex.value == index) {
+                    return PostGrid(contests: _postController.contests);
+                  } else {
+                    // 다른 탭의 경우 비동기로 데이터 로드
+                    return FutureBuilder<List<Contest>>(
+                      future: _postController.getFilteredContentsByTabIndex(index),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('오류가 발생했습니다: ${snapshot.error}'),
+                          );
+                        } else {
+                          return PostGrid(contests: snapshot.data ?? []);
+                        }
+                      },
+                    );
+                  }
                 });
               },
             ),

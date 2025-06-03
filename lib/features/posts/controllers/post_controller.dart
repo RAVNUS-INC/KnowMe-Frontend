@@ -176,7 +176,7 @@ class PostController extends GetxController {
     isLoading.value = true;
 
     try {
-      final results = getFilteredContentsByCurrentTab();
+      final results = await getFilteredContentsByCurrentTab();
       contests.assignAll(results);
     } catch (e) {
       _logger.e('Error loading contests: ${e.toString()}');
@@ -187,18 +187,18 @@ class PostController extends GetxController {
   }
 
   /// 현재 탭에 대한 필터링된 데이터 가져오기
-  List<Contest> getFilteredContentsByCurrentTab() {
-    return getFilteredContentsByTabIndex(selectedTabIndex.value);
+  Future<List<Contest>> getFilteredContentsByCurrentTab() async {
+    return await getFilteredContentsByTabIndex(selectedTabIndex.value);
   }
 
   /// 특정 탭에 대한 필터링된 데이터 가져오기
-  List<Contest> getFilteredContentsByTabIndex(int tabIndex) {
+  Future<List<Contest>> getFilteredContentsByTabIndex(int tabIndex) async {
     final filters = filtersByTab[tabIndex] ?? {};
     final values = filters.map((key, value) => MapEntry(key, value.value));
 
     switch (tabIndex) {
       case 0: // 채용
-        return repository.getJobListings(
+        return await repository.getJobListings(
           job: values['직무'],
           experience: values['신입~5년'],
           location: values['지역'],

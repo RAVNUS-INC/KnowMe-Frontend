@@ -39,7 +39,7 @@ class ApiClient {
       final token = prefs.getString('jwt_token');
 
       if (token != null && token.isNotEmpty) {
-        return 'Bearer $token';
+        return token.trim();
       }
       return null;
     } catch (e) {
@@ -197,9 +197,10 @@ class ApiClient {
       }
 
       try {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final dynamic responseData = jsonDecode(response.body);
 
         if (fromJson != null) {
+          // List인지 Map인지 확인 후 처리
           final data = fromJson(responseData);
           return ApiResponse.success(data);
         } else {

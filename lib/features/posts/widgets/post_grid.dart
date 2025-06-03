@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/views/post_detail_screen.dart';
+import 'package:knowme_frontend/routes/routes.dart';
 
 class PostGrid extends StatelessWidget {
   final List<Contest> contests;
@@ -21,7 +22,7 @@ class PostGrid extends StatelessWidget {
       child: SingleChildScrollView(
         child: Container(
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
+          const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
           child: contests.isEmpty
               ? _buildEmptyState()
               : _buildContestGrid(cardWidth),
@@ -37,9 +38,9 @@ class PostGrid extends StatelessWidget {
       alignment: WrapAlignment.spaceBetween,
       children: contests
           .map((contest) => ContestCard(
-                contest: contest,
-                width: cardWidth,
-              ))
+        contest: contest,
+        width: cardWidth,
+      ))
           .toList(),
     );
   }
@@ -102,9 +103,12 @@ class ContestCard extends StatelessWidget {
   }
 
   void _navigateToDetailScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PostDetailScreen()),
+    // ✅ 변경: postId를 arguments로 전달
+    Get.toNamed(
+      AppRoutes.postDetail,
+      arguments: {
+        'postId': int.tryParse(contest.id) ?? 0, // String ID를 int로 변환
+      },
     );
   }
 
@@ -152,7 +156,7 @@ class ContestCard extends StatelessWidget {
         height: _imageHeight,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(_getImageUrl()),
+            image: _getImageProvider(), // NetworkImage 대신 변경
             fit: BoxFit.cover,
           ),
         ),
@@ -160,28 +164,36 @@ class ContestCard extends StatelessWidget {
     );
   }
 
+  /// 이미지 경로에 따라 적절한 ImageProvider 반환
+  ImageProvider _getImageProvider() {
+    final imageUrl = contest.imageUrl;
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+    }
+
+    // assets 경로인지 확인
+    if (imageUrl.startsWith('assets/')) {
+      return AssetImage(imageUrl);
+    }
+
+    // HTTP/HTTPS URL인지 확인
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return NetworkImage(imageUrl);
+    }
+
+    // 그 외의 경우 기본 플레이스홀더
+    return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+  }
+
   String _getImageUrl() {
-    return contest.imageUrl.isNotEmpty
-        ? contest.imageUrl
+    return contest.imageUrl?.isNotEmpty == true
+        ? contest.imageUrl!
         : "https://placehold.co/600x400?text=No+Image";
   }
 
   Widget _buildGradientOverlay() {
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: Container(
-        width: width,
-        height: _imageHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(0.50, 1.00),
-            end: Alignment(0.50, -0.00),
-            colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
-          ),
-        ),
-      ),
-    );
+    return const SizedBox.shrink(); // 빈 위젯으로 대체
   }
 
   Widget _buildBookmarkButton() {
@@ -193,7 +205,7 @@ class ContestCard extends StatelessWidget {
         height: 24,
         child: IconButton(
           icon:
-              const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+          const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {

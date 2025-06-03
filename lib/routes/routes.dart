@@ -37,6 +37,9 @@ import 'package:knowme_frontend/features/recommendation/views/recommendation_scr
 import '../features/activity/views/activity_screen.dart';
 import '../features/activity/controllers/activity_controller.dart';
 
+// ✅ 새로 추가: 공고 상세 컨트롤러 import
+import '../features/posts/controllers/post_detail_controller.dart';
+
 class AppRoutes {
   static const String login = '/login';
   static const String signupFirst = '/signup/first';
@@ -170,7 +173,7 @@ class AppRoutes {
     GetPage(
       name: postDetail,
       page: () => const PostDetailScreen(),
-      binding: PostBinding(), // 필요한 경우 상세 페이지에도 바인딩
+      binding: PostDetailBinding(), // ✅ 별도 바인딩 클래스 사용
       transition: Transition.rightToLeft,
     ),
 
@@ -256,5 +259,13 @@ class ActivityBinding implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut<ActivityController>(() => ActivityController(), fenix: true);
+  }
+}
+
+// ✅ 새로 추가: PostDetailController 바인딩 클래스
+class PostDetailBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.put<PostDetailController>(PostDetailController());
   }
 }
