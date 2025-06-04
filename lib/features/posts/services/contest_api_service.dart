@@ -1,5 +1,5 @@
 import '../../../shared/services/api_client.dart';
-import '../models/contest_post_dtos.dart';
+import '../models/post_tabs/contest_post_dtos.dart';
 import 'package:logger/logger.dart';
 
 /// 공모전 공고 API 서비스

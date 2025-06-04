@@ -1,5 +1,5 @@
 import '../../../shared/services/api_client.dart';
-import '../models/external_post_dtos.dart';
+import 'package:knowme_frontend/features/posts/models/post_tabs/external_post_dtos.dart';
 import 'package:logger/logger.dart';
 
 /// 대외활동 공고 API 서비스

@@ -1,5 +1,5 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/models/basepost_model.dart';
+import 'package:knowme_frontend/features/posts/models/post_tabs/basepost_model.dart';
 
 /// 공모전 공고 모델
 class ContestPost extends BasePost {
@@ -119,6 +119,21 @@ class ContestPost extends BasePost {
       target: targetAudience,
       benefit: contestBenefits,
     );
+    /*@override
+  Contest toContest() {
+    return Contest(
+      id: postId.toString(),
+      title: title,
+      benefit: contestBenefits.isNotEmpty ? contestBenefits : '혜택 정보 없음',
+      target: targetAudience,
+      organization: hostingOrganization, // employee에선 company였지만, 공모전에서는 hostingOrganization
+      imageUrl: super.getValidImageUrl(),
+      dateRange: _formatDateRange(createdAt, activityDuration),
+      location: location,
+      field: activityField,
+      additionalInfo: onlineOrOffline,
+    );
+  } */
   }
 
   /// 날짜 표시 포맷팅 헬퍼 메서드

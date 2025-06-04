@@ -1,27 +1,27 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/models/basepost_model.dart';
+import 'package:knowme_frontend/features/posts/models/post_tabs/basepost_model.dart';
 
-// 대외활동 공고 모델
-class ExternalPost extends BasePost {
-  ExternalPost({
+// 교육/강연 공고 모델
+class EducationPost extends BasePost {
+  EducationPost({
     required int postId,
     required String category,
     required String title,
     required String company,
     required String companyIntro,
-    required String externalIntro,
+    required String educationIntro,
     required String content,
     required String image,
     required String location, // 지역
     required String jobTitle,
-    required int experience, // 경력
+    required int experience, 
     required String education,
     required String activityField, // 분야
     required int activityDuration, // 기간
-    required String hostingOrganization, // 주최 기관
-    required String onlineOrOffline,
+    required String organizingInstitution, // 주관 기관
+    required String onlineOrOffline, // 온/오프라인
     required String targetAudience,
-    required String contestBenefits,
+    required String educationBenefits,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : super(
@@ -30,7 +30,7 @@ class ExternalPost extends BasePost {
     title: title,
     company: company,
     companyIntro: companyIntro,
-    externalIntro: externalIntro,
+    externalIntro: educationIntro,
     content: content,
     image: image,
     location: location,
@@ -39,22 +39,22 @@ class ExternalPost extends BasePost {
     education: education,
     activityField: activityField,
     activityDuration: activityDuration,
-    hostingOrganization: hostingOrganization,
+    hostingOrganization: organizingInstitution,
     onlineOrOffline: onlineOrOffline,
     targetAudience: targetAudience,
-    contestBenefits: contestBenefits,
+    contestBenefits: educationBenefits,
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
 
-  factory ExternalPost.fromJson(Map<String, dynamic> json) {
-    return ExternalPost(
+  factory EducationPost.fromJson(Map<String, dynamic> json) {
+    return EducationPost(
       postId: json['post_id'] ?? 0,
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       company: json['company'] ?? '',
       companyIntro: json['company_intro'] ?? '',
-      externalIntro: json['external_intro'] ?? '',
+      educationIntro: json['external_intro'] ?? '',  // ✅ JSON key 기준
       content: json['content'] ?? '',
       image: json['image'] ?? '',
       location: json['location'] ?? '',
@@ -63,12 +63,12 @@ class ExternalPost extends BasePost {
       education: json['education'] ?? '',
       activityField: json['activityField'] ?? '',
       activityDuration: json['activityDuration'] ?? 0,
-      hostingOrganization: json['hostingOrganization'] ?? '',
+      organizingInstitution: json['hostingOrganization'] ?? '', // ✅ JSON 기준으로 수정
       onlineOrOffline: json['onlineOrOffline'] ?? '',
       targetAudience: json['targetAudience'] ?? '',
-      contestBenefits: json['contestBenefits'] ?? '',
-      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
+      educationBenefits: json['contestBenefits'] ?? '', // ✅ JSON 기준으로 수정
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
 
@@ -80,7 +80,7 @@ class ExternalPost extends BasePost {
       'title': title,
       'company': company,
       'company_intro': companyIntro,
-      'external_intro': externalIntro,
+      'education_intro': externalIntro,
       'content': content,
       'image': image,
       'location': location,
@@ -89,10 +89,10 @@ class ExternalPost extends BasePost {
       'education': education,
       'activityField': activityField,
       'activityDuration': activityDuration,
-      'hostingOrganization': hostingOrganization,
+      'organizingInstitution': hostingOrganization,
       'onlineOrOffline': onlineOrOffline,
       'targetAudience': targetAudience,
-      'contestBenefits': contestBenefits,
+      'educationBenefits': contestBenefits,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -106,12 +106,12 @@ class ExternalPost extends BasePost {
       benefit: contestBenefits.isNotEmpty ? contestBenefits : '혜택 정보 없음',
       target: targetAudience.isNotEmpty ? targetAudience : education,
       imageUrl: super.getValidImageUrl(),
-      organization: hostingOrganization, // 주최기관
+      organization: hostingOrganization, // 주관기관
       location: location, // 지역
       field: activityField, // 분야
       dateRange: _formatActivityDuration(activityDuration), // 기간
-      additionalInfo: content,
-      type: ActivityType.activity,
+      additionalInfo: onlineOrOffline, // 온/오프라인
+      type: ActivityType.course, // education 대신 course로 변경
       company: company,
     );
   }
@@ -126,6 +126,6 @@ class ExternalPost extends BasePost {
 
   @override
   String toString() {
-    return 'ExternalPost(postId: $postId, title: $title, organization: $hostingOrganization, field: $activityField, duration: $activityDuration, location: $location)';
+    return 'EducationPost(postId: $postId, title: $title, organization: $hostingOrganization, field: $activityField, duration: $activityDuration, location: $location)';
   }
 }

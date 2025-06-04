@@ -34,10 +34,10 @@ class ApiEndpoints {
 
   /// ============== posts 관련 ===============
   // 채용 공고 관련
-  static const String employeePosts = '/api/posts/employee'; // 인범오빠가 해줌
+  static const String employeePosts = '/api/posts/employee';
 
   // 인턴 공고 조회(페이징)
-  static const String Internposts = '/api/posts/intern'; // 완
+  static const String Internposts = '/api/posts/intern';
 
   // 대외활동 안내 조회(페이징)
   static const String Externalposts = '/api/posts/external';
@@ -47,7 +47,14 @@ class ApiEndpoints {
 
   // 공모전 안내 조회(페이징)
   static const String Contestposts = '/api/posts/contest';
-  //
+
+  /// 저장 기능
+  // Posts 저장하기
+  static const String PostSavedPosts = '/api/savedpost/{user_id}/{post_id}';
+  // Posts 저장된 목록 조회
+  static const String GetSavedPosts = '/api/savedpost/user/{user_id}';
+  // Posts 저장된 목록 삭제
+  static const String DeleteSavedPosts = '/api/savedpost/{savedpost_id}';
 
   /// ✅ 새로 추가: 모든 공고 상세 URL 생성 (채용, 인턴, 대외활동, 교육/강연, 공모전 통합)
   static String getPostDetailUrl(int postId) => '/api/posts/$postId';

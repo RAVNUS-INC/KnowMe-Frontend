@@ -151,7 +151,7 @@
 //   }
 // }
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/models/basepost_model.dart';
+import 'package:knowme_frontend/features/posts/models/post_tabs/basepost_model.dart';
 
 // 인턴 공고 모델
 class InternPost extends BasePost {

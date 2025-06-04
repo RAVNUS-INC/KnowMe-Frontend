@@ -1,5 +1,5 @@
 import '../../../shared/services/api_client.dart';
-import '../models/intern_post_dtos.dart';
+import '../models/post_tabs/intern_post_dtos.dart';
 import 'package:logger/logger.dart';
 
 /// 인턴 공고 API 서비스
