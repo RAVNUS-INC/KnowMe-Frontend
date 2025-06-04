@@ -60,8 +60,6 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      activeIcon: 'bell', // 상단 오른쪽 '알림' 아이콘 강조
-      showBottomBar: true,
       body: Container(
         color: Colors.grey[50],
         child: ListView.separated(

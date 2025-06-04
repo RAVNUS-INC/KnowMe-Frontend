@@ -12,6 +12,7 @@ class SearchScreen extends StatelessWidget {
 
     return BaseScaffold(
       currentIndex: 0,
+      activeIcon: 'search',
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
         child: Column(

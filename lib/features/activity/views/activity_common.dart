@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../models/activity_record.dart';
-import '../views/activity_add_screen.dart';
+import '../controllers/activity_controller.dart';
+import '../views/activity_modify_screen.dart';
 
 class ActivityColor {
   static const primaryBlue = Color(0xFF0066FF);
@@ -14,8 +16,7 @@ class ActivityColor {
 Future<bool> _showDeleteDialog(BuildContext context, Project project) async {
   final confirmed = await showDialog<bool>(
     context: context,
-    builder:
-        (_) => AlertDialog(
+    builder: (_) => AlertDialog(
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -100,10 +101,8 @@ class MenuPopup extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (_) => AddProjectPage(
+                    builder: (_) => ActivityModifyScreen(
                       project: project, // 수정할 데이터 전달
-                      isEdit: true, // 수정모드라는 플래그 전달
                     ),
                   ),
                 ); // 팝업 닫고
@@ -120,15 +119,43 @@ class MenuPopup extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // 활동 삭제하기
+            const SizedBox(height: 16), // 활동 삭제하기
             GestureDetector(
               onTap: () async {
-                await _showDeleteDialog(
-                  context,
-                  project,
-                ); // ← project 삭제 요청 보내기
+                // 메뉴 팝업을 닫지 말고 바로 삭제 다이얼로그 호출
+                final confirmed = await _showDeleteDialog(context, project);
+
+                // 다이얼로그 결과에 관계없이 메뉴 팝업 닫기
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }                if (confirmed) {
+                  // ActivityController를 사용하여 삭제 실행
+                  final controller = Get.find<ActivityController>();
+                  final success = await controller.removeProject(project);
+                  if (success) {
+                    // 성공 메시지 표시
+                    Get.snackbar(
+                      '성공',
+                      '활동이 삭제되었습니다.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                    );
+
+                    // 상세 화면에서 호출된 경우 내 활동 화면으로 이동
+                    // Get.back()을 여러 번 호출하여 상세 화면을 벗어나고 내 활동 화면으로 이동
+                    Get.until((route) => route.settings.name == '/activity');
+                  } else {
+                    // 실패 메시지 표시
+                    Get.snackbar(
+                      '실패',
+                      '활동 삭제에 실패했습니다.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
+                  }
+                }
               },
               child: Row(
                 children: [

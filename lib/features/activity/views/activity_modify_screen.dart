@@ -1,35 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../shared/widgets/base_scaffold.dart';
+import '../models/activity_record.dart';
 import '../controllers/activity_controller.dart';
+import '../../../shared/widgets/base_scaffold.dart';
 
-///활동 추가 페이지
-class ActivityAddScreen extends StatefulWidget {
-  const ActivityAddScreen({super.key});
+/// 활동 수정 페이지
+class ActivityModifyScreen extends StatefulWidget {
+  final Project project;
+
+  const ActivityModifyScreen({super.key, required this.project});
 
   @override
-  State<ActivityAddScreen> createState() => _ActivityAddScreenState();
+  State<ActivityModifyScreen> createState() => _ActivityModifyScreenState();
 }
 
-class _ActivityAddScreenState extends State<ActivityAddScreen> {
+class _ActivityModifyScreenState extends State<ActivityModifyScreen> {
   DateTime? selectedDate;
   final TextEditingController dateController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController tagController = TextEditingController();
-  // ActivityController 인스턴스 가져오기 (없으면 생성)
+
   late final ActivityController activityController;
 
   @override
   void initState() {
     super.initState();
-    // ActivityController 초기화 (없으면 생성)
+
     try {
       activityController = Get.find<ActivityController>();
     } catch (e) {
       activityController = Get.put(ActivityController());
     }
+
+    // 기존 데이터 로드
+    titleController.text = widget.project.title;
+    summaryController.text = widget.project.description;
+    contentController.text = widget.project.content;
+    tagController.text = widget.project.tags.join(', ');
   }
 
   @override
@@ -72,8 +81,8 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
     }
   }
 
-  /// 활동을 생성합니다
-  Future<void> _createActivity() async {
+  /// 활동을 수정합니다
+  Future<void> _updateActivity() async {
     // 입력 검증
     if (titleController.text.trim().isEmpty) {
       _showErrorDialog('제목을 입력해주세요.');
@@ -92,10 +101,10 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
 
     try {
       // 태그 파싱
-      final tags = activityController.parseTagsFromString(tagController.text);
-
-      // 활동 생성 API 호출
-      final success = await activityController.createActivity(
+      final tags = activityController
+          .parseTagsFromString(tagController.text); // 활동 수정 API 호출
+      final success = await activityController.updateActivity(
+        activityId: widget.project.portfolioId,
         title: titleController.text.trim(),
         description: summaryController.text.trim(),
         content: contentController.text.trim(),
@@ -106,16 +115,16 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
         // 성공 시 이전 페이지로 돌아가기
         Navigator.of(context).pop();
 
-        // 성공 메시지 표시 (옵션)
+        // 성공 메시지 표시
         Get.snackbar(
           '성공',
-          '활동이 성공적으로 추가되었습니다.',
+          '활동이 성공적으로 수정되었습니다.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
       } else {
-        _showErrorDialog('활동 생성에 실패했습니다. 다시 시도해주세요.');
+        _showErrorDialog('활동 수정에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (e) {
       _showErrorDialog('오류가 발생했습니다: $e');
@@ -139,6 +148,73 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
     );
   }
 
+  void _showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '활동 수정을 취소할까요?',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '수정한 내용이 저장되지 않습니다.',
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                        Navigator.of(context).pop(); // 수정 페이지 나가기
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.blueAccent),
+                        foregroundColor: Colors.blueAccent,
+                        minimumSize: const Size(0, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('확인'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('취소'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
@@ -147,7 +223,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 파일
+            // 기본 정보 섹션
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -165,7 +241,8 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12), // 제목 입력창
+                  const SizedBox(height: 12),
+                  // 제목 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
@@ -194,7 +271,8 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10), // 날짜 입력창
+                  const SizedBox(height: 10),
+                  // 날짜 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
@@ -237,61 +315,58 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
 
             Divider(
               thickness: 3,
-              color: Colors.grey[50], // ✅ 아주 연한 회색
+              color: Colors.grey[50],
               height: 24,
             ),
 
+            // 내용 섹션
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Stack(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 본문
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '내용',
-                        style: TextStyle(
-                          color: Color(0xFF1565C0),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  const Text(
+                    '내용',
+                    style: TextStyle(
+                      color: Color(0xFF1565C0),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // 내용 입력창 (높이 크게)
+                  Container(
+                    width: double.infinity,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFD2DAE6)),
+                    ),
+                    child: TextField(
+                      controller: contentController,
+                      maxLines: null,
+                      expands: true,
+                      decoration: InputDecoration(
+                        hintText: '직접 입력',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFFB7C4D4),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
                         ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(12),
                       ),
-                      const SizedBox(height: 16), // 내용 입력창 (높이 크게)
-                      Container(
-                        width: double.infinity,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFD2DAE6)),
-                        ),
-                        child: TextField(
-                          controller: contentController,
-                          maxLines: null,
-                          expands: true,
-                          decoration: InputDecoration(
-                            hintText: '직접 입력',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFB7C4D4),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.all(12),
-                          ),
-                          style: const TextStyle(
-                            color: Color(0xFF232323),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                      style: const TextStyle(
+                        color: Color(0xFF232323),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -304,7 +379,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
               height: 24,
             ),
 
-            // 요약 섹션 추가
+            // 요약 섹션
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -313,7 +388,6 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
               ),
               child: Stack(
                 children: [
-                  // 본문
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -396,10 +470,11 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
 
             Divider(
               thickness: 3,
-              color: Colors.grey[50], // ✅ 아주 연한 회색
+              color: Colors.grey[50],
               height: 24,
             ),
 
+            // 태그 섹션
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -429,7 +504,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 빈 태그 리스트 (Wrap, children: [] 로 아무것도 없음)                  // 입력창
+                  // 태그 입력창
                   SizedBox(
                     height: 44,
                     child: TextField(
@@ -465,7 +540,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
 
             Divider(
               thickness: 3,
-              color: Colors.grey[50], // ✅ 아주 연한 회색
+              color: Colors.grey[50],
               height: 24,
             ),
 
@@ -497,7 +572,7 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
 
             Divider(
               thickness: 3,
-              color: Colors.grey[50], // ✅ 아주 연한 회색
+              color: Colors.grey[50],
               height: 24,
             ),
 
@@ -561,26 +636,59 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
             ),
 
             const SizedBox(height: 40),
-            Center(
-              child: Obx(() => GestureDetector(
-                    onTap: activityController.isCreatingActivity.value
-                        ? null // 로딩 중에는 비활성화
-                        : _createActivity,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/wrapper-btn.png',
-                          width: 300,
-                          fit: BoxFit.contain,
+
+            // 수정 버튼 섹션
+            Row(
+              children: [
+                // 취소 버튼
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: () => _showCancelDialog(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF1565C0)),
+                        foregroundColor: const Color(0xFF1565C0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        if (activityController.isCreatingActivity.value)
-                          const CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                      ],
+                      ),
+                      child: const Text('취소', style: TextStyle(fontSize: 16)),
                     ),
-                  )),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // 수정 버튼
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    child: Obx(() => ElevatedButton(
+                          onPressed: activityController.isCreatingActivity.value
+                              ? null
+                              : _updateActivity,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1565C0),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: activityController.isCreatingActivity.value
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : const Text('수정',
+                                  style: TextStyle(fontSize: 16)),
+                        )),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

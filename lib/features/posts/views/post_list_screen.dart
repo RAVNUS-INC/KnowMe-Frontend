@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/filter_row_widget.dart';
@@ -55,7 +56,10 @@ class _PostListScreenState extends State<PostListScreen>
 
     // PostController의 pageController도 해당 페이지로 이동시킴
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _postController.pageController.jumpToPage(initialIndex);
+      // PageController가 연결된 후에 안전하게 이동
+      if (_postController.pageController.hasClients) {
+        _postController.pageController.jumpToPage(initialIndex);
+      }
     });
   }
 
@@ -98,38 +102,33 @@ class _PostListScreenState extends State<PostListScreen>
               itemBuilder: (context, index) {
                 // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
+                  // 로딩 상태 확인
                   if (_postController.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  
-                  if (_postController.hasError.value) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _postController.errorMessage.value,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () => _postController.loadPosts(),
-                            child: const Text('다시 시도'),
-                          ),
-                        ],
-                      ),
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
                   }
-                  
-                  // API로부터 가져온 PostModel 리스트 사용
-                  if (_postController.posts.isNotEmpty) {
-                    return PostGrid(posts: _postController.posts);
+
+                  // 현재 탭 인덱스가 맞는 경우에만 데이터 표시
+                  if (_postController.selectedTabIndex.value == index) {
+                    return PostGrid(contests: _postController.contests);
+                  } else {
+                    // 다른 탭의 경우 비동기로 데이터 로드
+                    return FutureBuilder<List<Contest>>(
+                      future: _postController.getFilteredContentsByTabIndex(index),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('오류가 발생했습니다: ${snapshot.error}'),
+                          );
+                        } else {
+                          return PostGrid(contests: snapshot.data ?? []);
+                        }
+                      },
+                    );
                   }
-                  
-                  // 데이터가 없을 경우 빈 화면 표시
-                  return const Center(
-                    child: Text("조건에 맞는 게시물이 없습니다."),
-                  );
                 });
               },
             ),

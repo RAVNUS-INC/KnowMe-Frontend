@@ -13,8 +13,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      showBottomBar: false,
-      activeIcon: 'user',
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -80,7 +78,7 @@ class ProfileScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                elevation: 8,
+                elevation: 3,
                 shape: const StadiumBorder(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,

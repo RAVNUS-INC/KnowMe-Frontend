@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/routes/routes.dart';
-import 'package:knowme_frontend/features/posts/models/postsPostid_model.dart';
 
 class PostGrid extends StatelessWidget {
-  final List<PostModel> posts;
+  final List<Contest> contests;
 
   const PostGrid({
     super.key,
-    required this.posts,
+    required this.contests,
   });
 
   @override
@@ -23,22 +23,22 @@ class PostGrid extends StatelessWidget {
         child: Container(
           padding:
           const EdgeInsets.only(left: 16, right: 16, top: 2, bottom: 16),
-          child: posts.isEmpty
+          child: contests.isEmpty
               ? _buildEmptyState()
-              : _buildPostGrid(cardWidth),
+              : _buildContestGrid(cardWidth),
         ),
       ),
     );
   }
 
-  Widget _buildPostGrid(double cardWidth) {
+  Widget _buildContestGrid(double cardWidth) {
     return Wrap(
       spacing: 16, // 가로 간격
       runSpacing: 16, // 세로 간격
       alignment: WrapAlignment.spaceBetween,
-      children: posts
-          .map((post) => PostCard(
-        post: post,
+      children: contests
+          .map((contest) => ContestCard(
+        contest: contest,
         width: cardWidth,
       ))
           .toList(),
@@ -55,7 +55,7 @@ class PostGrid extends StatelessWidget {
             Icon(Icons.search_off, size: 64, color: Color(0xFFB7C4D4)),
             SizedBox(height: 16),
             Text(
-              '조건에 맞는 게시물이 없습니다.',
+              '조건에 맞는 공모전이 없습니다.',
               style: TextStyle(
                 color: Color(0xFF454C53),
                 fontSize: 16,
@@ -70,34 +70,23 @@ class PostGrid extends StatelessWidget {
   }
 }
 
-class PostCard extends StatelessWidget {
-  final PostModel post;
+class ContestCard extends StatelessWidget {
+  final Contest contest;
   final double width;
   static const double _cardHeight = 232.0;
   static const double _imageHeight = 164.0;
   static const double _contentHeight = 68.0;
 
-  const PostCard({
+  const ContestCard({
     super.key,
-    required this.post,
+    required this.contest,
     this.width = 164, // 기본값을 Card1의 너비와 유사하게 설정
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // null 체크 추가
-        if (post.post_id != null && post.post_id! > 0) {
-          Get.toNamed(AppRoutes.postDetail, arguments: {'postId': post.post_id});
-        } else {
-          Get.snackbar(
-            '오류',
-            '유효하지 않은 게시물입니다',
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
-      },
+      onTap: () => _navigateToDetailScreen(context),
       child: Container(
         width: width,
         height: _cardHeight,
@@ -110,6 +99,16 @@ class PostCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _navigateToDetailScreen(BuildContext context) {
+    // ✅ 변경: postId를 arguments로 전달
+    Get.toNamed(
+      AppRoutes.postDetail,
+      arguments: {
+        'postId': int.tryParse(contest.id) ?? 0, // String ID를 int로 변환
+      },
     );
   }
 
@@ -157,7 +156,7 @@ class PostCard extends StatelessWidget {
         height: _imageHeight,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(_getImageUrl()),
+            image: _getImageProvider(), // NetworkImage 대신 변경
             fit: BoxFit.cover,
           ),
         ),
@@ -165,29 +164,36 @@ class PostCard extends StatelessWidget {
     );
   }
 
+  /// 이미지 경로에 따라 적절한 ImageProvider 반환
+  ImageProvider _getImageProvider() {
+    final imageUrl = contest.imageUrl;
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+    }
+
+    // assets 경로인지 확인
+    if (imageUrl.startsWith('assets/')) {
+      return AssetImage(imageUrl);
+    }
+
+    // HTTP/HTTPS URL인지 확인
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return NetworkImage(imageUrl);
+    }
+
+    // 그 외의 경우 기본 플레이스홀더
+    return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+  }
+
   String _getImageUrl() {
-    // 첨부 파일이 있으면 첫 번째 첨부파일의 URL 사용, 없으면 기본 이미지
-    return (post.attachments != null && post.attachments!.isNotEmpty)
-        ? post.attachments![0].url
+    return contest.imageUrl?.isNotEmpty == true
+        ? contest.imageUrl!
         : "https://placehold.co/600x400?text=No+Image";
   }
 
   Widget _buildGradientOverlay() {
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: Container(
-        width: width,
-        height: _imageHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(0.50, 1.00),
-            end: Alignment(0.50, -0.00),
-            colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
-          ),
-        ),
-      ),
-    );
+    return const SizedBox.shrink(); // 빈 위젯으로 대체
   }
 
   Widget _buildBookmarkButton() {
@@ -198,15 +204,12 @@ class PostCard extends StatelessWidget {
         width: 24,
         height: 24,
         child: IconButton(
-          icon: Icon(
-            post.isSaved ? Icons.bookmark : Icons.bookmark_border,
-            color: Colors.white,
-            size: 20
-          ),
+          icon:
+          const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {
-            // 북마크 기능 - 컨트롤러에 연결 필요
+            // 북마크 기능
           },
         ),
       ),
@@ -239,7 +242,7 @@ class PostCard extends StatelessWidget {
     return SizedBox(
       width: width - 16, // 좌우 패딩 8*2 제외
       child: Text(
-        post.title,
+        contest.title,
         style: const TextStyle(
           color: Color(0xFF454C53),
           fontSize: 14,
@@ -261,7 +264,7 @@ class PostCard extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            post.company,
+            contest.benefit,
             style: const TextStyle(
               color: Color(0xFF454C53),
               fontSize: 10,
@@ -276,7 +279,7 @@ class PostCard extends StatelessWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            post.category,
+            contest.target,
             style: const TextStyle(
               color: Color(0xFF72787F),
               fontSize: 10,

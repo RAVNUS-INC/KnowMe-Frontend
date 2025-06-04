@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/routes.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeController extends GetxController {
   // 🔹 현재 카드 인덱스 (슬라이더)
@@ -65,10 +66,18 @@ class HomeController extends GetxController {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(
-          child: Text(
-            'Card ${index + 1}',
-            style: const TextStyle(fontSize: 16, color: Colors.black54),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: (index == 0 || index == 1 || index == 2)
+              ? Image.asset(
+            'assets/images/banner-${index + 1}.png',
+            fit: BoxFit.cover,
+          )
+              : Center(
+            child: Text(
+              'Card ${index + 1}',
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
+            ),
           ),
         ),
       ),
