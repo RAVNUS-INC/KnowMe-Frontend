@@ -5,6 +5,7 @@ import 'package:knowme_frontend/features/posts/services/employee_api_service.dar
 import 'package:knowme_frontend/features/posts/services/intern_api_service.dart';
 import 'package:knowme_frontend/features/posts/services/external_api_service.dart';
 import 'package:knowme_frontend/features/posts/services/education_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/contest_api_service.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
@@ -13,6 +14,7 @@ class PostRepository {
   final InternApiService _internApiService = InternApiService();
   final ExternalApiService _externalApiService = ExternalApiService();
   final EducationApiService _educationApiService = EducationApiService();
+  final ContestApiService _contestApiService = ContestApiService();
   
   final Logger _logger = Logger();
   
@@ -214,12 +216,6 @@ class PostRepository {
         location: location,             // 지역
         onlineOrOffline: onOffline,     // 온/오프라인
       );
-      // final response = await _educationApiService.getEducationPosts(
-      //   activityField: field ?? '전체',
-      //   activityDuration: _parsePeriodToInt(period) ?? 0,
-      //   location: location ?? '전체',
-      //   onlineOrOffline: onOffline ?? '전체',
-      // );
 
       if (response.isSuccess && response.data != null) {
         // EducationPost를 Contest로 변환
@@ -239,93 +235,75 @@ class PostRepository {
     }
   }
 
-
-  // 공모전 정보 필터링해서 가져오기
-  List<Contest> getFilteredContests({
+  // 공모전 정보 필터링해서 가져오기 (API 사용)
+  Future<List<Contest>> getFilteredContests({
     String? field,
     String? target,
     String? organizer,
     String? benefit,
-  }) {
-    // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
-    return _getContestsFromDataSource()
-        .map((contest) =>
-            _applyContestFilters(contest, field, target, organizer, benefit))
-        .toList();
-  }
-  // 교육/강연에 필터 적용
-  Contest applyEducationFilters(Contest event, String? field, String? period,
-      String? location, String? onOffline) {
-    return Contest(
-      id: event.id,
-      title: event.title,
-      organization: event.organization,
-      imageUrl: event.imageUrl,
-      dateRange: period ?? event.dateRange,
-      location: location ?? event.location,
-      field: field ?? event.field,
-      additionalInfo: onOffline ?? event.additionalInfo,
-      benefit: event.benefit,
-      target: event.target,
-    );
+  }) async {
+    try {
+      _logger.d('공모전 공고 API 호출 - field: $field, target: $target, organizer: $organizer, benefit: $benefit');
+
+      // 실제 API 호출
+      final response = await _contestApiService.getContestPosts(
+        activityField: field,           // 분야
+        targetAudience: target,         // 대상
+        hostingOrganization: organizer, // 주최기관
+        contestBenefits: benefit,       // 혜택
+      );
+
+      if (response.isSuccess && response.data != null) {
+        // ContestPost를 Contest로 변환
+        final contests = response.data!
+            .map((contestPost) => contestPost.toContest())
+            .toList();
+
+        _logger.d('공모전 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('공모전 공고 API 호출 실패: ${response.message}');
+        // API 호출에 실패했을 때 빈 배열 대신 백업 데이터 제공
+        return [];
+      }
+    } catch (e) {
+      _logger.e('공모전 공고 조회 중 예외 발생: $e');
+      // 예외 발생 시 백업 데이터 제공
+      return [];
+    }
   }
 
-  // 데이터 소스에서 공모전 정보 가져오기
-  List<Contest> _getContestsFromDataSource() {
-    return [
-      Contest(
-        id: '9',
-        title: '제5회 전국 대학생 앱 개발 챌린지',
-        organization: '대한민국 IT 협회',
-        imageUrl: 'assets/images/contest_app_dev.png',
-        dateRange: '2024.07.01 ~ 2024.09.30',
-        location: '온라인 제출 후 본선 오프라인 (서울)',
-        field: 'IT/앱개발',
-        additionalInfo: '총 상금 3,000만원',
-        target: '전국 대학생 및 대학원생 (팀 참가 가능)',
-        benefit: '대상 수상팀 장관상 수여',
-      ),
-      Contest(
-        id: '10',
-        title: '지속가능한 도시 아이디어 공모전',
-        organization: '스마트시티 연구소',
-        imageUrl: 'assets/images/contest_sustainable_city.jpg',
-        dateRange: '2024.08.15 ~ 2024.11.15',
-        location: '온라인 접수',
-        field: '사회/도시계획',
-        additionalInfo: '우수 아이디어 사업화 지원 검토',
-        target: '일반인, 학생, 기업 등 누구나',
-        benefit: '총 상금 1,000만원 및 전문가 컨설팅',
-      ),
-      Contest(
-        id: '15',
-        title: '단편영화 시나리오 공모전 "나의 이야기"',
-        organization: '필름메이커스 포럼',
-        imageUrl: 'assets/images/contest_scenario.png',
-        dateRange: '2024.07.10 ~ 2024.08.31',
-        location: '온라인 접수',
-        field: '문화/영화',
-        additionalInfo: '20페이지 내외 단편 시나리오',
-        target: '신인 및 기성 작가 모두 가능',
-        benefit: '대상작 제작 지원금 500만원',
-      ),
-    ];
-  }
-
-  // 공모전에 필터 적용
-  Contest _applyContestFilters(Contest contest, String? field, String? target,
-      String? organizer, String? benefit) {
-    return Contest(
-      id: contest.id,
-      title: contest.title,
-      organization: organizer ?? contest.organization,
-      imageUrl: contest.imageUrl,
-      dateRange: contest.dateRange,
-      location: contest.location,
-      field: field ?? contest.field,
-      additionalInfo: contest.additionalInfo,
-      target: target ?? contest.target,
-      benefit: benefit ?? contest.benefit,
-    );
-  }
+  // // 교육/강연에 필터 적용
+  // Contest applyEducationFilters(Contest event, String? field, String? period,
+  //     String? location, String? onOffline) {
+  //   return Contest(
+  //     id: event.id,
+  //     title: event.title,
+  //     organization: event.organization,
+  //     imageUrl: event.imageUrl,
+  //     dateRange: period ?? event.dateRange,
+  //     location: location ?? event.location,
+  //     field: field ?? event.field,
+  //     additionalInfo: onOffline ?? event.additionalInfo,
+  //     benefit: event.benefit,
+  //     target: event.target,
+  //   );
+  // }
+  //
+  // // 공모전에 필터 적용
+  // Contest _applyContestFilters(Contest contest, String? field, String? target,
+  //     String? organizer, String? benefit) {
+  //   return Contest(
+  //     id: contest.id,
+  //     title: contest.title,
+  //     organization: organizer ?? contest.organization,
+  //     imageUrl: contest.imageUrl,
+  //     dateRange: contest.dateRange,
+  //     location: contest.location,
+  //     field: field ?? contest.field,
+  //     additionalInfo: contest.additionalInfo,
+  //     target: target ?? contest.target,
+  //     benefit: benefit ?? contest.benefit,
+  //   );
+  // }
 }
