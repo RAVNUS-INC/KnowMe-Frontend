@@ -15,6 +15,9 @@ class ApiEndpoints {
   // 아이디 찾기 (새로 추가)
   static const String findId = '/api/user/findId';
 
+  // ✅ 새로 추가: 현재 로그인된 사용자 정보 조회
+  static const String userMe = '/api/user/me';
+
   // OAuth 소셜 로그인
   static const String oauthAuthorization = '/api/user/oauth2/authorization';
 

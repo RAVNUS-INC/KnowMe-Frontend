@@ -160,6 +160,33 @@ class LoginController extends GetxController {
     }
   }
 
+  /// ✅ 새로 추가: 현재 사용자 정보 조회 및 저장
+  Future<void> _fetchAndUpdateUserInfo() async {
+    try {
+      logger.d('사용자 정보 조회 시작');
+
+      final userInfoResponse = await _authRepository.getCurrentUserInfo();
+
+      if (userInfoResponse.isSuccess && userInfoResponse.data != null) {
+        final userInfo = userInfoResponse.data!;
+
+        if (userInfo.isSuccess && userInfo.id > 0) {
+          // 사용자 ID 저장
+          await _authRepository.saveUserId(userInfo.id);
+
+          logger.d('사용자 정보 조회 및 저장 완료 - ID: ${userInfo.id}');
+        } else {
+          logger.e('사용자 정보 응답 실패: ${userInfo.message}');
+        }
+      } else {
+        logger.e('사용자 정보 API 호출 실패: ${userInfoResponse.message}');
+      }
+    } catch (e) {
+      logger.e('사용자 정보 조회 오류: $e');
+      // 사용자 정보 조회 실패는 로그인 성공에 영향을 주지 않음
+    }
+  }
+
   /// 로그인 성공 처리 공통 메서드
   Future<void> _handleLoginSuccess(
       String userId,
@@ -174,6 +201,9 @@ class LoginController extends GetxController {
       'userId': userId,
       'loginTime': DateTime.now().toIso8601String(),
     });
+
+    // ✅ 새로 추가: 현재 사용자 정보 조회 및 저장
+    await _fetchAndUpdateUserInfo();
 
     // Remember Me 처리
     await _authRepository.setRememberMe(rememberAccount.value);
@@ -233,15 +263,6 @@ class LoginController extends GetxController {
         handleNaverLogin();
         break;
       case '구글':
-        Get.snackbar(
-          '소셜 로그인',
-          '구글 로그인은 현재 개발 중입니다.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-        );
-        break;
-      default:
         Get.snackbar(
           '소셜 로그인',
           '$provider 로그인은 현재 지원되지 않습니다.',
