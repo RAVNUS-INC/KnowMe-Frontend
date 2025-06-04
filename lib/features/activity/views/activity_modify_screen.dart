@@ -82,6 +82,7 @@ class _ActivityModifyScreenState extends State<ActivityModifyScreen> {
   }
 
   /// 활동을 수정합니다
+  /// ✅ 수정: 활동을 수정합니다
   Future<void> _updateActivity() async {
     // 입력 검증
     if (titleController.text.trim().isEmpty) {
@@ -101,8 +102,9 @@ class _ActivityModifyScreenState extends State<ActivityModifyScreen> {
 
     try {
       // 태그 파싱
-      final tags = activityController
-          .parseTagsFromString(tagController.text); // 활동 수정 API 호출
+      final tags = activityController.parseTagsFromString(tagController.text);
+
+      // 활동 수정 API 호출
       final success = await activityController.updateActivity(
         activityId: widget.project.portfolioId,
         title: titleController.text.trim(),
@@ -112,7 +114,7 @@ class _ActivityModifyScreenState extends State<ActivityModifyScreen> {
       );
 
       if (success) {
-        // 성공 시 이전 페이지로 돌아가기
+        // ✅ 수정: 성공 시 즉시 이전 페이지로 돌아가기 (데이터는 자동 동기화됨)
         Navigator.of(context).pop();
 
         // 성공 메시지 표시
@@ -122,6 +124,7 @@ class _ActivityModifyScreenState extends State<ActivityModifyScreen> {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
+          duration: const Duration(seconds: 2),
         );
       } else {
         _showErrorDialog('활동 수정에 실패했습니다. 다시 시도해주세요.');

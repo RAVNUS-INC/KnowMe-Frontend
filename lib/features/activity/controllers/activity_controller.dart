@@ -252,6 +252,7 @@ class ActivityController extends GetxController {
   }
 
   /// 활동을 수정합니다
+  /// ✅ 수정: 활동을 수정하고 즉시 데이터 동기화
   Future<bool> updateActivity({
     required int activityId,
     required String title,
@@ -284,8 +285,8 @@ class ActivityController extends GetxController {
       );
 
       if (success) {
-        // 수정 성공 시 활동 목록을 다시 로드
-        await loadUserActivity();
+        // ✅ 수정 성공 시 즉시 데이터 동기화
+        await _updateLocalData(activityId, title, description, content, tags);
       }
 
       return success;
@@ -316,5 +317,68 @@ class ActivityController extends GetxController {
     contentController.dispose();
     tagController.dispose();
     super.onClose();
+  }
+
+  /// ✅ 새로 추가: 로컬 데이터 즉시 업데이트
+  Future<void> _updateLocalData(
+      int activityId,
+      String title,
+      String description,
+      String content,
+      List<String> tags,
+      ) async {
+    try {
+      // 1. 목록 데이터 즉시 업데이트
+      if (activityResponse.value != null) {
+        final updatedPortfolios = activityResponse.value!.portfolios.map((project) {
+          if (project.portfolioId == activityId) {
+            return Project(
+              portfolioId: project.portfolioId,
+              title: title,
+              description: description,
+              content: content,
+              visibility: project.visibility,
+              tags: tags,
+              createdAt: project.createdAt,
+              updatedAt: DateTime.now().toIso8601String(),
+            );
+          }
+          return project;
+        }).toList();
+
+        activityResponse.value = ActivityResponse(
+          userId: activityResponse.value!.userId,
+          portfolios: updatedPortfolios,
+        );
+
+        // 태그 목록 업데이트
+        final allTags = <String>{};
+        for (final project in updatedPortfolios) {
+          allTags.addAll(project.tags);
+        }
+        availableTags.value = allTags.toList()..sort();
+      }
+
+      // 2. 상세 데이터도 즉시 업데이트 (상세 화면이 열려있는 경우)
+      if (projectDetail.value != null && projectDetail.value!.id == activityId) {
+        projectDetail.value = ProjectDetail(
+          id: activityId,
+          title: title,
+          description: description,
+          content: content,
+          tags: tags,
+          visibility: projectDetail.value!.visibility,
+          createdAt: projectDetail.value!.createdAt,
+          updatedAt: DateTime.now().toIso8601String(),
+        );
+      }
+    } catch (e) {
+      print('Error updating local data: $e');
+      // 로컬 업데이트 실패 시 서버에서 다시 로드
+      await loadUserActivity();
+      if (projectDetail.value?.id == activityId) {
+        await loadProjectDetail(activityId);
+      }
+    }
   }
 }
