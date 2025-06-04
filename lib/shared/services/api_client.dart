@@ -363,16 +363,16 @@ class ApiClient {
     } else if (response.statusCode == 401) {
       // 토큰 만료나 인증 오류일 경우
       _logger.w('인증 오류 발생 (401): JWT 토큰에 문제가 있을 수 있습니다');
-      
+
       try {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final message = responseData['message'] ?? '인증에 실패했습니다.';
-        
+
         // JWT 공백 문제가 발견되면 저장된 토큰 정리
         if (message.toString().contains('whitespace')) {
           _cleanStoredToken();
         }
-        
+
         return ApiResponse.error(
           message: message,
           statusCode: response.statusCode,
@@ -399,17 +399,17 @@ class ApiClient {
       }
     }
   }
-  
+
   /// 토큰 공백 문제 해결을 위한 저장된 토큰 정리
   Future<void> _cleanStoredToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('jwt_token');
-      
+
       if (token != null) {
         // 공백 제거 후 다시 저장
         final cleanToken = token.trim();
-        
+
         if (cleanToken != token) {
           _logger.i('토큰 공백 제거 및 재저장');
           await prefs.setString('jwt_token', cleanToken);
