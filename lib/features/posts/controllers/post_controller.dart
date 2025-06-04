@@ -227,7 +227,7 @@ class PostController extends GetxController {
               : multiSelectHost.join(", "),
         );
       case 3: // 교육/강연
-        return repository.getEducationEvents(
+        return repository.getEducationListings(
           field: values['분야'],
           period: values['기간'],
           location: values['지역'],

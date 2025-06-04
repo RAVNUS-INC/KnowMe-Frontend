@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:knowme_frontend/features/posts/services/employee_api_service.dart';
 import 'package:knowme_frontend/features/posts/services/intern_api_service.dart';
 import 'package:knowme_frontend/features/posts/services/external_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/education_api_service.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
@@ -11,6 +12,7 @@ class PostRepository {
   final EmployeeApiService _employeeApiService = EmployeeApiService();
   final InternApiService _internApiService = InternApiService();
   final ExternalApiService _externalApiService = ExternalApiService();
+  final EducationApiService _educationApiService = EducationApiService();
   
   final Logger _logger = Logger();
   
@@ -195,19 +197,48 @@ class PostRepository {
     return null;
   }
 
-  // 교육/강연 정보 필터링해서 가져오기
-  List<Contest> getEducationEvents({
+  // 교육/강연 정보 필터링해서 가져오기 (API 사용)
+  Future<List<Contest>> getEducationListings({
     String? field,
     String? period,
     String? location,
     String? onOffline,
-  }) {
-    // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
-    return _getEducationEventsFromDataSource()
-        .map((event) =>
-            _applyEducationFilters(event, field, period, location, onOffline))
-        .toList();
+  }) async {
+    try {
+      _logger.d('교육/강연 공고 API 호출 - field: $field, period: $period, location: $location, onOffline: $onOffline');
+
+      // 실제 API 호출
+      final response = await _educationApiService.getEducationPosts(
+        activityField: field,           // 분야
+        activityDuration: _parsePeriodToInt(period),  // 기간
+        location: location,             // 지역
+        onlineOrOffline: onOffline,     // 온/오프라인
+      );
+      // final response = await _educationApiService.getEducationPosts(
+      //   activityField: field ?? '전체',
+      //   activityDuration: _parsePeriodToInt(period) ?? 0,
+      //   location: location ?? '전체',
+      //   onlineOrOffline: onOffline ?? '전체',
+      // );
+
+      if (response.isSuccess && response.data != null) {
+        // EducationPost를 Contest로 변환
+        final contests = response.data!
+            .map((educationPost) => educationPost.toContest())
+            .toList();
+
+        _logger.d('교육/강연 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('교육/강연 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('교육/강연 공고 조회 중 예외 발생: $e');
+      return [];
+    }
   }
+
 
   // 공모전 정보 필터링해서 가져오기
   List<Contest> getFilteredContests({
@@ -222,52 +253,8 @@ class PostRepository {
             _applyContestFilters(contest, field, target, organizer, benefit))
         .toList();
   }
-
-
-  // 데이터 소스에서 교육/강연 정보 가져오기
-  List<Contest> _getEducationEventsFromDataSource() {
-    return [
-      Contest(
-        id: '7',
-        title: '실전! AWS 클라우드 엔지니어링 부트캠프 (8주)',
-        organization: '클라우드에듀',
-        imageUrl: 'assets/images/edu_aws_bootcamp.jpg',
-        dateRange: '2024.08.15 ~ 2024.10.15',
-        location: '서울 강남 (오프라인)',
-        field: 'IT/클라우드',
-        additionalInfo: '오프라인',
-        benefit: '수료증 발급, 취업 컨설팅',
-        target: '클라우드 엔지니어 지망생',
-      ),
-      Contest(
-        id: '8',
-        title: '데이터 시각화 마스터클래스 (Tableau 활용)',
-        organization: '데이터인사이트 아카데미',
-        imageUrl: 'assets/images/edu_data_viz.png',
-        dateRange: '2024.09.01 ~ 2024.09.30 (매주 토)',
-        location: '온라인 (Zoom)',
-        field: '데이터 분석/시각화',
-        additionalInfo: '온라인',
-        benefit: '강의자료 및 실습 데이터 제공',
-        target: '데이터 분석가, 마케터, 기획자',
-      ),
-      Contest(
-        id: '14',
-        title: '챗GPT 활용 프롬프트 엔지니어링 워크샵',
-        organization: 'AI 러닝센터',
-        imageUrl: 'assets/images/edu_prompt_engineering.png',
-        dateRange: '2024.07.27 (1일 특강)',
-        location: '서울 종로 (오프라인)',
-        field: 'AI/챗GPT',
-        additionalInfo: '오프라인',
-        benefit: '실습 위주, Q&A 세션',
-        target: 'AI 기술 활용에 관심 있는 누구나',
-      ),
-    ];
-  }
-
   // 교육/강연에 필터 적용
-  Contest _applyEducationFilters(Contest event, String? field, String? period,
+  Contest applyEducationFilters(Contest event, String? field, String? period,
       String? location, String? onOffline) {
     return Contest(
       id: event.id,
