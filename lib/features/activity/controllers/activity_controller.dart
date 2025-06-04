@@ -62,6 +62,7 @@ class ActivityController extends GetxController {
   }
 
   final titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   final descController = TextEditingController();
   final sumController = TextEditingController();
   final tagController = TextEditingController();
@@ -83,6 +84,7 @@ class ActivityController extends GetxController {
   @override
   void onClose() {
     titleController.dispose();
+    descriptionController.dispose();
     descController.dispose();
     sumController.dispose();
     tagController.dispose();
