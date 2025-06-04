@@ -1,50 +1,51 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
+import 'package:knowme_frontend/features/posts/models/basepost_model.dart';
 
 // 채용 공고 모델
-class EmployeePost {
-  final int postId;
-  final String category;
-  final String title;
-  final String company;
-  final String companyIntro;
-  final String externalIntro;
-  final String content;
-  final String image;
-  final String location;
-  final String jobTitle;
-  final int experience;
-  final String education;
-  final String activityField;
-  final int activityDuration;
-  final String hostingOrganization;
-  final String onlineOrOffline;
-  final String targetAudience;
-  final String contestBenefits;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
+class EmployeePost extends BasePost {
   EmployeePost({
-    required this.postId,
-    required this.category,
-    required this.title,
-    required this.company,
-    required this.companyIntro,
-    required this.externalIntro,
-    required this.content,
-    required this.image,
-    required this.location,
-    required this.jobTitle,
-    required this.experience,
-    required this.education,
-    required this.activityField,
-    required this.activityDuration,
-    required this.hostingOrganization,
-    required this.onlineOrOffline,
-    required this.targetAudience,
-    required this.contestBenefits,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+    required int postId,
+    required String category,
+    required String title,
+    required String company,
+    required String companyIntro,
+    required String externalIntro,
+    required String content,
+    required String image,
+    required String location,
+    required String jobTitle,
+    required int experience,
+    required String education,
+    required String activityField,
+    required int activityDuration,
+    required String hostingOrganization,
+    required String onlineOrOffline,
+    required String targetAudience,
+    required String contestBenefits,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : super(
+    postId: postId,
+    category: category,
+    title: title,
+    company: company,
+    companyIntro: companyIntro,
+    externalIntro: externalIntro,
+    content: content,
+    image: image,
+    location: location,
+    jobTitle: jobTitle,
+    experience: experience,
+    education: education,
+    activityField: activityField,
+    activityDuration: activityDuration,
+    hostingOrganization: hostingOrganization,
+    onlineOrOffline: onlineOrOffline,
+    targetAudience: targetAudience,
+    contestBenefits: contestBenefits,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 
   factory EmployeePost.fromJson(Map<String, dynamic> json) {
     return EmployeePost(
@@ -71,6 +72,7 @@ class EmployeePost {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'post_id': postId,
@@ -96,14 +98,14 @@ class EmployeePost {
     };
   }
 
-  // Contest 모델로 변환하는 메서드 (기존 UI와 호환성을 위해)
+  @override
   Contest toContest() {
     return Contest(
       id: postId.toString(),
       title: title,
       benefit: contestBenefits.isNotEmpty ? contestBenefits : '혜택 정보 없음',
       target: targetAudience.isNotEmpty ? targetAudience : education,
-      imageUrl: _getValidImageUrl(),  // ✅ 새로운 메서드 사용
+      imageUrl: super.getValidImageUrl(),
       organization: company,
       location: location,
       field: jobTitle,
@@ -114,32 +116,14 @@ class EmployeePost {
     );
   }
 
-  String _getValidImageUrl() {
-    // 이미지가 있고 HTTP URL인 경우에만 사용
-    if (image.isNotEmpty &&
-        (image.startsWith('http://') || image.startsWith('https://'))) {
-      return image;
-    }
-
-    // 없거나 유효하지 않으면 기본 이미지 사용
-    return 'assets/images/whitepage.svg';
-  }
-
-  // 경력을 문자열로 포맷하는 메서드
   String _formatExperience(int exp) {
-    if (exp == 0) {
-      return '신입';
-    } else if (exp <= 3) {
-      return '${exp}년 이하';
-    } else if (exp <= 5) {
-      return '3~5년';
-    } else {
-      return '${exp}년 이상';
-    }
+    if (exp == 0) return '신입';
+    if (exp <= 3) return '${exp}년 이하';
+    if (exp <= 5) return '3~5년';
+    return '${exp}년 이상';
   }
-
-  @override
-  String toString() {
-    return 'EmployeePost(postId: $postId, title: $title, company: $company, jobTitle: $jobTitle, experience: $experience, location: $location)';
-  }
+@override
+String toString() {
+  return 'EmployeePost(postId: $postId, title: $title, company: $company, jobTitle: $jobTitle, experience: $experience, location: $location)';
+}
 }

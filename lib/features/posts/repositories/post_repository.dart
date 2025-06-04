@@ -1,13 +1,16 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/services/employee_api_service.dart';
 import 'package:logger/logger.dart';
+import 'package:knowme_frontend/features/posts/services/intern_api_service.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
 
   final EmployeeApiService _employeeApiService = EmployeeApiService();
+  final InternApiService _internApiService = InternApiService();
+  
   final Logger _logger = Logger();
-
+  
   // 채용 정보 필터링해서 가져오기
   Future<List<Contest>> getJobListings({
     String? job,
@@ -54,17 +57,57 @@ class PostRepository {
     }
   }
 
+  // 인턴 정보 필터링해서 가져오기
+  Future<List<Contest>> getInternListings({
+    String? job,
+    String? period,
+    String? location,
+    String? education,
+    List<String>? educationList,
+  }) async {
+    try {
+      // 다중 선택 학력을 단일 문자열로 변환
+      String? finalEducation = education;
+      if (finalEducation == null && educationList != null && educationList.isNotEmpty) {
+        finalEducation = educationList.first;
+      }
+
+      _logger.d('인턴 공고 API 호출 - job: $job, period: $period, location: $location, education: $finalEducation');
+
+      // 실제 API 호출
+      final response = await _internApiService.getInternPosts(
+        jobTitle: job,
+        period: period,
+        education: finalEducation,
+        location: location,
+      );
+
+      if (response.isSuccess && response.data != null) {
+        // InternPost를 Contest로 변환
+        final contests = response.data!
+            .map((internPost) => internPost.toContest())
+            .toList();
+
+        _logger.d('인턴 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('인턴 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('인턴 공고 조회 중 예외 발생: $e');
+      return [];
+    }
+  }
+
   /// 경력 문자열을 숫자로 변환하는 헬퍼 메서드
   int? _parseExperienceToInt(String? experience) {
     if (experience == null || experience.isEmpty) return null;
 
     if (experience.contains('신입')) {
       return 0;
-    } else if (experience.contains('1년')) {
-      return 1;
-    } else if (experience.contains('3년')) {
-      return 3;
-    } else if (experience.contains('5년')) {
+    }
+    else if (experience.contains('5년')) {
       return 5;
     } else if (experience.contains('10년')) {
       return 10;
@@ -83,54 +126,16 @@ class PostRepository {
     return null;
   }
 
-  // 학력 필터 일치 여부 확인 (중복 코드 제거 - DRY 원칙 적용)
-  bool _matchesEducationFilter(
-      String targetValue, String? education, List<String>? educationList) {
-    if (education != null && education.isNotEmpty) {
-      return targetValue.contains(education);
-    } else if (educationList != null && educationList.isNotEmpty) {
-      return educationList.any((edu) => targetValue.contains(edu));
-    }
-    return true;
-  }
-
-  // 인턴 정보 필터링해서 가져오기
-  List<Contest> getInternships({
-    String? job,
-    String? period,
-    String? location,
-    String? education,
-    List<String>? educationList,
-  }) {
-    // 데이터 소스 호출
-    final allInterns = _getInternshipsFromDataSource();
-
-    // 필터링 적용
-    return allInterns.where((intern) {
-      final String fieldValue = intern.field;
-      final String locationValue = intern.location;
-      final String targetValue = intern.target;
-      final String dateRangeValue = intern.dateRange;
-
-      // 직무 필터링
-      bool matchesJob = job == null || job.isEmpty || fieldValue.contains(job);
-
-      // 지역 필터링
-      bool matchesLocation = location == null ||
-          location.isEmpty ||
-          locationValue.contains(location);
-
-      // 학력 필터링
-      bool matchesEducation =
-          _matchesEducationFilter(targetValue, education, educationList);
-
-      // 기간 필터링
-      bool matchesPeriod =
-          period == null || period.isEmpty || dateRangeValue.contains(period);
-
-      return matchesJob && matchesLocation && matchesEducation && matchesPeriod;
-    }).toList();
-  }
+  // // 학력 필터 일치 여부 확인 (중복 코드 제거 - DRY 원칙 적용)
+  // bool _matchesEducationFilter(
+  //     String targetValue, String? education, List<String>? educationList) {
+  //   if (education != null && education.isNotEmpty) {
+  //     return targetValue.contains(education);
+  //   } else if (educationList != null && educationList.isNotEmpty) {
+  //     return educationList.any((edu) => targetValue.contains(edu));
+  //   }
+  //   return true;
+  // }
 
   // 대외활동 정보 필터링해서 가져오기
   List<Contest> getActivities({
@@ -344,45 +349,6 @@ class PostRepository {
 
   // 데이터 소스에서 채용 정보 가져오기 (데이터 로직과 비즈니스 로직 분리)
 
-  // 데이터 인덱스에서 인턴십 정보 가져오기
-  List<Contest> _getInternshipsFromDataSource() {
-    return [
-      Contest(
-        id: '3',
-        title: '2024 하계 UX/UI 디자인 인턴',
-        organization: '디자인팩토리',
-        imageUrl: 'assets/images/intern_ux_banner.png',
-        dateRange: '2024.07.01 ~ 2024.08.31',
-        location: '서울 마포구',
-        field: 'UX/UI 디자인',
-        benefit: '정규직 전환 가능, 인턴 수료증',
-        target: '대학교 재학생/졸업예정자',
-      ),
-      Contest(
-        id: '4',
-        title: '글로벌 사업개발팀 인턴 (영어 능통자)',
-        organization: '월드와이드 컴퍼니',
-        imageUrl: 'assets/images/intern_global_logo.jpg',
-        dateRange: '2024.09.01 ~ 2024.12.31',
-        location: '인천 송도',
-        field: '사업개발',
-        benefit: '실무 경험, 외국어 사용 환경',
-        target: '영어 능통자, 관련 전공 우대',
-      ),
-      Contest(
-        id: '12',
-        title: 'AI 데이터 분석 인턴십 프로그램',
-        organization: '데이터사이언스랩',
-        imageUrl: 'assets/images/intern_ai_poster.png',
-        dateRange: '2024.07.15 ~ 2024.10.15',
-        location: '대전 유성구',
-        field: '데이터 분석',
-        benefit: '전문가 멘토링, 프로젝트 참여',
-        target: '통계학, 컴퓨터공학 전공자',
-      ),
-    ];
-  }
-
   // 데이터 소스에서 대외활동 정보 가져오기
   List<Contest> _getActivitiesFromDataSource() {
     return [
@@ -395,7 +361,7 @@ class PostRepository {
         location: '전국 (온/오프라인 병행)',
         field: '환경/봉사',
         benefit: '활동비 지원, 우수활동자 표창',
-        target: '환경에 관심있는 대���생 누구나',
+        target: '환경에 관심있는 대학생 누구나',
       ),
       Contest(
         id: '6',

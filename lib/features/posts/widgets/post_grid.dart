@@ -168,9 +168,9 @@ class ContestCard extends StatelessWidget {
   ImageProvider _getImageProvider() {
     final imageUrl = contest.imageUrl;
 
-    if (imageUrl == null || imageUrl.isEmpty) {
-      return const NetworkImage("https://placehold.co/600x400?text=No+Image");
-    }
+    // if (imageUrl == null || imageUrl.isEmpty) {
+    //   return const NetworkImage("https://placehold.co/600x400?text=No+Image");
+    // }
 
     // assets 경로인지 확인
     if (imageUrl.startsWith('assets/')) {
@@ -186,9 +186,9 @@ class ContestCard extends StatelessWidget {
     return const NetworkImage("https://placehold.co/600x400?text=No+Image");
   }
 
-  String _getImageUrl() {
-    return contest.imageUrl?.isNotEmpty == true
-        ? contest.imageUrl!
+  String getImageUrl() {
+    return contest.imageUrl.isNotEmpty == true
+        ? contest.imageUrl
         : "https://placehold.co/600x400?text=No+Image";
   }
 

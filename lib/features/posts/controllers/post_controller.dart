@@ -208,7 +208,7 @@ class PostController extends GetxController {
               : multiSelectJobEducation.toList(),
         );
       case 1: // 인턴
-        return repository.getInternships(
+        return repository.getInternListings(
           job: values['직무'],
           period: values['기간'],
           location: values['지역'],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:knowme_frontend/features/posts/models/postsPostid_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/routes/routes.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,14 +13,14 @@ class RecommendationPostCard extends StatelessWidget {
   // 그림자를 위한 여백 추가
   static const double _shadowPadding = 8.0;
 
-  // 공고 데이터 모델 (PostModel로 변경)
-  final PostModel post;
+  // 공고 데이터 모델
+  final Contest contest;
   // 북마크 버튼 클릭 시 실행되는 콜백 함수 (선택 사항)
   final VoidCallback? onBookmarkTap;
 
   const RecommendationPostCard({
     super.key,
-    required this.post,
+    required this.contest,
     this.onBookmarkTap,
   });
 
@@ -58,15 +58,13 @@ class RecommendationPostCard extends StatelessWidget {
   /// 카드 탭 시 상세 화면으로 이동
   void _navigateToDetailScreen() {
     if (kDebugMode) {
-      debugPrint('카드가 탭 됨: ${post.post_id}');
+      debugPrint('카드가 탭 됨: ${contest.id}');
     }
-    // 포스트 상세 화면으로 이동
-    if (post.post_id != null) {
-      Get.toNamed(
-        AppRoutes.postDetail,
-        arguments: {'postId': post.post_id},
-      );
-    }
+    // AppRoutes 상수를 사용하여 경로 지정
+    Get.toNamed(
+      AppRoutes.postDetail,
+      arguments: {'contestId': contest.id},
+    );
   }
 
   /// 카드 배경 및 그림자 스타일 정의
@@ -132,11 +130,9 @@ class RecommendationPostCard extends StatelessWidget {
 
   /// 이미지 URL이 비어 있는 경우 기본 이미지로 대체
   String _getImageUrl() {
-    // 첨부 파일에서 이미지 URL을 가져오거나 기본 이미지 사용
-    if (post.attachments != null && post.attachments!.isNotEmpty) {
-      return post.attachments![0].url;
-    }
-    return "https://placehold.co/343x164";
+    return contest.imageUrl.isNotEmpty
+        ? contest.imageUrl
+        : "https://placehold.co/343x164";
   }
 
   /// 이미지 위에 반투명 그라디언트 오버레이 추가
@@ -164,7 +160,7 @@ class RecommendationPostCard extends StatelessWidget {
         height: 24,
         child: IconButton(
           icon: Icon(
-            post.isSaved ? Icons.bookmark : Icons.bookmark_border,
+            contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
             color: Colors.white,
             size: 20,
           ),
@@ -208,7 +204,7 @@ class RecommendationPostCard extends StatelessWidget {
   /// 공고 제목 텍스트 스타일 및 설정
   Widget _buildTitle() {
     return Text(
-      post.title,
+      contest.title,
       style: const TextStyle(
         color: Color(0xFF454C53),
         fontSize: 14,
@@ -230,8 +226,7 @@ class RecommendationPostCard extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            // 공모전의 경우 contestBenefits 사용, 아닌 경우 회사명 사용
-            post.contestBenefits ?? post.company,
+            contest.benefit,
             style: const TextStyle(
               color: Color(0xFF454C53),
               fontSize: 10,
@@ -248,8 +243,7 @@ class RecommendationPostCard extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  // 대상 정보가 있으면 사용, 없으면 위치 정보 표시
-                  post.targetAudience ?? post.location,
+                  contest.target,
                   style: const TextStyle(
                     color: Color(0xFF72787F),
                     fontSize: 10,
