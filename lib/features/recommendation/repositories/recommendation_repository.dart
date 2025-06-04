@@ -121,38 +121,4 @@ class RecommendationRepository {
       ),
     ];
   }
-
-  List<Contest> getSavedContests() {
-    // 사용자가 저장한 활동 목록
-    return [
-      Contest(
-        id: 'saved1',
-        title: '네이버 부스트캠프 웹·모바일 7기',
-        benefit: '개발 교육',
-        target: '6개월',
-        company: '네이버',
-        imageUrl: 'https://placehold.co/343x164',
-        type: ActivityType.activity,
-        isBookmarked: true,
-        organization: '네이버',
-        location: '온라인',
-        field: '교육/개발',
-        dateRange: '2023.12.01~2024.05.31',
-      ),
-      Contest(
-        id: 'saved2',
-        title: '[카카오] 프론트엔드 개발자 채용',
-        benefit: '프론트엔드 개발자',
-        target: '신입/경력',
-        company: '카카오',
-        imageUrl: 'https://placehold.co/343x164',
-        type: ActivityType.job,
-        isBookmarked: true,
-        organization: '카카오',
-        location: '경기도 성남시',
-        field: 'IT/개발',
-        dateRange: '상시채용',
-      ),
-    ];
-  }
 }

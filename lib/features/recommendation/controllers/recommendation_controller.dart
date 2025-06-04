@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../features/posts/models/contests_model.dart';
 import '../services/recommendation_service.dart';
+import '../services/saved_service.dart'; // SavedService 임포트 추가
 import 'package:flutter/foundation.dart';
 
 class RecommendationController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  final RecommendationService _service = RecommendationService();
-  // 사용되지 않는 _repository 필드 제거
+  final RecommendationService _recommendationService = RecommendationService();
+  final SavedService _savedService = SavedService(); // SavedService 인스턴스 추가
 
   List<ContestGroup> recommendedContests = [];
   List<Contest> savedContests = [];
@@ -41,7 +42,7 @@ class RecommendationController extends GetxController
     update();
 
     try {
-      recommendedContests = await _service.getRecommendedContests();
+      recommendedContests = await _recommendationService.getRecommendedContests();
     } catch (e) {
       // print 대신 디버그 모드에서만 로그를 출력
       if (kDebugMode) {
@@ -56,7 +57,7 @@ class RecommendationController extends GetxController
 
   Future<void> fetchSavedContests() async {
     try {
-      savedContests = await _service.getSavedContests();
+      savedContests = await _savedService.getSavedContests(); // _savedService 사용
       update();
     } catch (e) {
       // print 대신 디버그 모드에서만 로그를 출력
@@ -69,7 +70,7 @@ class RecommendationController extends GetxController
 
   Future<void> toggleBookmark(Contest contest) async {
     try {
-      final result = await _service.toggleBookmark(contest.id);
+      final result = await _recommendationService.toggleBookmark(contest.id);
       if (result) {
         // 북마크 상태 토글
         contest.isBookmarked = !contest.isBookmarked;
