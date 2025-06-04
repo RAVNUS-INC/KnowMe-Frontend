@@ -1,47 +1,86 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
+import 'package:knowme_frontend/features/posts/services/employee_api_service.dart';
+import 'package:logger/logger.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
+
+  final EmployeeApiService _employeeApiService = EmployeeApiService();
+  final Logger _logger = Logger();
+
   // 채용 정보 필터링해서 가져오기
-  List<Contest> getJobListings({
+  Future<List<Contest>> getJobListings({
     String? job,
     String? experience,
     String? location,
     String? education,
     List<String>? educationList,
-  }) {
-    // 데이터 소스 호출 (실제로는 API 또는 데이터베이스 호출)
-    final allJobs = _getJobListingsFromDataSource();
+  }) async {
+    try {
+      // 경력 문자열을 숫자로 변환
+      int? experienceYears = _parseExperienceToInt(experience);
 
-    // 필터링 적용
-    return allJobs.where((jobItem) {
-      // 필드 접근 안전성 보장
-      final String fieldValue = jobItem.field;
-      final String locationValue = jobItem.location;
-      final String targetValue = jobItem.target;
+      // 다중 선택 학력을 단일 문자열로 변환
+      String? finalEducation = education;
+      if (finalEducation == null && educationList != null && educationList.isNotEmpty) {
+        finalEducation = educationList.first;
+      }
 
-      // 직무 필터링
-      bool matchesJob = job == null || job.isEmpty || fieldValue.contains(job);
+      _logger.d('채용 공고 API 호출 - job: $job, experience: $experienceYears, location: $location, education: $finalEducation');
 
-      // 지역 필터링
-      bool matchesLocation = location == null ||
-          location.isEmpty ||
-          locationValue.contains(location);
+      // 실제 API 호출
+      final response = await _employeeApiService.getEmployeePosts(
+        jobTitle: job,
+        experience: experienceYears,
+        education: finalEducation,
+        location: location,
+      );
 
-      // 학력 필터링
-      bool matchesEducation =
-          _matchesEducationFilter(targetValue, education, educationList);
+      if (response.isSuccess && response.data != null) {
+        // EmployeePost를 Contest로 변환
+        final contests = response.data!
+            .map((employeePost) => employeePost.toContest())
+            .toList();
 
-      // 경력 필터링
-      bool matchesExperience = experience == null ||
-          experience.isEmpty ||
-          targetValue.contains(experience);
+        _logger.d('채용 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('채용 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('채용 공고 조회 중 예외 발생: $e');
+      return [];
+    }
+  }
 
-      return matchesJob &&
-          matchesLocation &&
-          matchesEducation &&
-          matchesExperience;
-    }).toList();
+  /// 경력 문자열을 숫자로 변환하는 헬퍼 메서드
+  int? _parseExperienceToInt(String? experience) {
+    if (experience == null || experience.isEmpty) return null;
+
+    if (experience.contains('신입')) {
+      return 0;
+    } else if (experience.contains('1년')) {
+      return 1;
+    } else if (experience.contains('3년')) {
+      return 3;
+    } else if (experience.contains('5년')) {
+      return 5;
+    } else if (experience.contains('10년')) {
+      return 10;
+    } else if (experience.contains('15년')) {
+      return 15;
+    } else if (experience.contains('20년')) {
+      return 20;
+    }
+
+    final RegExp numberRegex = RegExp(r'\d+');
+    final match = numberRegex.firstMatch(experience);
+    if (match != null) {
+      return int.tryParse(match.group(0) ?? '');
+    }
+
+    return null;
   }
 
   // 학력 필터 일치 여부 확인 (중복 코드 제거 - DRY 원칙 적용)
@@ -304,43 +343,6 @@ class PostRepository {
   }
 
   // 데이터 소스에서 채용 정보 가져오기 (데이터 로직과 비즈니스 로직 분리)
-  List<Contest> _getJobListingsFromDataSource() {
-    return [
-      Contest(
-        id: '1',
-        title: '프론트엔드 개발자 (React, 3년 이상)',
-        organization: '주식회사 멋쟁이들',
-        imageUrl: 'assets/images/company_a_logo.png',
-        dateRange: '상시채용',
-        location: '서울 강남구',
-        field: '프론트엔드 개발',
-        benefit: '스톡옵션, 유연근무제',
-        target: '경력 3년 이상',
-      ),
-      Contest(
-        id: '2',
-        title: '신입 마케팅 콘텐츠 에디터',
-        organization: '알잘딱깔센 마케팅',
-        imageUrl: 'assets/images/company_b_banner.jpg',
-        dateRange: '2024.08.01 ~ 2024.08.31',
-        location: '경기 성남시 분당구',
-        field: '콘텐츠 마케팅',
-        benefit: '성과급, 교육 지원',
-        target: '학력무관, 신입 가능',
-      ),
-      Contest(
-        id: '11',
-        title: '백엔드 개발자 (Java/Spring)',
-        organization: '튼튼 IT 솔루션',
-        imageUrl: 'assets/images/company_c_logo.png',
-        dateRange: '채용시 마감',
-        location: '부산 해운대구',
-        field: '백엔드 개발',
-        benefit: '주택자금 대출, 복지포인트',
-        target: '경력 2년 이상 Spring 경험자',
-      ),
-    ];
-  }
 
   // 데이터 인덱스에서 인턴십 정보 가져오기
   List<Contest> _getInternshipsFromDataSource() {

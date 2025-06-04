@@ -31,4 +31,10 @@ class ApiEndpoints {
 
   // 비밀번호 수정
   static const String editPassword = '/api/user/editPassword';
+
+  // 채용 공고 관련
+  static const String employeePosts = '/api/posts/employee';
+
+  /// ✅ 새로 추가: 모든 공고 상세 URL 생성 (채용, 인턴, 대외활동, 교육/강연, 공모전 통합)
+  static String getPostDetailUrl(int postId) => '/api/posts/$postId';
 }
