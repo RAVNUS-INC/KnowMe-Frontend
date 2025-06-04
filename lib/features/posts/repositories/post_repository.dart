@@ -18,6 +18,32 @@ class PostRepository {
   
   final Logger _logger = Logger();
   
+  /// 탭 인덱스에 따른 컨텐츠 목록을 가져오는 메서드 (userId 포함)
+  Future<List<Contest>> getContests({required int tabIndex, required String userId}) async {
+    _logger.d('getContests 호출: tabIndex=$tabIndex, userId=$userId');
+    
+    try {
+      switch (tabIndex) {
+        case 0: // 채용
+          return await getJobListings();
+        case 1: // 인턴
+          return await getInternListings();
+        case 2: // 대외활동
+          return await getExternalListings();
+        case 3: // 교육/강연
+          return await getEducationListings();
+        case 4: // 공모전
+          return await getFilteredContests();
+        default:
+          _logger.w('지원하지 않는 탭 인덱스: $tabIndex');
+          return [];
+      }
+    } catch (e) {
+      _logger.e('컨텐츠 로드 실패: $e');
+      return [];
+    }
+  }
+  
   // 채용 정보 필터링해서 가져오기
   Future<List<Contest>> getJobListings({
     String? job,
@@ -272,38 +298,4 @@ class PostRepository {
       return [];
     }
   }
-
-  // // 교육/강연에 필터 적용
-  // Contest applyEducationFilters(Contest event, String? field, String? period,
-  //     String? location, String? onOffline) {
-  //   return Contest(
-  //     id: event.id,
-  //     title: event.title,
-  //     organization: event.organization,
-  //     imageUrl: event.imageUrl,
-  //     dateRange: period ?? event.dateRange,
-  //     location: location ?? event.location,
-  //     field: field ?? event.field,
-  //     additionalInfo: onOffline ?? event.additionalInfo,
-  //     benefit: event.benefit,
-  //     target: event.target,
-  //   );
-  // }
-  //
-  // // 공모전에 필터 적용
-  // Contest _applyContestFilters(Contest contest, String? field, String? target,
-  //     String? organizer, String? benefit) {
-  //   return Contest(
-  //     id: contest.id,
-  //     title: contest.title,
-  //     organization: organizer ?? contest.organization,
-  //     imageUrl: contest.imageUrl,
-  //     dateRange: contest.dateRange,
-  //     location: contest.location,
-  //     field: field ?? contest.field,
-  //     additionalInfo: contest.additionalInfo,
-  //     target: target ?? contest.target,
-  //     benefit: benefit ?? contest.benefit,
-  //   );
-  // }
 }

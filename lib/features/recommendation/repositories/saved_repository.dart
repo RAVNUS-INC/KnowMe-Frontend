@@ -1,9 +1,12 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import '../services/get_saved_posts_api_service.dart';
+import '../services/post_saved_posts_api_service.dart';  // 추가된 import
+import '../models/post_saved_posts_dtos.dart';  // 추가된 import
 import 'package:logger/logger.dart';
 
 class SavedRepository {
   final GetSavedPostsApiService _apiService = GetSavedPostsApiService();
+  final PostSavedPostsApiService _postApiService = PostSavedPostsApiService();  // 추가된 서비스
   final Logger _logger = Logger();
 
   // API를 통해 저장된 활동 목록 가져오기
@@ -78,6 +81,13 @@ class SavedRepository {
       ));
     }
     
+    if (groupedByType.containsKey(ActivityType.internship)) {
+      categories.add(CategoryContests(
+        categoryName: '저장한 인턴십',
+        contests: groupedByType[ActivityType.internship]!,
+      ));
+    }
+    
     if (groupedByType.containsKey(ActivityType.activity)) {
       categories.add(CategoryContests(
         categoryName: '저장한 대외활동',
@@ -87,11 +97,57 @@ class SavedRepository {
     
     if (groupedByType.containsKey(ActivityType.course)) {
       categories.add(CategoryContests(
-        categoryName: '저장한 강의',
+        categoryName: '저장한 교육/강연',
         contests: groupedByType[ActivityType.course]!,
       ));
     }
     
+    if (groupedByType.containsKey(ActivityType.contest)) {
+      categories.add(CategoryContests(
+        categoryName: '저장한 공모전',
+        contests: groupedByType[ActivityType.contest]!,
+      ));
+    }
+    
     return categories;
+  }
+
+  /// 활동 저장 요청
+  Future<bool> savePost(String userId, int postId) async {
+    try {
+      _logger.d('📌 Repository: 활동 저장 요청 - userId=$userId postId=$postId');
+      final request = SavePostRequest(userId: userId, postId: postId);
+      final response = await _postApiService.savePost(request);
+      
+      if (response.isSuccess) {
+        _logger.d('✅ Repository: 활동 저장 성공 - ${response.data?.id}');
+        return true;
+      } else {
+        _logger.e('❌ Repository: 활동 저장 실패 - ${response.message}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('❌ Repository: 활동 저장 중 예외 발생 - $e');
+      return false;
+    }
+  }
+  
+  /// 활동 저장 취소(삭제) 요청
+  Future<bool> unsavePost(int savedPostId) async {
+    try {
+      _logger.d('📌 Repository: 활동 저장 취소 요청 - savedPostId=$savedPostId');
+      final response = await _postApiService.unsavePost(savedPostId);
+      
+      if (response.isSuccess) {
+        _logger.d('✅ Repository: 활동 저장 취소 성공');
+        return true;
+      } else {
+        _logger.e('❌ Repository: 활동 저장 취소 실패 - ${response.message}');
+        return false;
+      }
+    } catch (e) {
+      _logger.e('❌ Repository: 활동 저장 취소 중 예외 발생 - $e');
+      return false;
+    }
   }
 }

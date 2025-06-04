@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/routes/routes.dart';
+import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
 
 class PostGrid extends StatelessWidget {
   final List<Contest> contests;
@@ -85,6 +86,8 @@ class ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postController = Get.find<PostController>();
+    
     return GestureDetector(
       onTap: () => _navigateToDetailScreen(context),
       child: Container(
@@ -168,28 +171,49 @@ class ContestCard extends StatelessWidget {
   ImageProvider _getImageProvider() {
     final imageUrl = contest.imageUrl;
 
-    // if (imageUrl == null || imageUrl.isEmpty) {
-    //   return const NetworkImage("https://placehold.co/600x400?text=No+Image");
-    // }
+    // 기본 플레이스홀더 이미지 URL (고정)
+    const fallbackImageUrl = "https://placehold.co/600x400/EEEEEE/CCCCCC?text=No+Image";
 
-    // assets 경로인지 확인
-    if (imageUrl.startsWith('assets/')) {
-      return AssetImage(imageUrl);
+    try {
+      // 이미지 URL이 비어있거나 null인 경우
+      if (imageUrl.isEmpty) {
+        return const NetworkImage(fallbackImageUrl);
+      }
+
+      // assets 경로인지 확인
+      if (imageUrl.startsWith('assets/')) {
+        return AssetImage(imageUrl);
+      }
+
+      // HTTP/HTTPS URL인지 확인
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        // 유효하지 않을 수 있는 example.com 도메인 필터링
+        if (imageUrl.contains('example.com')) {
+          return const NetworkImage(fallbackImageUrl);
+        }
+        return NetworkImage(imageUrl);
+      }
+
+      // 그 외의 경우 기본 플레이스홀더
+      return const NetworkImage(fallbackImageUrl);
+    } catch (e) {
+      // 예외 발생 시 기본 이미지 사용
+      return const NetworkImage(fallbackImageUrl);
     }
-
-    // HTTP/HTTPS URL인지 확인
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return NetworkImage(imageUrl);
-    }
-
-    // 그 외의 경우 기본 플레이스홀더
-    return const NetworkImage("https://placehold.co/600x400?text=No+Image");
   }
 
   String getImageUrl() {
-    return contest.imageUrl.isNotEmpty == true
-        ? contest.imageUrl
-        : "https://placehold.co/600x400?text=No+Image";
+    // 빈 이미지 URL 처리
+    if (contest.imageUrl.isEmpty) {
+      return "https://placehold.co/600x400/EEEEEE/CCCCCC?text=No+Image";
+    }
+    
+    // example.com 도메인 필터링
+    if (contest.imageUrl.contains('example.com')) {
+      return "https://placehold.co/600x400/EEEEEE/CCCCCC?text=No+Image";
+    }
+    
+    return contest.imageUrl;
   }
 
   Widget _buildGradientOverlay() {
@@ -197,6 +221,8 @@ class ContestCard extends StatelessWidget {
   }
 
   Widget _buildBookmarkButton() {
+    final postController = Get.find<PostController>();
+    
     return Positioned(
       right: 4,
       top: 7,
@@ -204,12 +230,16 @@ class ContestCard extends StatelessWidget {
         width: 24,
         height: 24,
         child: IconButton(
-          icon:
-          const Icon(Icons.bookmark_border, color: Colors.white, size: 20),
+          icon: Icon(
+            contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border, 
+            color: Colors.white, 
+            size: 20
+          ),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {
-            // 북마크 기능
+            // 북마크 토글 기능을 PostController와 연결
+            postController.toggleBookmark(contest);
           },
         ),
       ),
