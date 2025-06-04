@@ -218,7 +218,7 @@ class PostController extends GetxController {
               : multiSelectInternEducation.toList(),
         );
       case 2: // 대외활동
-        return repository.getActivities(
+        return repository.getExternalListings(
           field: values['분야'],
           organization: values['기관'],
           location: values['지역'],
