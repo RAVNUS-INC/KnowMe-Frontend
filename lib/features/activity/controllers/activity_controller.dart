@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/activity_record.dart';
 import '../services/activity_service.dart';
+import '../../../features/membership/repositories/auth_repository.dart';  // ✅ 새로 추가
 import 'package:flutter/material.dart';
 
 class ActivityController extends GetxController {
@@ -8,8 +9,11 @@ class ActivityController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
-  // 사용자 ID (실제 앱에서는 인증 시스템에서 가져와야 함)
-  final int userId = 2; // TODO: 실제 로그인한 사용자 ID로 변경
+  // ✅ 수정: 사용자 ID를 동적으로 관리
+  var userId = 0.obs; // Rx로 변경하여 반응형으로 관리
+
+  // AuthRepository 인스턴스 추가
+  final AuthRepository _authRepository = AuthRepository();
 
   // 활동 데이터
   var activityResponse = Rxn<ActivityResponse>();
@@ -29,16 +33,52 @@ class ActivityController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadUserActivity();
+    _initializeUserId();
+  }
+
+  /// ✅ 새로 추가: 사용자 ID 초기화 및 활동 데이터 로드
+  Future<void> _initializeUserId() async {
+    try {
+      // 저장된 사용자 ID 가져오기
+      final savedUserId = await _authRepository.getUserId();
+
+      if (savedUserId != null && savedUserId > 0) {
+        userId.value = savedUserId;
+        // 사용자 ID가 있으면 활동 데이터 로드
+        await loadUserActivity();
+      } else {
+        // 사용자 ID가 없으면 로그인되지 않은 상태
+        print('Warning: 사용자 ID가 없습니다. 로그인이 필요합니다.');
+        errorMessage.value = '로그인이 필요합니다.';
+      }
+    } catch (e) {
+      print('Error initializing user ID: $e');
+      errorMessage.value = '사용자 정보를 불러올 수 없습니다.';
+    }
+  }
+
+  /// ✅ 새로 추가: 외부에서 사용자 ID를 업데이트하는 메서드
+  Future<void> updateUserId(int newUserId) async {
+    if (newUserId > 0 && userId.value != newUserId) {
+      userId.value = newUserId;
+      // 새로운 사용자 ID로 활동 데이터 다시 로드
+      await loadUserActivity();
+    }
   }
 
   /// 사용자 활동 데이터를 로드합니다
   Future<void> loadUserActivity() async {
+    // 사용자 ID가 유효하지 않으면 로드하지 않음
+    if (userId.value <= 0) {
+      errorMessage.value = '유효하지 않은 사용자 ID입니다.';
+      return;
+    }
+
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await ActivityService.getUserActivity(userId);
+      final response = await ActivityService.getUserActivity(userId.value);
       activityResponse.value = response;
 
       // 모든 프로젝트의 태그들을 수집하여 필터 태그 목록 생성
@@ -80,15 +120,20 @@ class ActivityController extends GetxController {
 
   /// 프로젝트 삭제 (서버 API 호출)
   Future<bool> removeProject(Project project) async {
+    if (userId.value <= 0) {
+      print('Error: Invalid user ID for delete operation');
+      return false;
+    }
+
     try {
       // 서버에서 삭제
       final success =
-          await ActivityService.deleteActivity(userId, project.portfolioId);
+      await ActivityService.deleteActivity(userId.value, project.portfolioId);
 
       if (success && activityResponse.value != null) {
         // 로컬 데이터에서도 제거
         final updatedPortfolios =
-            List<Project>.from(activityResponse.value!.portfolios);
+        List<Project>.from(activityResponse.value!.portfolios);
         updatedPortfolios
             .removeWhere((p) => p.portfolioId == project.portfolioId);
 
@@ -136,11 +181,16 @@ class ActivityController extends GetxController {
 
   /// 프로젝트 상세 정보를 로드합니다
   Future<void> loadProjectDetail(int activityId) async {
+    if (userId.value <= 0) {
+      detailErrorMessage.value = '유효하지 않은 사용자 ID입니다.';
+      return;
+    }
+
     try {
       isLoadingDetail.value = true;
       detailErrorMessage.value = '';
 
-      final detail = await ActivityService.getProjectDetail(userId, activityId);
+      final detail = await ActivityService.getProjectDetail(userId.value, activityId);
       projectDetail.value = detail;
     } catch (e) {
       detailErrorMessage.value = e.toString();
@@ -167,6 +217,11 @@ class ActivityController extends GetxController {
     required String content,
     required List<String> tags,
   }) async {
+    if (userId.value <= 0) {
+      createErrorMessage.value = '유효하지 않은 사용자 ID입니다.';
+      return false;
+    }
+
     try {
       isCreatingActivity.value = true;
       createErrorMessage.value = '';
@@ -179,7 +234,7 @@ class ActivityController extends GetxController {
         visibility: null, // NULL로 전달
       );
 
-      final success = await ActivityService.createActivity(userId, request);
+      final success = await ActivityService.createActivity(userId.value, request);
 
       if (success) {
         // 활동 생성 성공 시 목록 새로고침
@@ -205,6 +260,11 @@ class ActivityController extends GetxController {
     required List<String> tags,
     String? visibility,
   }) async {
+    if (userId.value <= 0) {
+      createErrorMessage.value = '유효하지 않은 사용자 ID입니다.';
+      return false;
+    }
+
     try {
       isCreatingActivity.value = true;
       createErrorMessage.value = '';
@@ -218,7 +278,7 @@ class ActivityController extends GetxController {
       );
 
       final success = await ActivityService.updateActivity(
-        userId,
+        userId.value,
         activityId,
         request,
       );
