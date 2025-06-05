@@ -51,19 +51,22 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               ),
             ),
           ),
+
+          // 🔹 검색 결과 or 전체 공모전
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverGrid(
+            sliver: Obx(() => SliverGrid(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
+                    (context, index) {
                   final item = controller.results[index];
-                  return Obx(() => _ContestCard(
-                        contest: item,
-                        onSave: () => controller.toggleSave(item),
-                        isSaved: controller.isSaved(item),
-                      ));
+                  return _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  );
                 },
-                childCount: controller.results.length.clamp(0, visibleCount),
+                childCount:
+                controller.results.length.clamp(0, visibleCount),
               ),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -71,8 +74,10 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 mainAxisSpacing: 12,
                 childAspectRatio: 180 / 240,
               ),
-            ),
+            )),
           ),
+
+          // 🔘 더보기 버튼
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -82,8 +87,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     visibleCount += 4;
                   }),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     decoration: ShapeDecoration(
                       color: const Color(0xFFB7C4D4),
                       shape: RoundedRectangleBorder(
@@ -105,6 +110,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               ),
             ),
           ),
+
+          // 🔻 구분선 및 텍스트
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,17 +142,19 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               ],
             ),
           ),
+
+          // ⭐ 저장된 공모전 카드
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverGrid(
+            sliver: Obx(() => SliverGrid(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
+                    (context, index) {
                   final item = controller.savedContests[index];
-                  return Obx(() => _ContestCard(
-                        contest: item,
-                        onSave: () => controller.toggleSave(item),
-                        isSaved: controller.isSaved(item),
-                      ));
+                  return _ContestCard(
+                    contest: item,
+                    onSave: () => controller.toggleSave(item),
+                    isSaved: controller.isSaved(item),
+                  );
                 },
                 childCount: controller.savedContests.length,
               ),
@@ -155,8 +164,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 mainAxisSpacing: 12,
                 childAspectRatio: 180 / 240,
               ),
-            ),
+            )),
           ),
+
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),
@@ -177,6 +187,8 @@ class _ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNetworkImage = contest.imageUrl.startsWith('http');
+
     return Container(
       width: 180,
       height: 240,
@@ -196,26 +208,19 @@ class _ContestCard extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Image.network(
+              isNetworkImage
+                  ? Image.network(
                 contest.imageUrl,
                 width: double.infinity,
                 height: 160,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 160,
-                  color: const Color(0xFFE0E0E0),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    '이미지를 불러올 수 없음',
-                    style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 12,
-                      fontFamily: 'Pretendard',
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                errorBuilder: (context, error, stackTrace) => _fallback(),
+              )
+                  : Image.asset(
+                contest.imageUrl,
+                width: double.infinity,
+                height: 160,
+                fit: BoxFit.cover,
               ),
               Positioned(
                 right: 4,
@@ -227,7 +232,7 @@ class _ContestCard extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-              )
+              ),
             ],
           ),
           Padding(
@@ -260,8 +265,26 @@ class _ContestCard extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _fallback() {
+    return Container(
+      width: double.infinity,
+      height: 160,
+      color: const Color(0xFFE0E0E0),
+      alignment: Alignment.center,
+      child: const Text(
+        '이미지를 불러올 수 없음',
+        style: TextStyle(
+          color: Colors.black45,
+          fontSize: 12,
+          fontFamily: 'Pretendard',
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

@@ -33,21 +33,21 @@ class SearchResultController extends GetxController {
     allContests.addAll([
       Contest(
         title: '코디언 AI 서비스 기획 공모전',
-        imageUrl: 'https://example.com/image1.jpg',
+        imageUrl: 'assets/images/card-img-1.png',
         reward: '인턴 채용 연계',
         eligibility: '대학생',
         tags: ['AI', '기획'],
       ),
       Contest(
         title: '브레인코드 IT 문제해결 공모전',
-        imageUrl: 'https://example.com/image2.jpg',
+        imageUrl: 'assets/images/card-img-2.png',
         reward: '상금/입사 가산점',
         eligibility: '대학생/일반인',
         tags: ['IT', '문제해결'],
       ),
       Contest(
         title: '제12회 한국환경연구원 탄소중립 아이디어 공모전',
-        imageUrl: 'https://example.com/image3.jpg',
+        imageUrl: 'assets/images/card-img-3.png',
         reward: '환경부 장관상/상품',
         eligibility: '제한없음',
         tags: ['환경', '아이디어'],
@@ -64,10 +64,10 @@ class SearchResultController extends GetxController {
     final lowerQuery = query.toLowerCase();
     results.value = allContests
         .where((contest) =>
-            contest.title.toLowerCase().contains(lowerQuery) ||
-            contest.reward.toLowerCase().contains(lowerQuery) ||
-            contest.eligibility.toLowerCase().contains(lowerQuery) ||
-            contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery)))
+    contest.title.toLowerCase().contains(lowerQuery) ||
+        contest.reward.toLowerCase().contains(lowerQuery) ||
+        contest.eligibility.toLowerCase().contains(lowerQuery) ||
+        contest.tags.any((tag) => tag.toLowerCase().contains(lowerQuery)))
         .toList();
   }
 
