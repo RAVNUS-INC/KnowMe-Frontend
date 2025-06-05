@@ -62,7 +62,7 @@ class AiAnalysisResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AiAnalysisResultController(2));
+    final controller = Get.put(AiAnalysisResultController(1));
 
     return Obx(() {
       if (controller.isLoading.value) {

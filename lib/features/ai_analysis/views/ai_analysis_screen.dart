@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../routes/routes.dart';
 import '../controllers/ai_analysis_controller.dart';
-
+import '../../../routes/routes.dart';
 class AiAnalysisScreen extends StatefulWidget {
   const AiAnalysisScreen({super.key});
 
@@ -11,7 +12,7 @@ class AiAnalysisScreen extends StatefulWidget {
 
 class _AiAnalysisScreenState extends State<AiAnalysisScreen>
     with SingleTickerProviderStateMixin {
-  bool _showDetails = false;
+  bool _showDetails = true;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
   late AiAnalysisController _analysisController;
@@ -32,12 +33,8 @@ class _AiAnalysisScreenState extends State<AiAnalysisScreen>
       end: const Offset(0, -0.1),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
-    Future.delayed(const Duration(seconds: 1), () {
-      _controller.forward();
-      setState(() {
-        _showDetails = true;
-      });
-    });
+    // 🔁 바로 애니메이션 시작 & 내용 보여주기
+    _controller.forward();
   }
 
   @override
@@ -57,17 +54,22 @@ class _AiAnalysisScreenState extends State<AiAnalysisScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.white, Color(0xFFD9D9D9)],
+                colors: [Colors.white, Color(0xD7E7FAFF)],
               ),
             ),
             child: Column(
               children: [
                 const SizedBox(height: 80),
                 Center(
-                  child: Image.asset(
-                    'assets/images/ai_analysis_logo.png',
-                    width: 120,
-                    fit: BoxFit.contain,
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.offAllNamed(AppRoutes.home);
+                    },
+                    child: Image.asset(
+                      'assets/images/ai_analysis_logo.png',
+                      width: 120,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -85,68 +87,66 @@ class _AiAnalysisScreenState extends State<AiAnalysisScreen>
                   ),
                 ),
                 const SizedBox(height: 30),
-                if (_showDetails) ...[
-                  const Text(
-                    '내 활동에 기록된 내용으로\nKnowMe AI가 취업 정보를 \n제공합니다',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF454C53),
-                      fontSize: 14,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.56,
-                    ),
+                const Text(
+                  '내 활동에 기록된 내용으로\nKnowMe AI가 취업 정보를 \n제공합니다',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF454C53),
+                    fontSize: 14,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.56,
                   ),
-                  const SizedBox(height: 102),
-                  GestureDetector(
-                    onTap: _analysisController.startAnalysis,
-                    child: Container(
-                      width: 380,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0068E5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '분석 시작하기',
-                          style: TextStyle(
-                            color: Color(0xFFF5F5F5),
-                            fontSize: 18,
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.72,
-                          ),
+                ),
+                const SizedBox(height: 102),
+                GestureDetector(
+                  onTap: _analysisController.startAnalysis,
+                  child: Container(
+                    width: 380,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0068E5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '분석 시작하기',
+                        style: TextStyle(
+                          color: Color(0xFFF5F5F5),
+                          fontSize: 18,
+                          fontFamily: 'Pretendard',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.72,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: _analysisController.viewPreviousResult,
-                    child: Container(
-                      width: 380,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xCDD0CFC7),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '이전 결과 보기',
-                          style: TextStyle(
-                            color: Color(0xFFF5F5F5),
-                            fontSize: 18,
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.72,
-                          ),
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: _analysisController.viewPreviousResult,
+                  child: Container(
+                    width: 380,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xCDD0CFC7),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '이전 결과 보기',
+                        style: TextStyle(
+                          color: Color(0xFFF5F5F5),
+                          fontSize: 18,
+                          fontFamily: 'Pretendard',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.72,
                         ),
                       ),
                     ),
                   ),
-                ],
-                const SizedBox(height: 10),
+                ),
+                const SizedBox(height: 60),
               ],
             ),
           ),
