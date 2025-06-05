@@ -10,6 +10,7 @@ class RecommendationController extends GetxController
   final RecommendationService _recommendationService = RecommendationService();
   final SavedService _savedService = SavedService();
 
+
   List<ContestGroup> recommendedContests = [];
   List<Contest> savedContests = [];
   bool isLoading = false;
@@ -73,9 +74,16 @@ class RecommendationController extends GetxController
     update();
 
     try {
+      // 1) 서버에서 “내가 저장해 둔(북마크된)” Contest 리스트를 가져온다
       savedContests = await _savedService.getSavedContests();
-      
-      // 저장한 활동이 없는 경우 메시지 설정
+
+      // 2) 이 리스트에 담긴 모든 Contest 객체는 “이미 북마크된 상태”이므로
+      //    isBookmarked 를 true 로 설정해 준다
+      for (var c in savedContests) {
+        c.isBookmarked = true;
+      }
+
+      // 3) 저장된 활동이 없는 경우 메시지 설정
       if (savedContests.isEmpty) {
         errorMessage = '저장한 활동이 없습니다.';
       }
@@ -84,8 +92,6 @@ class RecommendationController extends GetxController
         debugPrint('Error fetching saved contests: $e');
       }
       errorMessage = '저장한 활동을 불러오는 중 오류가 발생했습니다.';
-      
-      // Get.snackbar를 사용하여 사용자에게 오류 알림
       Get.snackbar(
         '데이터 로드 오류',
         '저장한 활동을 불러오는 중 오류가 발생했습니다.',
