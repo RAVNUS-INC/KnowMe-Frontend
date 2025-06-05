@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import '../models/contests_model.dart';
 import '../repositories/post_repository.dart';
 import 'package:knowme_frontend/features/recommendation/repositories/saved_repository.dart';
+import 'package:knowme_frontend/features/recommendation/controllers/recommendation_controller.dart';
 
 /// 게시물 데이터 관련 비즈니스 로직을 담당하는 Controller 클래스
 /// 데이터 검색 및 필터 상태 관리를 담당합니다.
@@ -293,7 +294,6 @@ class PostController extends GetxController {
 
       bool success = false;
 
-      // 북마크 추가 또는 제거 요청
       if (!contest.isBookmarked) {
         // 북마크 추가 (저장)
         success = await _savedRepository.savePost(int.parse(contest.id));
@@ -323,13 +323,30 @@ class PostController extends GetxController {
           );
         }
       }
-//
-      if (success) {
-        // 북마크 상태 변경
-        contest.isBookmarked = !contest.isBookmarked;
 
-        // UI 업데이트를 위해 리스트 갱신
+      if (success) {
+        // 1) PostController 내에서 토글 상태 반전
+        contest.isBookmarked = !contest.isBookmarked;
         contests.refresh();
+
+        // 2) RecommendationController(savedActivitiesTab)와 동기화
+        if (Get.isRegistered<RecommendationController>()) {
+          final recCtrl = Get.find<RecommendationController>();
+
+          if (contest.isBookmarked) {
+            // 새롭게 북마크된 경우 savedContests에 추가
+            if (!recCtrl.savedContests.any((c) => c.id == contest.id)) {
+              // savedContests는 RecommendationController 내부에서 isBookmarked=true로 초기화돼 있다고 간주
+              contest.isBookmarked = true; // 확실히 true로 유지
+              recCtrl.savedContests.add(contest);
+            }
+          } else {
+            // 북마크 해제된 경우 savedContests에서 제거
+            recCtrl.savedContests.removeWhere((c) => c.id == contest.id);
+          }
+          // RecommendationController 가 GetBuilder/Rebuilder로 UI를 갱신하도록 update() 호출
+          recCtrl.update();
+        }
       } else {
         _logger.e('북마크 토글 실패: ${contest.id}');
         Get.snackbar(
@@ -353,6 +370,7 @@ class PostController extends GetxController {
       );
     }
   }
+
 
   /// 탭별 필터 매핑 정보 제공 (리팩토링에 활용)
   static Map<String, Map<int, String>> getFilterMapping() {
