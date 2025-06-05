@@ -32,18 +32,22 @@ class PostGrid extends StatelessWidget {
     );
   }
 
+  /// ★★★ 변경: 여기에서 Get.find<PostController>().contests 전체를 Obx로 감싸줍니다.
   Widget _buildContestGrid(double cardWidth) {
-    return Wrap(
-      spacing: 16, // 가로 간격
-      runSpacing: 16, // 세로 간격
-      alignment: WrapAlignment.spaceBetween,
-      children: contests
-          .map((contest) => ContestCard(
-        contest: contest,
-        width: cardWidth,
-      ))
-          .toList(),
-    );
+    final postController = Get.find<PostController>();
+    return Obx(() {
+      return Wrap(
+        spacing: 16, // 가로 간격
+        runSpacing: 16, // 세로 간격
+        alignment: WrapAlignment.spaceBetween,
+        children: postController.contests
+            .map((contest) => ContestCard(
+          contest: contest,
+          width: cardWidth,
+        ))
+            .toList(),
+      );
+    });
   }
 
   Widget _buildEmptyState() {
@@ -99,6 +103,7 @@ class ContestCard extends StatelessWidget {
           children: [
             _buildImageSection(),
             _buildContentSection(),
+            _buildBookmarkButton(), // ← 여기가 수정된 부분입니다.
           ],
         ),
       ),
@@ -220,9 +225,10 @@ class ContestCard extends StatelessWidget {
     return const SizedBox.shrink(); // 빈 위젯으로 대체
   }
 //
+  /// ★★★ 수정된 _buildBookmarkButton() (Obx 제거 → 그냥 IconButton으로만 처리)
   Widget _buildBookmarkButton() {
     final postController = Get.find<PostController>();
-    
+
     return Positioned(
       right: 4,
       top: 7,
@@ -231,21 +237,22 @@ class ContestCard extends StatelessWidget {
         height: 24,
         child: IconButton(
           icon: Icon(
-            contest.isBookmarked ? Icons.bookmark : Icons.bookmark_border, 
-            color: Colors.white, 
-            size: 20
+            // Obx 대신 plain bool로 읽어서, 리스트 갱신에 따라 재빌드될 때 자동 반영됩니다.
+            contest.isBookmarked
+                ? Icons.bookmark
+                : Icons.bookmark_border,
+            color: Colors.white,
+            size: 20,
           ),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () {
-            // 북마크 토글 기능을 PostController와 연결
             postController.toggleBookmark(contest);
           },
         ),
       ),
     );
   }
-
   Widget _buildContentSection() {
     return Positioned(
       left: 0,

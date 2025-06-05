@@ -180,6 +180,7 @@ class PostController extends GetxController {
     try {
       final results = await getFilteredContentsByCurrentTab();
       contests.assignAll(results);
+      await _initSavedStatuses(); /// 추가했음
     } catch (e) {
       _logger.e('Error loading contests: ${e.toString()}');
       contests.clear();
@@ -187,6 +188,37 @@ class PostController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  /// ★★★ 서버에 저장된(북마크된) 공고 ID들을 가져와서
+  ///     contests 리스트의 해당 객체에 isBookmarked=true 로 초기화
+  Future<void> _initSavedStatuses() async {
+    try {
+      // 1) 서버에서 “내가 저장(북마크)해 둔” Contest 리스트 조회
+      final List<Contest> savedContests =
+      await _savedRepository.getSavedContestsFromApi();
+
+      // 2) 저장된 Contest들의 ID만 Set으로 추출
+      final Set<String> savedIdSet =
+      savedContests.map((c) => c.id).toSet();
+
+      // 3) 현재 로드된 contests 리스트 순회하면서, ID가 Set에 있으면 isBookmarked=true
+      for (var contest in contests) {
+        if (savedIdSet.contains(contest.id)) {
+          contest.isBookmarked = true;
+        } else {
+          contest.isBookmarked = false;
+        }
+      }
+
+      // 4) RxList 갱신 → Obx로 묶인 UI에 반영
+      contests.refresh();
+
+      _logger.d('_initSavedStatuses 완료: ${savedIdSet.length}개 공고가 북마크됨');
+    } catch (e) {
+      _logger.e('_initSavedStatuses 중 예외 발생: $e');
+    }
+  }
+
 
   /// 현재 탭에 대한 필터링된 데이터 가져오기
   Future<List<Contest>> getFilteredContentsByCurrentTab() async {
