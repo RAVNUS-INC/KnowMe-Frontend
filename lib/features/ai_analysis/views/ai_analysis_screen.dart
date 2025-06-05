@@ -57,7 +57,7 @@ class _AiAnalysisScreenState extends State<AiAnalysisScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Colors.white, Color(0xFFD9D9D9)],
+                colors: [Colors.white, Color(0xD7E7FAFF) ],
               ),
             ),
             child: Column(
@@ -146,7 +146,7 @@ class _AiAnalysisScreenState extends State<AiAnalysisScreen>
                     ),
                   ),
                 ],
-                const SizedBox(height: 10),
+                const SizedBox(height: 60),
               ],
             ),
           ),
