@@ -74,19 +74,16 @@ class RecommendationController extends GetxController
     update();
 
     try {
-      // 1) 서버에서 “내가 저장해 둔(북마크된)” Contest 리스트를 가져온다
-      savedContests = await _savedService.getSavedContests();
-
-      // 2) 이 리스트에 담긴 모든 Contest 객체는 “이미 북마크된 상태”이므로
-      //    isBookmarked 를 true 로 설정해 준다
-      for (var c in savedContests) {
-        c.isBookmarked = true;
-      }
-
-      // 3) 저장된 활동이 없는 경우 메시지 설정
-      if (savedContests.isEmpty) {
-        errorMessage = '저장한 활동이 없습니다.';
-      }
+      final List<Contest> list = await _savedService.getSavedContests();
+      // 바로 isBookmarked=true로 세팅할 수도 있지만
+      // Obx 빌드 중에 값 바꾸면 오류 → addPostFrameCallback에 위임
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 빌드가 끝난 뒤에 값 복사 & 갱신
+        savedContests.assignAll(list.map((c) {
+          c.isBookmarked = true;
+          return c;
+        }));
+      });
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Error fetching saved contests: $e');

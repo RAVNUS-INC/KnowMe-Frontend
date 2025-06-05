@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-import 'package:knowme_frontend/features/posts/models/contests_model.dart';
+// import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/filter_row_widget.dart';
@@ -25,38 +25,39 @@ class _PostListScreenState extends State<PostListScreen>
   @override
   void initState() {
     super.initState();
-    // 컨트롤러 주입받기
+
+    // 1) 컨트롤러 주입받기
     _postController = Get.find<PostController>();
 
-    // Get.arguments에서 tabIndex를 받아옴
-    int initialIndex = 0; // 기본값
-
+    // 2) Get.arguments에서 tabIndex를 받아옴 (+ PostController에도 반영)
+    int initialIndex = 0;
     if (Get.arguments != null && Get.arguments is Map<String, dynamic>) {
       final args = Get.arguments as Map<String, dynamic>;
       if (args.containsKey('tabIndex') && args['tabIndex'] is int) {
         initialIndex = args['tabIndex'];
-        // PostController의 현재 탭 인덱스도 업데이트
-        _postController.currentTabIndex.value = initialIndex;
+        // ← 이 부분을 바로 실행하지 않고, 빌드 이후에 실행하도록 한다.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _postController.selectedTabIndex.value = initialIndex;
+        });
       }
     }
 
+    // 3) TabController 초기화
     _tabController = TabController(
       length: tabTitles.length,
       vsync: this,
-      initialIndex: initialIndex, // arguments에서 받아온 인덱스로 설정
+      initialIndex: initialIndex,
     );
 
-    // TabBar와 PageView 연결
+    // 4) TabBar와 PageView 연결 (사용자 스와이프/탭 변경 시 changeTab 호출)
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        // PageController는 postController 내부에 있으므로 접근하여 사용
         _postController.changeTab(_tabController.index);
       }
     });
 
-    // PostController의 pageController도 해당 페이지로 이동시킴
+    // 5) 화면 띄운 직후 PageController가 들어오면 초기 페이지로 이동
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // PageController가 연결된 후에 안전하게 이동
       if (_postController.pageController.hasClients) {
         _postController.pageController.jumpToPage(initialIndex);
       }
@@ -66,7 +67,6 @@ class _PostListScreenState extends State<PostListScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    // PageController는 PostController에서 관리하므로 여기서 dispose할 필요 없음
     super.dispose();
   }
 
@@ -74,10 +74,10 @@ class _PostListScreenState extends State<PostListScreen>
   Widget build(BuildContext context) {
     return BaseScaffold(
       currentIndex: 0, // '공고' 탭 인덱스
-      backgroundColor: const Color(0xFFEEEFF0), // 배경색을 #EEEFF0로 변경
+      backgroundColor: const Color(0xFFEEEFF0),
       body: Column(
         children: [
-          // 상단 고정 영역
+          // 상단 고정 영역: 탭 바
           PostTabBar(
             tabController: _tabController,
             tabTitles: tabTitles,
@@ -91,43 +91,30 @@ class _PostListScreenState extends State<PostListScreen>
           // 스크롤 가능한 콘텐츠 영역
           Expanded(
             child: PageView.builder(
-              // 직접 생성하지 않고 PostController의 pageController 사용
               controller: _postController.pageController,
               onPageChanged: (index) {
-                _tabController.animateTo(index);
-                // PageView에서의 페이지 변경을 컨트롤러에 알림
-                _postController.onPageChanged(index);
+                // 사용자 스와이프 시 _tabController에 반영
+                if (_tabController.index != index) {
+                  _tabController.animateTo(index);
+                }
+
+                // 빌드 이후에 탭 전환 처리
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _postController.onPageChanged(index);
+                });
               },
               itemCount: tabTitles.length,
               itemBuilder: (context, index) {
-                // GetX를 사용하여 상태 변화 감지 및 UI 업데이트
                 return Obx(() {
-                  // 로딩 상태 확인
-                  if (_postController.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  // 현재 탭 인덱스가 맞는 경우에만 데이터 표시
+                  // 현재 탭이면 데이터 표시, 아니면 플레이스홀더
                   if (_postController.selectedTabIndex.value == index) {
-                    return PostGrid(contests: _postController.contests);
+                    if (_postController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return PostGrid(contests: _postController.contests);
+                    }
                   } else {
-                    // 다른 탭의 경우 비동기로 데이터 로드
-                    return FutureBuilder<List<Contest>>(
-                      future: _postController.getFilteredContentsByTabIndex(index),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('오류가 발생했습니다: ${snapshot.error}'),
-                          );
-                        } else {
-                          return PostGrid(contests: snapshot.data ?? []);
-                        }
-                      },
-                    );
+                    return const Center(child: Text("탭을 선택하면 데이터가 로드됩니다"));
                   }
                 });
               },

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/ai_analysis_model.dart';
-import '../models/past_analysis_summary.dart' hide PastAnalysisSummary; // 새 모델 import
+// import '../models/past_analysis_summary.dart' hide PastAnalysisSummary; // 새 모델 import
 
 class AiAnalysisService {
   final String baseUrl = 'http://server.tunnel.jaram.net';
