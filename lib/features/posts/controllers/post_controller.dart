@@ -155,20 +155,28 @@ class PostController extends GetxController {
     }
   }
 
-  /// PageView에서 페이지 변경 시 호출하는 메서드
+  // /// PageView에서 페이지 변경 시 호출하는 메서드
+  // void onPageChanged(int index) {
+  //   if (selectedTabIndex.value != index) {
+  //     selectedTabIndex.value = index;
+  //     ever(selectedTabIndex, (index) {
+  //       _logger.d('ever: 탭 인덱스 바뀜 → $index');
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         _logger.d('addPostFrameCallback: loadContests 호출 직전');
+  //         loadContests();
+  //       });
+  //     });
+  //
+  //   }
+  // }
+  /// PageView에서 스와이프로 페이지 변경 시 호출되는 메서드
   void onPageChanged(int index) {
     if (selectedTabIndex.value != index) {
       selectedTabIndex.value = index;
-      ever(selectedTabIndex, (index) {
-        _logger.d('ever: 탭 인덱스 바뀜 → $index');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _logger.d('addPostFrameCallback: loadContests 호출 직전');
-          loadContests();
-        });
-      });
-
+      // ever() 로직이 이미 onInit()에서 한 번만 등록되어 있으므로, 여기서는 추가 등록하지 않습니다.
     }
   }
+
 
   /// 특정 탭의 모든 필터 초기화
   void resetFiltersForTab(int tabIndex) {
@@ -231,35 +239,38 @@ class PostController extends GetxController {
 
   /// 데이터 로드 메서드
   Future<void> loadContests() async {
-    if (isLoading.value) return; // 이미 로딩 중이면 리턴
-    isLoading.value = true;
-    ever(selectedTabIndex, (index) {
-      _logger.d('ever: 탭 인덱스 바뀜 → $index');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _logger.d('addPostFrameCallback: loadContests 호출 직전');
-        loadContests();
-      });
-    });
+    // if (isLoading.value) return; // 이미 로딩 중이면 리턴
+    // isLoading.value = true;
+    // ever(selectedTabIndex, (index) {
+    //   _logger.d('ever: 탭 인덱스 바뀜 → $index');
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     _logger.d('addPostFrameCallback: loadContests 호출 직전');
+    //     loadContests();
+    //   });
+    // });
+
+    // if (isLoading.value) return; // 이미 로딩 중이면 리턴
+    // isLoading.value = true;
+
 
 
     try {
-      // 1. 캐시된 데이터가 있으면 그것을 사용
       final currentTab = selectedTabIndex.value;
-
       if (_cachedContestsByTab.containsKey(currentTab)) {
-        _logger.d('탭 $currentTab의 캐시된 데이터 사용');
+        // 1) 캐시된 데이터 사용
+        _logger.d('탭 \$currentTab의 캐시된 데이터 사용');
         contests.assignAll(_cachedContestsByTab[currentTab]!);
       } else {
-        // 2. 캐시된 데이터가 없으면 새로 가져와서 캐시에 저장
+        // 2) 캐시가 없으면 서버에서 읽어서 캐시에 저장
         final results = await getFilteredContentsByCurrentTab();
         contests.assignAll(results);
         _cachedContestsByTab[currentTab] = results;
-        _logger.d('탭 $currentTab의 데이터 새로 로드: ${results.length} 항목');
+        _logger.d('탭 \$currentTab의 데이터 새로 로드: \${results.length} 항목');
       }
 
       await _initSavedStatuses();
     } catch (e) {
-      _logger.e('Error loading contests: ${e.toString()}');
+      _logger.e('Error loading contests: \${e.toString()}');
       contests.clear();
     } finally {
       isLoading.value = false;
@@ -473,6 +484,12 @@ class PostController extends GetxController {
       }
     });
   }
+
+  /// 특정 탭의 캐시된 Contest 리스트를 반환하는 Getter
+  List<Contest>? getCachedContests(int tabIndex) {
+    return _cachedContestsByTab[tabIndex];
+  }
+
 
   /// 탭별 필터 매핑 정보 제공 (리팩토링에 활용)
   static Map<String, Map<int, String>> getFilterMapping() {

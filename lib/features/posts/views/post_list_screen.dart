@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:knowme_frontend/features/posts/controllers/post_controller.dart';
-// import 'package:knowme_frontend/features/posts/models/contests_model.dart';
+import 'package:knowme_frontend/features/posts/models/contests_model.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_grid.dart';
 import 'package:knowme_frontend/features/posts/widgets/post_tab_bar.dart';
 import 'package:knowme_frontend/features/posts/widgets/filter_row_widget.dart';
@@ -106,16 +106,34 @@ class _PostListScreenState extends State<PostListScreen>
               itemCount: tabTitles.length,
               itemBuilder: (context, index) {
                 return Obx(() {
-                  // 현재 탭이면 데이터 표시, 아니면 플레이스홀더
-                  if (_postController.selectedTabIndex.value == index) {
-                    if (_postController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return PostGrid(contests: _postController.contests);
-                    }
-                  } else {
-                    return const Center(child: Text("탭을 선택하면 데이터가 로드됩니다"));
+                  // // 현재 탭이면 데이터 표시, 아니면 플레이스홀더
+                  // if (_postController.selectedTabIndex.value == index) {
+                  //   if (_postController.isLoading.value) {
+                  //     return const Center(child: CircularProgressIndicator());
+                  //   } else {
+                  //     return PostGrid(contests: _postController.contests);
+                  //   }
+                  // } else {
+                  //   // 플레이스홀더를 보여줄 때 콘솔에 로그를 찍음
+                  //   print('[$index] 탭이 선택되지 않아 플레이스홀더 표시');
+                  //   return Center(child: Text("탭을 선택하면 데이터가 로드됩니다"));
+                  // 1) 현재 탭이 로딩 중이면서 해당 index라면 로딩 인디케이터 표시
+                  if (_postController.isLoading.value &&
+                      _postController.selectedTabIndex.value == index) {
+                    return const Center(child: CircularProgressIndicator());
                   }
+
+                  // 2) 캐시 데이터를 가져오되, null이면 (캐시가 없으면)
+                  //    - 현재 탭이면 controller.contests 사용
+                  //    - 아니라면 빈 리스트 전달
+                  final cachedList = _postController.getCachedContests(index);
+                  final dataToShow = (cachedList != null)
+                      ? cachedList
+                      : (_postController.selectedTabIndex.value == index
+                      ? _postController.contests
+                      : <Contest>[]);
+
+                  return PostGrid(contests: dataToShow);
                 });
               },
             ),
