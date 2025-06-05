@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../features/splash/splash_screen.dart';
 import '../features/ai_analysis/views/ai_analysis_screen.dart';
 import '../features/home/controllers/home_controller.dart';
 import '../features/membership/views/login_page.dart';
@@ -41,6 +42,7 @@ import '../features/activity/controllers/activity_controller.dart';
 import '../features/posts/controllers/post_detail_controller.dart';
 
 class AppRoutes {
+  static const String splash = '/splash';
   static const String login = '/login';
   static const String signupFirst = '/signup/first';
   static const String signupSecond = '/signup/second';
@@ -52,7 +54,6 @@ class AppRoutes {
   static const String passwordResetSuccess = '/password-reset-success';
   static const String search = '/search';
   static const String searchResult = '/searchResult';
-
 
   // ✅ 새 라우트 추가
   static const String post = '/post';
@@ -67,8 +68,12 @@ class AppRoutes {
   static const String postDetail = '/post/detail';
   // 추천 활동 관련 라우트
   static const String recommendationScreen = '/recommendation';
-
   static final routes = [
+    GetPage(
+      name: splash,
+      page: () => const SplashScreen(),
+      transition: Transition.fadeIn,
+    ),
     GetPage(
       name: login,
       page: () => const LoginPage(),
@@ -242,7 +247,8 @@ class PostBinding implements Bindings {
     // FilterController 추가
     Get.lazyPut<FilterController>(() => FilterController(), fenix: true);
     // FilterOptionsService 추가
-    Get.lazyPut<FilterOptionsService>(() => FilterOptionsService(), fenix: true);
+    Get.lazyPut<FilterOptionsService>(() => FilterOptionsService(),
+        fenix: true);
   }
 }
 
