@@ -51,7 +51,7 @@ class ContestPost extends BasePost {
   /// JSON으로부터 ContestPost 객체 생성
   factory ContestPost.fromJson(Map<String, dynamic> json) {
     return ContestPost(
-      postId: json['post_id'] as int,
+      postId: json['post_id'] as int? ?? 0,
       category: json['category'] as String? ?? '공모전',
       title: json['title'] as String? ?? '',
       company: json['company'] as String? ?? '',
