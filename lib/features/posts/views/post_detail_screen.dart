@@ -150,7 +150,45 @@ class PostDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
 
-          // ✅ 새로 추가: 모집 부문 (구조화된 정보)
+          // ✅ 새로 추가: 대외활동 정보 종합 섹션
+          if (controller.getCategoryDisplayName() == '대외활동') ...[
+            _buildExternalActivityInfoSection(postDetail),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // 대외활동 정보
+          if (postDetail.parsedContent?.externalInfo?.isNotEmpty == true) ...[
+            const SectionTitle('활동 소개'),
+            const SizedBox(height: 8),
+            _buildBulletText(postDetail.parsedContent!.externalInfo!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // 대외활동 시간 및 장소
+          if (postDetail.parsedContent?.externalTimeAndLocation?.isNotEmpty == true) ...[
+            const SectionTitle('시간 및 장소'),
+            const SizedBox(height: 8),
+            _buildBulletText(postDetail.parsedContent!.externalTimeAndLocation!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // 대외활동 프로세스
+          if (postDetail.parsedContent?.externalProcess?.isNotEmpty == true) ...[
+            const SectionTitle('진행 과정'),
+            const SizedBox(height: 8),
+            _buildBulletText(postDetail.parsedContent!.externalProcess!),
+            const SizedBox(height: 20),
+            Divider(color: Colors.grey[300], thickness: 1),
+            const SizedBox(height: 20),
+          ],
+
+          // 모집 부문 (구조화된 정보)
           if (postDetail.parsedContent?.recruitmentPart?.isNotEmpty == true) ...[
             _buildRecruitmentSection(postDetail.parsedContent!.recruitmentPart!),
             const SizedBox(height: 20),
@@ -158,7 +196,7 @@ class PostDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
 
-          // ✅ 새로 추가: 근무 조건
+          // 근무 조건
           if (postDetail.parsedContent?.workConditions != null) ...[
             _buildWorkConditionsSection(postDetail.parsedContent!.workConditions!),
             const SizedBox(height: 20),
@@ -166,7 +204,7 @@ class PostDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
 
-          // ✅ 새로 추가: 복지
+          // 복지
           if (postDetail.parsedContent?.benefits?.isNotEmpty == true) ...[
             _buildBenefitsSection(postDetail.parsedContent!.benefits!),
             const SizedBox(height: 20),
@@ -174,7 +212,7 @@ class PostDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
 
-          // ✅ 새로 추가: 전형 절차
+          // 전형 절차
           if (postDetail.parsedContent?.recruitmentProcess?.isNotEmpty == true) ...[
             _buildRecruitmentProcessSection(postDetail.parsedContent!.recruitmentProcess!),
             const SizedBox(height: 20),
@@ -182,7 +220,7 @@ class PostDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
           ],
 
-          // ✅ 새로 추가: 지원 방법
+          // 지원 방법
           if (postDetail.parsedContent?.applicationMethod?.isNotEmpty == true) ...[
             _buildApplicationMethodSection(postDetail.parsedContent!.applicationMethod!),
             const SizedBox(height: 20),
@@ -198,7 +236,48 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 모집 부문 섹션 (List로 변경)
+  /// ✅ 새로 추가: 대외활동 정보 섹션
+  Widget _buildExternalActivityInfoSection(dynamic postDetail) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        // 주최기관
+        if (postDetail.hostingOrganization.isNotEmpty) ...[
+          const SubSectionTitle('주최기관'),
+          const SizedBox(height: 6),
+          Text(postDetail.hostingOrganization),
+          const SizedBox(height: 16),
+        ],
+
+        // 대상
+        if (postDetail.targetAudience.isNotEmpty) ...[
+          const SubSectionTitle('참가 대상'),
+          const SizedBox(height: 6),
+          _buildBulletText(postDetail.targetAudience),
+          const SizedBox(height: 16),
+        ],
+
+        // 활동 분야
+        if (postDetail.activityField.isNotEmpty) ...[
+          const SubSectionTitle('활동 분야'),
+          const SizedBox(height: 6),
+          Text(postDetail.activityField),
+          const SizedBox(height: 16),
+        ],
+
+
+        // 진행방식
+        if (postDetail.onlineOrOffline.isNotEmpty) ...[
+          const SubSectionTitle('진행 방식'),
+          const SizedBox(height: 6),
+          Text(postDetail.onlineOrOffline),
+        ],
+      ],
+    );
+  }
+
+  /// 모집 부문 섹션 (List로 변경)
   Widget _buildRecruitmentSection(List<dynamic> recruitmentParts) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +325,7 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 근무 조건 섹션 (서버 응답에 맞춰 수정)
+  /// 근무 조건 섹션 (서버 응답에 맞춰 수정)
   Widget _buildWorkConditionsSection(dynamic workConditions) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +343,7 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 복지 섹션 (String으로 수정)
+  /// 복지 섹션 (String으로 수정)
   Widget _buildBenefitsSection(String benefits) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +355,7 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 전형 절차 섹션 (String으로 수정)
+  /// 전형 절차 섹션 (String으로 수정)
   Widget _buildRecruitmentProcessSection(String recruitmentProcess) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,7 +367,7 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 지원 방법 섹션 (String으로 수정)
+  /// 지원 방법 섹션 (String으로 수정)
   Widget _buildApplicationMethodSection(String applicationMethod) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +379,7 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 새로 추가: 개행 문자를 기준으로 불릿 리스트 생성
+  /// 개행 문자를 기준으로 불릿 리스트 생성
   Widget _buildBulletText(String text) {
     final lines = text.split('\n').where((line) => line.trim().isNotEmpty).toList();
 
@@ -361,6 +440,12 @@ class PostDetailScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: Text('• 진행방식: ${postDetail.onlineOrOffline}'),
+          ),
+        // ✅ 새로 추가: 대상 정보
+        if (postDetail.targetAudience.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text('• 참가대상: ${postDetail.targetAudience.split('\n').first}'),
           ),
       ],
     );

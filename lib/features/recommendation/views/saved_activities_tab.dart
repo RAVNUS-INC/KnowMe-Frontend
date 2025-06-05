@@ -143,16 +143,18 @@ class SavedActivitiesTab extends StatelessWidget {
     return Wrap(
       spacing: 16, // 가로 간격
       runSpacing: 16, // 세로 간격
-      children: contests
-          .map((contest) => _createCustomContestCard(contest, cardWidth))
-          .toList(),
+      children: contests.asMap().entries.map((entry) {
+        // 인덱스와 Contest 객체를 함께 사용하여 고유한 키를 생성
+        return _createCustomContestCard(entry.value, cardWidth, title: '${entry.key}_${entry.value.id}');
+      }).toList(),
     );
   }
 
   /// 각 Contest 데이터를 위젯으로 만들어 반환 (북마크 버튼 포함된 카드)
-  Widget _createCustomContestCard(Contest contest, double width) {
+  Widget _createCustomContestCard(Contest contest, double width, {required String title}) {
     return _CustomContestCard(
-      key: ValueKey(contest.id), // 고유 키 추가 - contest.id를 사용하여 각 카드에 고유 식별자 제공
+      // 카테고리와 ID를 조합하여 진정으로 고유한 키 생성
+      key: ValueKey('${contest.type.name}_${contest.id}_$title'),
       contest: contest,
       width: width,
       onBookmarkTap: () => controller.toggleBookmark(contest),
@@ -195,7 +197,6 @@ class _CustomContestCard extends StatelessWidget {
       right: 4,
       top: 7,
       child: SizedBox(
-        // Container를 SizedBox로 변경
         width: 24,
         height: 24,
         child: IconButton(
@@ -205,7 +206,14 @@ class _CustomContestCard extends StatelessWidget {
               size: 20),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          onPressed: onBookmarkTap,
+          onPressed: () {
+            // 빌드 사이클 이후에 상태 변경이 일어나도록 함
+            Future.microtask(() {
+              if (onBookmarkTap != null) {
+                onBookmarkTap!();
+              }
+            });
+          },
         ),
       ),
     );

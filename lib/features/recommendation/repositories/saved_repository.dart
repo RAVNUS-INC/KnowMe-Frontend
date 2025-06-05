@@ -113,10 +113,10 @@ class SavedRepository {
   }
 
   /// 활동 저장 요청
-  Future<bool> savePost(String userId, int postId) async {
+  Future<bool> savePost(int postId) async {
     try {
-      _logger.d('📌 Repository: 활동 저장 요청 - userId=$userId postId=$postId');
-      final request = SavePostRequest(userId: userId, postId: postId);
+      _logger.d('📌 Repository: 활동 저장 요청 - postId=$postId');
+      final request = SavePostRequest(postId: postId);
       final response = await _postApiService.savePost(request);
       
       if (response.isSuccess) {

@@ -86,7 +86,7 @@ class ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final postController = Get.find<PostController>();
+    // final postController = Get.find<PostController>();
     
     return GestureDetector(
       onTap: () => _navigateToDetailScreen(context),

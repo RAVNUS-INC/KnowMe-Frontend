@@ -89,6 +89,171 @@ class PostController extends GetxController {
     return filtersByTab[tabIndex] ?? {};
   }
 
+  /// 현재 탭의 모든 필터값 Map 가져오기
+  Map<String, Rx<String?>> getCurrentTabFilters() {
+    return filtersByTab[selectedTabIndex.value] ?? {};
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    // PageController 초기화
+    pageController = PageController(initialPage: selectedTabIndex.value);
+    loadContests();
+  }
+
+  @override
+  void onClose() {
+    // PageController 자원 해제
+    pageController.dispose();
+    super.onClose();
+  }
+
+  /// 탭 변경 메서드 - PageController와 탭 인덱스 동기화 포함
+  void changeTab(int index) {
+    selectedTabIndex.value = index;
+    // PageController 페이지도 함께 변경
+    if (pageController.hasClients && pageController.page?.toInt() != index) {
+      pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+    loadContests();
+  }
+
+  /// PageView에서 페이지 변경 시 호출하는 메서드
+  void onPageChanged(int index) {
+    selectedTabIndex.value = index;
+    loadContests();
+  }
+
+  /// 특정 탭의 모든 필터 초기화
+  void resetFiltersForTab(int tabIndex) {
+    // 단일 선택 필터 초기화
+    filtersByTab[tabIndex]?.forEach((_, value) => value.value = null);
+
+    // 다중 선택 필터 초기화
+    _resetMultiSelectFilters(tabIndex);
+
+    // 데이터 다시 로드
+    loadContests();
+  }
+
+  /// 다중 선택 필터 초기화 메서드 (SRP 원칙 적용)
+  void _resetMultiSelectFilters(int tabIndex) {
+    switch (tabIndex) {
+      case 0: // 채용
+        multiSelectJobEducation.clear();
+        break;
+      case 1: // 인턴
+        multiSelectInternEducation.clear();
+        break;
+      case 2: // 대외활동
+        multiSelectHost.clear();
+        break;
+      case 3: // 교육/강연
+        multiSelectOnOffline.clear();
+        break;
+      case 4: // 공모전
+        multiSelectTarget.clear();
+        multiSelectOrganizer.clear();
+        multiSelectBenefit.clear();
+        break;
+    }
+  }
+
+  /// 현재 탭의 모든 필터 초기화 (FilterController와의 호환성 유지)
+  void resetFilters() => resetFiltersForTab(selectedTabIndex.value);
+
+  /// 필터 값 업데이트
+  void updateFilter(String filterType, String? value) {
+    filtersByTab[selectedTabIndex.value]?[filterType]?.value = value;
+    loadContests(); // 필터링 적용 후 데이터 갱신
+  }
+
+  /// 데이터 로드 메서드
+  Future<void> loadContests() async {
+    isLoading.value = true;
+
+    try {
+      final results = await getFilteredContentsByCurrentTab();
+      contests.assignAll(results);
+    } catch (e) {
+      _logger.e('Error loading contests: ${e.toString()}');
+      contests.clear();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// 현재 탭에 대한 필터링된 데이터 가져오기
+  Future<List<Contest>> getFilteredContentsByCurrentTab() async {
+    return await getFilteredContentsByTabIndex(selectedTabIndex.value);
+  }
+
+  /// 특정 탭에 대한 필터링된 데이터 가져오기
+  Future<List<Contest>> getFilteredContentsByTabIndex(int tabIndex) async {
+    final filters = filtersByTab[tabIndex] ?? {};
+    final values = filters.map((key, value) => MapEntry(key, value.value));
+
+    switch (tabIndex) {
+      case 0: // 채용
+        return await repository.getJobListings(
+          job: values['직무'],
+          experience: values['신입~5년'],
+          location: values['지역'],
+          education: values['학력'],
+          educationList: multiSelectJobEducation.isEmpty
+              ? null
+              : multiSelectJobEducation.toList(),
+        );
+      case 1: // 인턴
+        return repository.getInternListings(
+          job: values['직무'],
+          period: values['기간'],
+          location: values['지역'],
+          education: values['학력'],
+          educationList: multiSelectInternEducation.isEmpty
+              ? null
+              : multiSelectInternEducation.toList(),
+        );
+      case 2: // 대외활동
+        return repository.getExternalListings(
+          field: values['분야'],
+          organization: values['기관'],
+          location: values['지역'],
+          host: multiSelectHost.isEmpty
+              ? values['주최기관']
+              : multiSelectHost.join(", "),
+        );
+      case 3: // 교육/강연
+        return repository.getEducationListings(
+          field: values['분야'],
+          period: values['기간'],
+          location: values['지역'],
+          onOffline: multiSelectOnOffline.isEmpty
+              ? values['온/오프라인']
+              : multiSelectOnOffline.join(", "),
+        );
+      case 4: // 공모전
+      default:
+        return repository.getFilteredContests(
+          field: values['분야'],
+          target: multiSelectTarget.isEmpty
+              ? values['대상']
+              : multiSelectTarget.join(", "),
+          organizer: multiSelectOrganizer.isEmpty
+              ? values['주최기관']
+              : multiSelectOrganizer.join(", "),
+          benefit: multiSelectBenefit.isEmpty
+              ? values['혜택']
+              : multiSelectBenefit.join(", "),
+        );
+    }
+  }
+
   /// 북마크 토글 (저장/저장 취소) 기능
   Future<void> toggleBookmark(Contest contest) async {
     try {
@@ -99,7 +264,7 @@ class PostController extends GetxController {
       // 북마크 추가 또는 제거 요청
       if (!contest.isBookmarked) {
         // 북마크 추가 (저장)
-        success = await _savedRepository.savePost("1", int.parse(contest.id));
+        success = await _savedRepository.savePost(int.parse(contest.id));
         if (success) {
           _logger.d('🌟 북마크 추가 성공: ${contest.id}');
           Get.snackbar(
@@ -113,121 +278,65 @@ class PostController extends GetxController {
         }
       } else {
         // 북마크 제거 (저장 취소)
-        success = await _savedRepository.unsavePost(int.parse(contest.id)); // 메서드명 수정
+        success = await _savedRepository.unsavePost(int.parse(contest.id));
         if (success) {
-          _logger.d('❌ 북마크 제거 성공: ${contest.id}');
+          _logger.d('🗑️ 북마크 제거 성공: ${contest.id}');
           Get.snackbar(
             '저장 취소',
-            '${contest.title} 활동이 저장 취소되었습니다.',
+            '${contest.title} 활동이 저장 목록에서 제거되었습니다.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red[100],
-            colorText: Colors.red[800],
+            backgroundColor: Colors.amber[100],
+            colorText: Colors.amber[800],
             duration: const Duration(seconds: 1),
           );
         }
       }
 
-      // 상태 업데이트
       if (success) {
+        // 북마크 상태 변경
         contest.isBookmarked = !contest.isBookmarked;
+
+        // UI 업데이트를 위해 리스트 갱신
         contests.refresh();
+      } else {
+        _logger.e('북마크 토글 실패: ${contest.id}');
+        Get.snackbar(
+          '오류 발생',
+          '북마크 상태를 변경하는데 실패했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[800],
+          duration: const Duration(seconds: 2),
+        );
       }
     } catch (e) {
-      _logger.e('북마크 토글 실패: ${e.toString()}');
+      _logger.e('북마크 토글 중 예외 발생: $e');
       Get.snackbar(
         '오류 발생',
-        '북마크 처리 중 문제가 발생했습니다.',
+        '북마크 상태를 변경하는 중 오류가 발생했습니다.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.grey[300],
-        colorText: Colors.black,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
         duration: const Duration(seconds: 2),
       );
     }
   }
 
-  /// 컨텐츠 로드 (탭 인덱스에 따라 다른 데이터 로드)
-  Future<void> loadContests({bool refresh = false}) async {
-    try {
-      isLoading.value = true;
-      final result = await repository.getContests(tabIndex: selectedTabIndex.value, userId: "1");
-      contests.assignAll(result);
-    } catch (e) {
-      _logger.e('데이터 로드 실패: $e');
-      Get.snackbar(
-        '오류 발생',
-        '데이터를 불러오는 중 문제가 발생했습니다.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  /// 탭 변경 처리
-  void changeTab(int index) {
-    selectedTabIndex.value = index;
-    pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-    loadContests();
-  }
-
-  /// 페이지 변경 이벤트 처리
-  void onPageChanged(int index) {
-    selectedTabIndex.value = index;
-    loadContests();
-  }
-
-  /// 선택된 탭 인덱스에 따라 필터링된 컨텐츠 가져오기
-  Future<List<Contest>> getFilteredContentsByTabIndex(int tabIndex) async {
-    // 탭 인덱스가 현재 선택된 탭과 같으면 이미 로드된 데이터 반환
-    if (tabIndex == selectedTabIndex.value) {
-      return contests.where((contest) => contest.type.index == tabIndex).toList();
-    }
-    
-    // 다른 탭의 경우 데이터 로드
-    try {
-      return await repository.getContests(tabIndex: tabIndex, userId: "1");
-    } catch (e) {
-      _logger.e('데이터 필터링 실패: $e');
-      return [];
-    }
-  }
-
-  /// 모든 필터 초기화
-  void resetFilters() {
-    final currentFilters = filtersByTab[selectedTabIndex.value];
-    if (currentFilters != null) {
-      for (var key in currentFilters.keys) {
-        currentFilters[key]?.value = null;
-      }
-    }
-    
-    // 다중 선택 필터도 초기화
-    multiSelectTarget.clear();
-    multiSelectHost.clear();
-    multiSelectOrganizer.clear();
-    multiSelectBenefit.clear();
-    multiSelectOnOffline.clear();
-    multiSelectJobEducation.clear();
-    multiSelectInternEducation.clear();
-    
-    // 필터 초기화 후 데이터 새로고침
-    loadContests(refresh: true);
-  }
-  
-  @override
-  void onInit() {
-    super.onInit();
-    pageController = PageController(initialPage: selectedTabIndex.value);
-    loadContests();
-  }
-  
-  @override
-  void onClose() {
-    pageController.dispose();
-    super.onClose();
+  /// 탭별 필터 매핑 정보 제공 (리팩토링에 활용)
+  static Map<String, Map<int, String>> getFilterMapping() {
+    return {
+      'job': {0: '직무', 1: '직무'},
+      'experience': {0: '신입~5년'},
+      'location': {0: '지역', 1: '지역', 2: '지역', 3: '지역'},
+      'education': {0: '학력', 1: '학력'},
+      'period': {1: '기간', 2: '기간', 3: '기간'},
+      'field': {2: '분야', 3: '분야', 4: '분야'},
+      'organization': {2: '기관'},
+      'host': {2: '주최기관'},
+      'onOffline': {3: '온/오프라인'},
+      'target': {4: '대상'},
+      'organizer': {4: '주최기관'},
+      'benefit': {4: '혜택'},
+    };
   }
 }

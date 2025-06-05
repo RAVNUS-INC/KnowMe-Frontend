@@ -13,19 +13,12 @@ class SavedPostResponse {
   // 게시물 정보 (BasePost 추상 타입 → GetSavedPosts가 구현체)
   final BasePost post;
 
-  // 즐겨찾기 생성 시간
-  final DateTime createdAt;
-
-  // 즐겨찾기 수정 시간
-  final DateTime updatedAt;
 
   // 생성자
   SavedPostResponse({
     required this.id,
     required this.userId,
     required this.post,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   // JSON → 객체 변환
@@ -34,8 +27,6 @@ class SavedPostResponse {
       id: json['id'] ?? 0,
       userId: json['userId'] ?? 0,
       post: _parsePost(json['post']), // 하단 _parsePost 함수 사용
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
 

@@ -1,54 +1,72 @@
-import 'package:flutter/foundation.dart';
-
 /// 활동 저장 요청 DTO
 class SavePostRequest {
   final int postId; // 저장할 포스트 ID
-  final String userId;
 
   SavePostRequest({
-    required this.userId,
     required this.postId,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'userId': userId,
       'postId': postId,
     };
   }
 
   @override
-  String toString() => 'SavePostRequest(userId: $userId, postId: $postId)';
+  String toString() => 'SavePostRequest(postId: $postId)';
 }
 
+
 /// 저장된 활동 응답 DTO
-class SavedPostDTO {
+class SavePostResponse {
   final int id; // 저장한 활동 ID
   final int userId;
-  final SavedPostDetailDTO post;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final PostDto post;
 
-  SavedPostDTO({
+
+  SavePostResponse({
     required this.id,
     required this.userId,
     required this.post,
-    required this.createdAt,
-    required this.updatedAt,
+
   });
 
-  factory SavedPostDTO.fromJson(Map<String, dynamic> json) {
-    return SavedPostDTO(
-      id: json['id'] ?? 0,
-      userId: json['userId'] ?? 0,
-      post: SavedPostDetailDTO.fromJson(json['post'] ?? {}),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : DateTime.now(),
-    );
+  factory SavePostResponse.fromJson(Map<String, dynamic> json) {
+    try {
+      // 필수 필드부터 안전하게 가져옵니다
+      int id = json['id'] ?? 0;
+      int userId = 0;
+
+      // user 객체가 있으면 userId를 추출
+      if (json['user'] != null && json['user'] is Map<String, dynamic>) {
+        userId = json['user']['id'] ?? 0;
+      } else {
+        userId = json['userId'] ?? 0;
+      }
+
+      // post 객체가 복잡하거나 없는 경우를 대비
+      PostDto postDetail;
+      if (json['post'] != null && json['post'] is Map<String, dynamic>) {
+        postDetail = PostDto.fromJson(json['post']);
+      } else {
+        // empty() 메서드 대신 기본 생성자 직접 호출
+        postDetail = PostDto(postId: 0);
+      }
+
+      return SavePostResponse(
+        id: id,
+        userId: userId,
+        post: postDetail,
+      );
+    } catch (e) {
+      // 예외 발생 시 기본 객체 반환
+      return SavePostResponse(
+        id: 0,
+        userId: 0,
+        // empty() 메서드 대신 기본 생성자 직접 호출
+        post: PostDto(postId: 1),
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -56,119 +74,42 @@ class SavedPostDTO {
       'id': id,
       'userId': userId,
       'post': post.toJson(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 
   @override
   String toString() {
-    return 'SavedPostDTO(id: $id, userId: $userId, post: $post, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'SavedPostDTO(id: $id, userId: $userId, post: $post)';
   }
 }
-
-/// 저장된 포스트의 상세 정보 DTO
-class SavedPostDetailDTO {
+class PostDto {
   final int postId;
-  final String category;
-  final String title;
-  final String company;
-  final String companyIntro;
-  final String externalIntro;
-  final String content;
-  final String image;
-  final String location;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? jobTitle;
-  final int experience;
-  final String education;
-  final String activityField;
-  final int activityDuration;
-  final String hostingOrganization;
-  final String onlineOrOffline;
-  final String targetAudience;
-  final String contestBenefits;
 
-  SavedPostDetailDTO({
+  PostDto({
     required this.postId,
-    required this.category,
-    required this.title,
-    required this.company,
-    required this.companyIntro,
-    required this.externalIntro,
-    required this.content,
-    required this.image,
-    required this.location,
-    required this.createdAt,
-    required this.updatedAt,
-    this.jobTitle,
-    required this.experience,
-    required this.education,
-    required this.activityField,
-    required this.activityDuration,
-    required this.hostingOrganization,
-    required this.onlineOrOffline,
-    required this.targetAudience,
-    required this.contestBenefits,
   });
+  
+  // empty 팩토리 메서드 추가
+  factory PostDto.empty() {
+    return PostDto(
+      postId: 1,
+    );
+  }
 
-  factory SavedPostDetailDTO.fromJson(Map<String, dynamic> json) {
-    return SavedPostDetailDTO(
-      postId: json['post_id'] ?? 0,
-      category: json['category'] ?? '',
-      title: json['title'] ?? '',
-      company: json['company'] ?? '',
-      companyIntro: json['company_intro'] ?? '',
-      externalIntro: json['external_intro'] ?? '',
-      content: json['content'] ?? '',
-      image: json['image'] ?? '',
-      location: json['location'] ?? '',
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : DateTime.now(),
-      jobTitle: json['jobTitle'],
-      experience: json['experience'] ?? 0,
-      education: json['education'] ?? '',
-      activityField: json['activityField'] ?? '',
-      activityDuration: json['activityDuration'] ?? 0,
-      hostingOrganization: json['hostingOrganization'] ?? '',
-      onlineOrOffline: json['onlineOrOffline'] ?? '',
-      targetAudience: json['targetAudience'] ?? '',
-      contestBenefits: json['contestBenefits'] ?? '',
+  factory PostDto.fromJson(Map<String, dynamic> json) {
+    return PostDto(
+      postId: json['post_id'] ?? json['id'] ?? json['postId'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'post_id': postId,
-      'category': category,
-      'title': title,
-      'company': company,
-      'company_intro': companyIntro,
-      'external_intro': externalIntro,
-      'content': content,
-      'image': image,
-      'location': location,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'jobTitle': jobTitle,
-      'experience': experience,
-      'education': education,
-      'activityField': activityField,
-      'activityDuration': activityDuration,
-      'hostingOrganization': hostingOrganization,
-      'onlineOrOffline': onlineOrOffline,
-      'targetAudience': targetAudience,
-      'contestBenefits': contestBenefits,
     };
   }
 
   @override
   String toString() {
-    return 'SavedPostDetailDTO(postId: $postId, title: $title, company: $company)';
+    return 'PostDto(postId: $postId,)';
   }
 }
