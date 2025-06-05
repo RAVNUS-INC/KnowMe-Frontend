@@ -291,7 +291,7 @@ class PostController extends GetxController {
           );
         }
       }
-
+//
       if (success) {
         // 북마크 상태 변경
         contest.isBookmarked = !contest.isBookmarked;
@@ -301,11 +301,11 @@ class PostController extends GetxController {
       } else {
         _logger.e('북마크 토글 실패: ${contest.id}');
         Get.snackbar(
-          '오류 발생',
-          '북마크 상태를 변경하는데 실패했습니다.',
+          '',
+          '이미 저장된 북마크입니다.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red[100],
-          colorText: Colors.red[800],
+          backgroundColor: Colors.amber[100],
+          colorText: Colors.amber[800],
           duration: const Duration(seconds: 2),
         );
       }

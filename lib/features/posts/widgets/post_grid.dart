@@ -219,7 +219,7 @@ class ContestCard extends StatelessWidget {
   Widget _buildGradientOverlay() {
     return const SizedBox.shrink(); // 빈 위젯으로 대체
   }
-
+//
   Widget _buildBookmarkButton() {
     final postController = Get.find<PostController>();
     

@@ -153,9 +153,6 @@ class PostDetailScreen extends StatelessWidget {
           // ✅ 새로 추가: 대외활동 정보 종합 섹션
           if (controller.getCategoryDisplayName() == '대외활동') ...[
             _buildExternalActivityInfoSection(postDetail),
-            const SizedBox(height: 20),
-            Divider(color: Colors.grey[300], thickness: 1),
-            const SizedBox(height: 20),
           ],
 
           // 대외활동 정보

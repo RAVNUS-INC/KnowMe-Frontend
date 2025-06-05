@@ -198,7 +198,7 @@ class PostRepository {
       return [];
     }
   }
-
+//
   /// 기간 문자열을 숫자로 변환하는 헬퍼 메서드
   int? _parsePeriodToInt(String? period) {
     if (period == null || period.isEmpty) return null;
