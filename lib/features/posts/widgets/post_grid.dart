@@ -301,7 +301,7 @@ class ContestCard extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            contest.benefit,
+            contest.title,
             style: const TextStyle(
               color: Color(0xFF454C53),
               fontSize: 10,
