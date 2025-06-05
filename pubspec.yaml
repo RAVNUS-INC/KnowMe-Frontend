@@ -48,6 +48,7 @@ flutter:
     - assets/bottom_nav_svgs/
     - assets/logos/
     - assets/posts_images/
+    - assets/company_images/
 
   fonts:
     - family: Pretendard
