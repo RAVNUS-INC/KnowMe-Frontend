@@ -27,7 +27,7 @@ class PostDetailApiService {
           // JSON 데이터를 PostDetailDto로 변환
           final postDetail = PostDetailDto.fromJson(response.data!);
 
-          _logger.d('공고 상세 조회 성공: ${postDetail.title}');
+          _logger.d('공고 상세 조회 성공: ${postDetail.title}'); // 테크노바 프론트엔드 개발자 채용 잘 됨
 
           return ApiResponse.success(postDetail);
         } catch (e) {

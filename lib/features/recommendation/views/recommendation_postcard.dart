@@ -99,7 +99,6 @@ class RecommendationPostCard extends StatelessWidget {
           child: Stack(
             children: [
               _buildImage(width), // 실제 이미지
-              _buildGradientOverlay(), // 어두운 그라디언트 오버레이
               _buildBookmarkButton(), // 북마크 버튼
             ],
           ),
@@ -118,10 +117,10 @@ class RecommendationPostCard extends StatelessWidget {
         height: _imageHeight,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(_getImageUrl()),
+            image: AssetImage(_getImageUrl()),
             fit: BoxFit.cover,
             onError: (exception, stackTrace) =>
-                const NetworkImage("https://placehold.co/343x164"),
+                const AssetImage("https://placehold.co/343x164"),
           ),
         ),
       ),
@@ -135,20 +134,6 @@ class RecommendationPostCard extends StatelessWidget {
         : "https://placehold.co/343x164";
   }
 
-  /// 이미지 위에 반투명 그라디언트 오버레이 추가
-  Widget _buildGradientOverlay() {
-    return Positioned.fill(
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(0.50, 1.00),
-            end: Alignment(0.50, -0.00),
-            colors: [Color(0x00F5F5F5), Color(0xFF5D666F)],
-          ),
-        ),
-      ),
-    );
-  }
 
   /// 우측 상단의 북마크 버튼 구현
   Widget _buildBookmarkButton() {

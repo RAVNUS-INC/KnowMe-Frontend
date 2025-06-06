@@ -11,10 +11,10 @@ class SignupSecondController extends GetxController {
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController passwordConfirmController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController verificationCodeController =
-      TextEditingController();
+  TextEditingController();
 
   @override
   void onInit() {
@@ -109,11 +109,38 @@ class SignupSecondController extends GetxController {
     update();
   }
 
-  // Send verification code
+  // ✅ 수정: 인증번호 발송 기능에 개발 중 메시지 추가
   void sendVerificationCode() {
     if (signupModel.isPhoneValid) {
-      logger.d('인증번호 발송');
-      // Logic to send verification code
+      logger.d('인증번호 발송 버튼 클릭');
+
+      // 개발 중 메시지 표시
+      Get.snackbar(
+        '알림',
+        '이 기능은 현재 개발 중입니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        icon: const Icon(
+          Icons.info_outline,
+          color: Colors.white,
+        ),
+      );
+
+      // 임시로 인증번호 검증을 통과시킴 (개발용)
+      signupModel.isPhoneVerified = true;
+      update();
+    } else {
+      // 휴대폰 번호가 유효하지 않은 경우
+      Get.snackbar(
+        '오류',
+        '올바른 휴대폰 번호를 입력해주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
     }
   }
 
