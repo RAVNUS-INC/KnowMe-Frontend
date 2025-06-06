@@ -1,13 +1,49 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import 'package:knowme_frontend/features/posts/services/employee_api_service.dart';
 import 'package:logger/logger.dart';
+// api service imports
+import 'package:knowme_frontend/features/posts/services/employee_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/intern_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/external_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/education_api_service.dart';
+import 'package:knowme_frontend/features/posts/services/contest_api_service.dart';
 
 /// 게시물 데이터 접근을 위한 Repository 클래스 - Model 계층 담당
 class PostRepository {
 
   final EmployeeApiService _employeeApiService = EmployeeApiService();
+  final InternApiService _internApiService = InternApiService();
+  final ExternalApiService _externalApiService = ExternalApiService();
+  final EducationApiService _educationApiService = EducationApiService();
+  final ContestApiService _contestApiService = ContestApiService();
+  
   final Logger _logger = Logger();
-
+  
+  /// 탭 인덱스에 따른 컨텐츠 목록을 가져오는 메서드 (userId 포함)
+  Future<List<Contest>> getContests({required int tabIndex, required String userId}) async {
+    _logger.d('getContests 호출: tabIndex=$tabIndex, userId=$userId');
+    
+    try {
+      switch (tabIndex) {
+        case 0: // 채용
+          return await getJobListings();
+        case 1: // 인턴
+          return await getInternListings();
+        case 2: // 대외활동
+          return await getExternalListings();
+        case 3: // 교육/강연
+          return await getEducationListings();
+        case 4: // 공모전
+          return await getFilteredContests();
+        default:
+          _logger.w('지원하지 않는 탭 인덱스: $tabIndex');
+          return [];
+      }
+    } catch (e) {
+      _logger.e('컨텐츠 로드 실패: $e');
+      return [];
+    }
+  }
+  
   // 채용 정보 필터링해서 가져오기
   Future<List<Contest>> getJobListings({
     String? job,
@@ -54,17 +90,57 @@ class PostRepository {
     }
   }
 
+  // 인턴 정보 필터링해서 가져오기
+  Future<List<Contest>> getInternListings({
+    String? job,
+    String? period,
+    String? location,
+    String? education,
+    List<String>? educationList,
+  }) async {
+    try {
+      // 다중 선택 학력을 단일 문자열로 변환
+      String? finalEducation = education;
+      if (finalEducation == null && educationList != null && educationList.isNotEmpty) {
+        finalEducation = educationList.first;
+      }
+
+      _logger.d('인턴 공고 API 호출 - job: $job, period: $period, location: $location, education: $finalEducation');
+
+      // 실제 API 호출
+      final response = await _internApiService.getInternPosts(
+        jobTitle: job,
+        period: period,
+        education: finalEducation,
+        location: location,
+      );
+
+      if (response.isSuccess && response.data != null) {
+        // InternPost를 Contest로 변환
+        final contests = response.data!
+            .map((internPost) => internPost.toContest())
+            .toList();
+
+        _logger.d('인턴 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('인턴 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('인턴 공고 조회 중 예외 발생: $e');
+      return [];
+    }
+  }
+
   /// 경력 문자열을 숫자로 변환하는 헬퍼 메서드
   int? _parseExperienceToInt(String? experience) {
     if (experience == null || experience.isEmpty) return null;
 
     if (experience.contains('신입')) {
       return 0;
-    } else if (experience.contains('1년')) {
-      return 1;
-    } else if (experience.contains('3년')) {
-      return 3;
-    } else if (experience.contains('5년')) {
+    }
+    else if (experience.contains('5년')) {
       return 5;
     } else if (experience.contains('10년')) {
       return 10;
@@ -83,477 +159,143 @@ class PostRepository {
     return null;
   }
 
-  // 학력 필터 일치 여부 확인 (중복 코드 제거 - DRY 원칙 적용)
-  bool _matchesEducationFilter(
-      String targetValue, String? education, List<String>? educationList) {
-    if (education != null && education.isNotEmpty) {
-      return targetValue.contains(education);
-    } else if (educationList != null && educationList.isNotEmpty) {
-      return educationList.any((edu) => targetValue.contains(edu));
-    }
-    return true;
-  }
-
-  // 인턴 정보 필터링해서 가져오기
-  List<Contest> getInternships({
-    String? job,
+  // 대외활동 정보 필터링해서 가져오기 (API 사용)
+  Future<List<Contest>> getExternalListings({
+    String? field,
     String? period,
     String? location,
-    String? education,
-    List<String>? educationList,
-  }) {
-    // 데이터 소스 호출
-    final allInterns = _getInternshipsFromDataSource();
-
-    // 필터링 적용
-    return allInterns.where((intern) {
-      final String fieldValue = intern.field;
-      final String locationValue = intern.location;
-      final String targetValue = intern.target;
-      final String dateRangeValue = intern.dateRange;
-
-      // 직무 필터링
-      bool matchesJob = job == null || job.isEmpty || fieldValue.contains(job);
-
-      // 지역 필터링
-      bool matchesLocation = location == null ||
-          location.isEmpty ||
-          locationValue.contains(location);
-
-      // 학력 필터링
-      bool matchesEducation =
-          _matchesEducationFilter(targetValue, education, educationList);
-
-      // 기간 필터링
-      bool matchesPeriod =
-          period == null || period.isEmpty || dateRangeValue.contains(period);
-
-      return matchesJob && matchesLocation && matchesEducation && matchesPeriod;
-    }).toList();
-  }
-
-  // 대외활동 정보 필터링해서 가져오기
-  List<Contest> getActivities({
-    String? field,
-    String? organization,
-    String? location,
     String? host,
-  }) {
-    // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
-    return _getActivitiesFromDataSource()
-        .map((activity) => _applyActivityFilters(
-            activity, field, organization, location, host))
-        .toList();
+    String? organization,  // 하위 호환성을 위해 추가
+  }) async {
+    try {
+      // 주최기관 매개변수: host 우선 사용, 없으면 organization 사용
+      final String? finalHost = host ?? organization;
+
+      _logger.d('대외활동 공고 API 호출 - field: $field, period: $period, location: $location, host: $finalHost');
+
+      // 실제 API 호출
+      final response = await _externalApiService.getExternalPosts(
+        activityField: field,           // 분야
+        activityDuration: _parsePeriodToInt(period),  // 기간
+        location: location,     // 지역
+        hostingOrganization: finalHost,  // 주최기관
+      );
+
+      if (response.isSuccess && response.data != null) {
+        // ExternalPost를 Contest로 변환
+        final contests = response.data!
+            .map((externalPost) => externalPost.toContest())
+            .toList();
+
+        _logger.d('대외활동 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('대외활동 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('대외활동 공고 조회 중 예외 발생: $e');
+      return [];
+    }
+  }
+//
+  /// 기간 문자열을 숫자로 변환하는 헬퍼 메서드
+  int? _parsePeriodToInt(String? period) {
+    if (period == null || period.isEmpty) return null;
+
+    if (period.contains('1개월')) {
+      return 1;
+    }
+    else if (period.contains('3개월')) {
+      return 3;
+    }
+    else if (period.contains('6개월')) {
+      return 6;
+    }
+    else if (period.contains('12개월') || period.contains('1년')) {
+      return 12;
+    }
+
+    final RegExp numberRegex = RegExp(r'\d+');
+    final match = numberRegex.firstMatch(period);
+    if (match != null) {
+      return int.tryParse(match.group(0) ?? '');
+    }
+
+    return null;
   }
 
-  // 교육/강연 정보 필터링해서 가져오기
-  List<Contest> getEducationEvents({
+  // 교육/강연 정보 필터링해서 가져오기 (API 사용)
+  Future<List<Contest>> getEducationListings({
     String? field,
     String? period,
     String? location,
     String? onOffline,
-  }) {
-    // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
-    return _getEducationEventsFromDataSource()
-        .map((event) =>
-            _applyEducationFilters(event, field, period, location, onOffline))
-        .toList();
+  }) async {
+    try {
+      _logger.d('교육/강연 공고 API 호출 - field: $field, period: $period, location: $location, onOffline: $onOffline');
+
+      // 실제 API 호출
+      final response = await _educationApiService.getEducationPosts(
+        activityField: field,           // 분야
+        activityDuration: _parsePeriodToInt(period),  // 기간
+        location: location,             // 지역
+        onlineOrOffline: onOffline,     // 온/오프라인
+      );
+
+      if (response.isSuccess && response.data != null) {
+        // EducationPost를 Contest로 변환
+        final contests = response.data!
+            .map((educationPost) => educationPost.toContest())
+            .toList();
+
+        _logger.d('교육/강연 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('교육/강연 공고 API 호출 실패: ${response.message}');
+        return [];
+      }
+    } catch (e) {
+      _logger.e('교육/강연 공고 조회 중 예외 발생: $e');
+      return [];
+    }
   }
 
-  // 공모전 정보 필터링해서 가져오기
-  List<Contest> getFilteredContests({
+  // 공모전 정보 필터링해서 가져오기 (API 사용)
+  Future<List<Contest>> getFilteredContests({
     String? field,
     String? target,
     String? organizer,
     String? benefit,
-  }) {
-    // 실제 구현에서는 데이터베이스나 API에서 데이터를 가져오고 필터링
-    return _getContestsFromDataSource()
-        .map((contest) =>
-            _applyContestFilters(contest, field, target, organizer, benefit))
-        .toList();
-  }
+  }) async {
+    try {
+      _logger.d('공모전 공고 API 호출 - field: $field, target: $target, organizer: $organizer, benefit: $benefit');
 
-  List<Contest> getContests() {
-    return [
-      Contest(
-        id: '1', // int 값을 String으로 변경
-        title: "제1회 마이데이터 비즈니스 아이디어 공모전",
-        benefit: "총 상금 3,000만원",
-        target: "대학(원)생, 일반인",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "한국데이터산업진흥원",
-        location: "온라인",
-        field: "IT/프로그래밍",
-        dateRange: "2023.10.01 ~ 2023.11.30",
-      ),
-    ];
-  }
+      // 실제 API 호출
+      final response = await _contestApiService.getContestPosts(
+        activityField: field,           // 분야
+        targetAudience: target,         // 대상
+        hostingOrganization: organizer, // 주최기관
+        contestBenefits: benefit,       // 혜택
+      );
 
-  List<Contest> getPopularContests() {
-    return [
-      Contest(
-        id: '101', // int 값을 String으로 변경
-        title: "2023 서울 국제 디자인 공모전",
-        benefit: "총 상금 5,000만원",
-        target: "제한없음",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "서울디자인재단",
-        location: "서울",
-        field: "디자인",
-        dateRange: "2023.09.15 ~ 2023.11.15",
-      ),
-      Contest(
-        id: '102', // int 값을 String으로 변경
-        title: "환경보호 아이디어 해커톤",
-        benefit: "상금 및 창업지원",
-        target: "대학(원)생, 일반인",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "환경부",
-        location: "부산",
-        field: "환경/에너지",
-        dateRange: "2023.10.05 ~ 2023.12.05",
-      ),
-      Contest(
-        id: '103', // int 값을 String으로 변경
-        title: "청년 스타트업 비즈니스 모델 경진대회",
-        benefit: "총 상금 1억원",
-        target: "만 19~39세",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "중소벤처기업부",
-        location: "서울",
-        field: "창업/스타트업",
-        dateRange: "2023.09.01 ~ 2023.11.30",
-      ),
-    ];
-  }
+      if (response.isSuccess && response.data != null) {
+        // ContestPost를 Contest로 변환
+        final contests = response.data!
+            .map((contestPost) => contestPost.toContest())
+            .toList();
 
-  List<Contest> getRecentContests() {
-    return [
-      Contest(
-        id: '201', // int 값을 String으로 변경
-        title: "농업기술 혁신 아이디어 공모전",
-        benefit: "총 상금 2,000만원",
-        target: "제한없음",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "농촌진흥청",
-        location: "대전",
-        field: "농업/식품",
-        dateRange: "2023.10.01 ~ 2023.11.30",
-      ),
-      Contest(
-        id: '202', // int 값을 String으로 변경
-        title: "금융 서비스 UX 디자인 공모전",
-        benefit: "총 상금 3,000만원",
-        target: "대학(원)생",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "한국금융정보원",
-        location: "서울",
-        field: "디자인/UX",
-        dateRange: "2023.09.15 ~ 2023.11.15",
-      ),
-      Contest(
-        id: '203', // int 값을 String으로 변경
-        title: "미래 모빌리티 아이디어 경진대회",
-        benefit: "총 상금 4,000만원",
-        target: "제한없음",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "한국자동차공학회",
-        location: "경기",
-        field: "자동차/모빌리티",
-        dateRange: "2023.10.10 ~ 2023.12.10",
-      ),
-    ];
-  }
-
-  List<Contest> getDesignContests() {
-    return [
-      Contest(
-        id: '301', // int 값을 String으로 변경
-        title: "국제 그래픽 디자인 공모전",
-        benefit: "총 상금 5,000만원",
-        target: "디자이너, 학생",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "세계디자인협회",
-        location: "온라인",
-        field: "그래픽디자인",
-        dateRange: "2023.09.01 ~ 2023.11.30",
-      ),
-      Contest(
-        id: '302', // int 값을 String으로 변경
-        title: "사용자 경험 개선 UI/UX 공모전",
-        benefit: "취업 연계 및 상금",
-        target: "디자이너, 개발자",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "테크기업협회",
-        location: "서울",
-        field: "UI/UX",
-        dateRange: "2023.10.15 ~ 2023.12.15",
-      ),
-      Contest(
-        id: '303', // int 값을 String으로 변경
-        title: "친환경 패키지 디자인 공모전",
-        benefit: "총 상금 2,000만원",
-        target: "제한없음",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "환경디자인협회",
-        location: "부산",
-        field: "패키지디자인",
-        dateRange: "2023.09.20 ~ 2023.11.20",
-      ),
-    ];
-  }
-
-  List<Contest> getITContests() {
-    return [
-      Contest(
-        id: '401', // int 값을 String으로 변경
-        title: "블록체인 기술 활용 해커톤",
-        benefit: "총 상금 5,000만원",
-        target: "개발자, 대학생",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "블록체인협회",
-        location: "서울",
-        field: "블록체인/핀테크",
-        dateRange: "2023.10.01 ~ 2023.11.15",
-      ),
-      Contest(
-        id: '402', // int 값을 String으로 변경
-        title: "인공지능 서비스 개발 경진대회",
-        benefit: "총 상금 1억원",
-        target: "개발자, 연구원",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "과학기술정보통신부",
-        location: "대전",
-        field: "AI/머신러닝",
-        dateRange: "2023.09.15 ~ 2023.12.15",
-      ),
-      Contest(
-        id: '403', // int 값을 String으로 변경
-        title: "빅데이터 분석 챌린지",
-        benefit: "취업연계 및 상금",
-        target: "데이터 분석가, 학생",
-        imageUrl: "https://placehold.co/400x300/png",
-        organization: "한국데이터산업협회",
-        location: "온라인",
-        field: "빅데이터/통계",
-        dateRange: "2023.10.10 ~ 2023.11.30",
-      ),
-    ];
-  }
-
-  // 데이터 소스에서 채용 정보 가져오기 (데이터 로직과 비즈니스 로직 분리)
-
-  // 데이터 인덱스에서 인턴십 정보 가져오기
-  List<Contest> _getInternshipsFromDataSource() {
-    return [
-      Contest(
-        id: '3',
-        title: '2024 하계 UX/UI 디자인 인턴',
-        organization: '디자인팩토리',
-        imageUrl: 'assets/images/intern_ux_banner.png',
-        dateRange: '2024.07.01 ~ 2024.08.31',
-        location: '서울 마포구',
-        field: 'UX/UI 디자인',
-        benefit: '정규직 전환 가능, 인턴 수료증',
-        target: '대학교 재학생/졸업예정자',
-      ),
-      Contest(
-        id: '4',
-        title: '글로벌 사업개발팀 인턴 (영어 능통자)',
-        organization: '월드와이드 컴퍼니',
-        imageUrl: 'assets/images/intern_global_logo.jpg',
-        dateRange: '2024.09.01 ~ 2024.12.31',
-        location: '인천 송도',
-        field: '사업개발',
-        benefit: '실무 경험, 외국어 사용 환경',
-        target: '영어 능통자, 관련 전공 우대',
-      ),
-      Contest(
-        id: '12',
-        title: 'AI 데이터 분석 인턴십 프로그램',
-        organization: '데이터사이언스랩',
-        imageUrl: 'assets/images/intern_ai_poster.png',
-        dateRange: '2024.07.15 ~ 2024.10.15',
-        location: '대전 유성구',
-        field: '데이터 분석',
-        benefit: '전문가 멘토링, 프로젝트 참여',
-        target: '통계학, 컴퓨터공학 전공자',
-      ),
-    ];
-  }
-
-  // 데이터 소스에서 대외활동 정보 가져오기
-  List<Contest> _getActivitiesFromDataSource() {
-    return [
-      Contest(
-        id: '5',
-        title: '대학생 환경보호 서포터즈 "그린메이트" 10기',
-        organization: '푸른환경재단',
-        imageUrl: 'assets/images/activity_greenmate.jpg',
-        dateRange: '2024.07.20 ~ 2024.12.20',
-        location: '전국 (온/오프라인 병행)',
-        field: '환경/봉사',
-        benefit: '활동비 지원, 우수활동자 표창',
-        target: '환경에 관심있는 대���생 누구나',
-      ),
-      Contest(
-        id: '6',
-        title: '청소년 코딩 교육 봉사단 모집',
-        organization: '코딩천사들',
-        imageUrl: 'assets/images/activity_coding_angel.png',
-        dateRange: '2024.08.01 ~ 2024.11.30',
-        location: '서울/경기 지역아동센터',
-        field: 'IT/교육봉사',
-        benefit: '봉사시간 인정, 교육자료 제공',
-        target: '코딩 교육 경험자 또는 관심있는 대학생',
-      ),
-      Contest(
-        id: '13',
-        title: 'K-Culture 홍보대사 3기 모집',
-        organization: '한국문화교류원',
-        imageUrl: 'assets/images/activity_kculture.png',
-        dateRange: '2024.09.01 ~ 2025.02.28',
-        location: '온라인 중심 (월 1회 오프라인 모임)',
-        field: '문화/홍보',
-        benefit: '위촉장 수여, 문화행사 참여 기회',
-        target: 'SNS 활용 능숙자, 외국어 가능자 우대',
-      ),
-    ];
-  }
-
-  // 대외활동에 필터 적용
-  Contest _applyActivityFilters(Contest activity, String? field,
-      String? organization, String? location, String? host) {
-    return Contest(
-      id: activity.id,
-      title: activity.title,
-      organization: host ?? organization ?? activity.organization,
-      imageUrl: activity.imageUrl,
-      dateRange: activity.dateRange,
-      location: location ?? activity.location,
-      field: field ?? activity.field,
-      benefit: activity.benefit,
-      target: activity.target,
-      additionalInfo: activity.additionalInfo,
-    );
-  }
-
-  // 데이터 소스에서 교육/강연 정보 가져오기
-  List<Contest> _getEducationEventsFromDataSource() {
-    return [
-      Contest(
-        id: '7',
-        title: '실전! AWS 클라우드 엔지니어링 부트캠프 (8주)',
-        organization: '클라우드에듀',
-        imageUrl: 'assets/images/edu_aws_bootcamp.jpg',
-        dateRange: '2024.08.15 ~ 2024.10.15',
-        location: '서울 강남 (오프라인)',
-        field: 'IT/클라우드',
-        additionalInfo: '오프라인',
-        benefit: '수료증 발급, 취업 컨설팅',
-        target: '클라우드 엔지니어 지망생',
-      ),
-      Contest(
-        id: '8',
-        title: '데이터 시각화 마스터클래스 (Tableau 활용)',
-        organization: '데이터인사이트 아카데미',
-        imageUrl: 'assets/images/edu_data_viz.png',
-        dateRange: '2024.09.01 ~ 2024.09.30 (매주 토)',
-        location: '온라인 (Zoom)',
-        field: '데이터 분석/시각화',
-        additionalInfo: '온라인',
-        benefit: '강의자료 및 실습 데이터 제공',
-        target: '데이터 분석가, 마케터, 기획자',
-      ),
-      Contest(
-        id: '14',
-        title: '챗GPT 활용 프롬프트 엔지니어링 워크샵',
-        organization: 'AI 러닝센터',
-        imageUrl: 'assets/images/edu_prompt_engineering.png',
-        dateRange: '2024.07.27 (1일 특강)',
-        location: '서울 종로 (오프라인)',
-        field: 'AI/챗GPT',
-        additionalInfo: '오프라인',
-        benefit: '실습 위주, Q&A 세션',
-        target: 'AI 기술 활용에 관심 있는 누구나',
-      ),
-    ];
-  }
-
-  // 교육/강연에 필터 적용
-  Contest _applyEducationFilters(Contest event, String? field, String? period,
-      String? location, String? onOffline) {
-    return Contest(
-      id: event.id,
-      title: event.title,
-      organization: event.organization,
-      imageUrl: event.imageUrl,
-      dateRange: period ?? event.dateRange,
-      location: location ?? event.location,
-      field: field ?? event.field,
-      additionalInfo: onOffline ?? event.additionalInfo,
-      benefit: event.benefit,
-      target: event.target,
-    );
-  }
-
-  // 데이터 소스에서 공모전 정보 가져오기
-  List<Contest> _getContestsFromDataSource() {
-    return [
-      Contest(
-        id: '9',
-        title: '제5회 전국 대학생 앱 개발 챌린지',
-        organization: '대한민국 IT 협회',
-        imageUrl: 'assets/images/contest_app_dev.png',
-        dateRange: '2024.07.01 ~ 2024.09.30',
-        location: '온라인 제출 후 본선 오프라인 (서울)',
-        field: 'IT/앱개발',
-        additionalInfo: '총 상금 3,000만원',
-        target: '전국 대학생 및 대학원생 (팀 참가 가능)',
-        benefit: '대상 수상팀 장관상 수여',
-      ),
-      Contest(
-        id: '10',
-        title: '지속가능한 도시 아이디어 공모전',
-        organization: '스마트시티 연구소',
-        imageUrl: 'assets/images/contest_sustainable_city.jpg',
-        dateRange: '2024.08.15 ~ 2024.11.15',
-        location: '온라인 접수',
-        field: '사회/도시계획',
-        additionalInfo: '우수 아이디어 사업화 지원 검토',
-        target: '일반인, 학생, 기업 등 누구나',
-        benefit: '총 상금 1,000만원 및 전문가 컨설팅',
-      ),
-      Contest(
-        id: '15',
-        title: '단편영화 시나리오 공모전 "나의 이야기"',
-        organization: '필름메이커스 포럼',
-        imageUrl: 'assets/images/contest_scenario.png',
-        dateRange: '2024.07.10 ~ 2024.08.31',
-        location: '온라인 접수',
-        field: '문화/영화',
-        additionalInfo: '20페이지 내외 단편 시나리오',
-        target: '신인 및 기성 작가 모두 가능',
-        benefit: '대상작 제작 지원금 500만원',
-      ),
-    ];
-  }
-
-  // 공모전에 필터 적용
-  Contest _applyContestFilters(Contest contest, String? field, String? target,
-      String? organizer, String? benefit) {
-    return Contest(
-      id: contest.id,
-      title: contest.title,
-      organization: organizer ?? contest.organization,
-      imageUrl: contest.imageUrl,
-      dateRange: contest.dateRange,
-      location: contest.location,
-      field: field ?? contest.field,
-      additionalInfo: contest.additionalInfo,
-      target: target ?? contest.target,
-      benefit: benefit ?? contest.benefit,
-    );
+        _logger.d('공모전 공고 ${contests.length}개 조회 성공');
+        return contests;
+      } else {
+        _logger.e('공모전 공고 API 호출 실패: ${response.message}');
+        // API 호출에 실패했을 때 빈 배열 대신 백업 데이터 제공
+        return [];
+      }
+    } catch (e) {
+      _logger.e('공모전 공고 조회 중 예외 발생: $e');
+      // 예외 발생 시 백업 데이터 제공
+      return [];
+    }
   }
 }

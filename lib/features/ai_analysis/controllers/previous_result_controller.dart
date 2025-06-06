@@ -1,7 +1,7 @@
 // ✅ Controller
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../models/past_analysis_summary.dart';
+// import '../models/past_analysis_summary.dart';
 import '../services/ai_analysis_service.dart';
 
 class PreviousResultController extends GetxController {

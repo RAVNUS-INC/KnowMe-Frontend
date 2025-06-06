@@ -1,5 +1,5 @@
 import 'package:knowme_frontend/features/posts/models/contests_model.dart';
-import '../repositories/recommendation_repositories.dart';
+import '../repositories/recommendation_repository.dart';
 
 class RecommendationService {
   final RecommendationRepository _repository = RecommendationRepository();
@@ -29,14 +29,6 @@ class RecommendationService {
     }
 
     return recommendedContests;
-  }
-
-  Future<List<Contest>> getSavedContests() async {
-    // API 호출을 시뮬레이션하기 위한 지연
-    await Future.delayed(const Duration(seconds: 1));
-
-    // 저장된 활동 반환
-    return _repository.getSavedContests();
   }
 
   Future<bool> toggleBookmark(String contestId) async {

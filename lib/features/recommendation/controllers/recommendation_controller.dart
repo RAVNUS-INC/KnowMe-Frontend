@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../features/posts/models/contests_model.dart';
 import '../services/recommendation_service.dart';
+import '../services/saved_service.dart';
 import 'package:flutter/foundation.dart';
 
 class RecommendationController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  final RecommendationService _service = RecommendationService();
-  // 사용되지 않는 _repository 필드 제거
+  final RecommendationService _recommendationService = RecommendationService();
+  final SavedService _savedService = SavedService();
+
 
   List<ContestGroup> recommendedContests = [];
   List<Contest> savedContests = [];
   bool isLoading = false;
+  bool isLoadingSaved = false; // 저장된 활동 로딩 상태 추가
+  String errorMessage = ''; // 에러 메시지 추가
 
   // 탭 관련 변수
   late TabController tabController;
@@ -33,6 +37,10 @@ class RecommendationController extends GetxController
 
   void changeTab(int index) {
     tabController.animateTo(index);
+    // 저장한 활동 탭으로 이동할 때 데이터 새로고침
+    if (index == 1) {
+      fetchSavedContests();
+    }
     update();
   }
 
@@ -41,13 +49,19 @@ class RecommendationController extends GetxController
     update();
 
     try {
-      recommendedContests = await _service.getRecommendedContests();
+      recommendedContests = await _recommendationService.getRecommendedContests();
     } catch (e) {
-      // print 대신 디버그 모드에서만 로그를 출력
       if (kDebugMode) {
         debugPrint('Error fetching recommended contests: $e');
       }
-      // 오류 처리 (예: 스낵바 표시)
+      // Get.snackbar를 사용하여 사용자에게 오류 알림
+      Get.snackbar(
+        '데이터 로드 오류',
+        '추천 활동을 불러오는 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
     } finally {
       isLoading = false;
       update();
@@ -55,21 +69,42 @@ class RecommendationController extends GetxController
   }
 
   Future<void> fetchSavedContests() async {
+    isLoadingSaved = true;
+    errorMessage = '';
+    update();
+
     try {
-      savedContests = await _service.getSavedContests();
-      update();
+      final List<Contest> list = await _savedService.getSavedContests();
+      // 바로 isBookmarked=true로 세팅할 수도 있지만
+      // Obx 빌드 중에 값 바꾸면 오류 → addPostFrameCallback에 위임
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 빌드가 끝난 뒤에 값 복사 & 갱신
+        savedContests.assignAll(list.map((c) {
+          c.isBookmarked = true;
+          return c;
+        }));
+      });
     } catch (e) {
-      // print 대신 디버그 모드에서만 로그를 출력
       if (kDebugMode) {
         debugPrint('Error fetching saved contests: $e');
       }
-      // 오류 처리
+      errorMessage = '저장한 활동을 불러오는 중 오류가 발생했습니다.';
+      Get.snackbar(
+        '데이터 로드 오류',
+        '저장한 활동을 불러오는 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
+    } finally {
+      isLoadingSaved = false;
+      update();
     }
   }
 
   Future<void> toggleBookmark(Contest contest) async {
     try {
-      final result = await _service.toggleBookmark(contest.id);
+      final result = await _recommendationService.toggleBookmark(contest.id);
       if (result) {
         // 북마크 상태 토글
         contest.isBookmarked = !contest.isBookmarked;
@@ -89,7 +124,14 @@ class RecommendationController extends GetxController
       if (kDebugMode) {
         debugPrint('Error toggling bookmark: $e');
       }
-      // 오류 처리
+      // 북마크 오류 알림
+      Get.snackbar(
+        '북마크 오류',
+        '북마크 상태를 변경하는 중 오류가 발생했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
     }
   }
 
