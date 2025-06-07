@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../controllers/login_controller.dart';
 
 class LoginPage extends StatelessWidget {
@@ -28,8 +29,8 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 80),
-                  Image.asset(
-                    'assets/images/knowme_logo.png',
+                  SvgPicture.asset(
+                    'assets/logos/logor.svg',
                     width: 350,
                     height: 200,
                   ),

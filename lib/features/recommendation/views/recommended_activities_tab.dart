@@ -18,7 +18,17 @@ class RecommendedActivitiesTab extends StatelessWidget {
       child: GetBuilder<RecommendationController>(
         builder: (controller) {
           if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Container(
+              height: MediaQuery.of(context).size.height - 200,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xFF007AFF),
+                  ),
+                  strokeWidth: 3,
+                ),
+              ),
+            );
           }
           return Column(
             children: [

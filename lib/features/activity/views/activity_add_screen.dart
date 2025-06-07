@@ -126,15 +126,59 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('알림'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('확인'),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '알림',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF232323),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF232323),
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: SizedBox(
+                  width: 100,
+                  height: 40,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF0066FF)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      '확인',
+                      style: TextStyle(color: Color(0xFF0066FF)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -559,28 +603,66 @@ class _ActivityAddScreenState extends State<ActivityAddScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 40),
             Center(
-              child: Obx(() => GestureDetector(
-                    onTap: activityController.isCreatingActivity.value
-                        ? null // 로딩 중에는 비활성화
-                        : _createActivity,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/wrapper-btn.png',
-                          width: 300,
-                          fit: BoxFit.contain,
-                        ),
-                        if (activityController.isCreatingActivity.value)
-                          const CircularProgressIndicator(
-                            color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 취소 버튼
+                  Expanded(
+                    child: Container(
+                      height: 48,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF1565C0)),
+                          foregroundColor: const Color(0xFF1565C0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                      ],
+                        ),
+                        child: const Text('취소', style: TextStyle(fontSize: 16)),
+                      ),
                     ),
-                  )),
+                  ),
+                  const SizedBox(width: 12),
+                  // 저장 버튼
+                  Expanded(
+                    child: Container(
+                      height: 48,
+                      child: Obx(() => ElevatedButton(
+                            onPressed:
+                                activityController.isCreatingActivity.value
+                                    ? null
+                                    : _createActivity,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  activityController.isCreatingActivity.value
+                                      ? const Color(0xFF9CA3AF)
+                                      : const Color(0xFF1565C0),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: activityController.isCreatingActivity.value
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    '저장',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                          )),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -9,10 +9,10 @@ import '../views/membership_screen.dart';
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
   final controller = Get.find<ProfileController>();
-
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
+      currentIndex: -1, // 어떤 탭도 활성화하지 않음
       body: Obx(() {
         // 에러 상태 처리 (로딩은 기본 더미 데이터 표시하면서 백그라운드 로딩)
         if (controller.errorMessage.isNotEmpty) {
@@ -77,7 +77,8 @@ class ProfileScreen extends StatelessWidget {
                       backgroundColor: Colors.transparent,
                       child: CircleAvatar(
                         radius: 58,
-                        backgroundImage: AssetImage('assets/images/silhouette.png'),
+                        backgroundImage:
+                            AssetImage('assets/images/silhouette.png'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -95,7 +96,8 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         Text(
                           controller.userProfile.value.name,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         // 로딩 중일 때 작은 로딩 인디케이터 표시
                         if (controller.isLoading.value)
@@ -106,7 +108,8 @@ class ProfileScreen extends StatelessWidget {
                               height: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[400]!),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.grey[400]!),
                               ),
                             ),
                           ),
@@ -170,7 +173,8 @@ class ProfileScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 40),
-              Container(width: double.infinity, height: 24, color: Colors.grey[50]),
+              Container(
+                  width: double.infinity, height: 24, color: Colors.grey[50]),
               const SizedBox(height: 20),
 
               // 메뉴 리스트
@@ -231,11 +235,13 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     Text(
                       '고객지원',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     SizedBox(height: 4),
                     Text('tel: 02-000-0000', style: TextStyle(fontSize: 12)),
-                    Text('email : help@knowme.com', style: TextStyle(fontSize: 12)),
+                    Text('email : help@knowme.com',
+                        style: TextStyle(fontSize: 12)),
                     Text('주소', style: TextStyle(fontSize: 12)),
                   ],
                 ),
@@ -246,7 +252,8 @@ class ProfileScreen extends StatelessWidget {
               // 그라데이션 푸터 및 로그아웃 메뉴
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,

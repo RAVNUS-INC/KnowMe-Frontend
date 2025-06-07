@@ -11,7 +11,7 @@ class SearchScreen extends StatelessWidget {
     final controller = Get.find<search.SearchController>();
 
     return BaseScaffold(
-      currentIndex: 0,
+      currentIndex: -1,
       activeIcon: 'search',
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),

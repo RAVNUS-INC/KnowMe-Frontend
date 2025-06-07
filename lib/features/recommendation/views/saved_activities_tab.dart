@@ -16,7 +16,6 @@ class SavedActivitiesTab extends StatelessWidget {
   // PostController get postcontroller =>
   //     Get.find<PostController>();
 
-
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => PostController());
@@ -25,8 +24,17 @@ class SavedActivitiesTab extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: controller.refreshData, // 당겨서 새로고침 기능
           child: controller.isLoading
-              ? const Center(
-              child: CircularProgressIndicator()) // 로딩 중이면 로딩 인디케이터
+              ? Container(
+                  height: MediaQuery.of(context).size.height - 200,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF007AFF),
+                      ),
+                      strokeWidth: 3,
+                    ),
+                  ),
+                ) // 로딩 중이면 로딩 인디케이터
               : _buildContent(context), // 로딩이 끝났으면 콘텐츠 빌드
         );
       },
@@ -47,7 +55,7 @@ class SavedActivitiesTab extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       child: Container(
         padding:
-        const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
+            const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
         decoration: const BoxDecoration(color: Color(0xFFEDEFF0)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,15 +120,15 @@ class SavedActivitiesTab extends StatelessWidget {
           // 해당 카테고리에 저장된 활동이 있으면 그리드로 표시, 없으면 비어있음 메시지 표시
           contests.isEmpty
               ? const Text(
-            '저장한 활동이 없습니다',
-            style: TextStyle(
-              color: Color(0xFFB7C4D4),
-              fontSize: 14,
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.56,
-            ),
-          )
+                  '저장한 활동이 없습니다',
+                  style: TextStyle(
+                    color: Color(0xFFB7C4D4),
+                    fontSize: 14,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.56,
+                  ),
+                )
               : _buildContestGrid(context, contests, title),
         ],
       ),
@@ -142,7 +150,8 @@ class SavedActivitiesTab extends StatelessWidget {
   }
 
   /// 그리드 형태로 활동 카드 배치
-  Widget _buildContestGrid(BuildContext context, List<Contest> contests, String categoryName) {
+  Widget _buildContestGrid(
+      BuildContext context, List<Contest> contests, String categoryName) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = (screenWidth - 48) / 2; // 전체 너비에서 padding, margin 감안
 
@@ -167,31 +176,34 @@ class SavedActivitiesTab extends StatelessWidget {
     }
 
     // 해당 카테고리에 맞는 타입의 Contest만 필터링
-    final categoryContests = contests.where((contest) => contest.type == categoryType).toList();
+    final categoryContests =
+        contests.where((contest) => contest.type == categoryType).toList();
 
     return categoryContests.isEmpty
         ? const Text(
-      '저장한 활동이 없습니다',
-      style: TextStyle(
-        color: Color(0xFFB7C4D4),
-        fontSize: 14,
-        fontFamily: 'Pretendard',
-        fontWeight: FontWeight.w500,
-        letterSpacing: -0.56,
-      ),
-    )
+            '저장한 활동이 없습니다',
+            style: TextStyle(
+              color: Color(0xFFB7C4D4),
+              fontSize: 14,
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.56,
+            ),
+          )
         : Wrap(
-      spacing: 16, // 가로 간격
-      runSpacing: 16, // 세로 간격
-      children: categoryContests.asMap().entries.map((entry) {
-        // 인덱스와 Contest 객체를 함께 사용하여 고유한 키를 생성
-        return _createCustomContestCard(entry.value, cardWidth, title: '${categoryName}_${entry.key}_${entry.value.id}');
-      }).toList(),
-    );
+            spacing: 16, // 가로 간격
+            runSpacing: 16, // 세로 간격
+            children: categoryContests.asMap().entries.map((entry) {
+              // 인덱스와 Contest 객체를 함께 사용하여 고유한 키를 생성
+              return _createCustomContestCard(entry.value, cardWidth,
+                  title: '${categoryName}_${entry.key}_${entry.value.id}');
+            }).toList(),
+          );
   }
 
   /// 각 Contest 데이터를 위젯으로 만들어 반환 (북마크 버튼 포함된 카드)
-  Widget _createCustomContestCard(Contest contest, double width, {required String title}) {
+  Widget _createCustomContestCard(Contest contest, double width,
+      {required String title}) {
     return _CustomContestCard(
       // 카테고리와 ID를 조합하여 진정으로 고유한 키 생성
       key: ValueKey('${contest.type.name}_${contest.id}_$title'),

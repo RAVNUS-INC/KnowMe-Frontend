@@ -51,30 +51,33 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // 로고 이미지
-              Image.asset(
-                'assets/logos/logor가로@2x.png',
-                width: 200,
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 24),
-              // 로딩 인디케이터 (선택사항)
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(0xFF007AFF), // iOS 블루 색상
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 로고 이미지
+                Image.asset(
+                  'assets/logos/logor가로@2x.png',
+                  width: 200,
+                  height: 100,
+                  fit: BoxFit.contain,
                 ),
-                strokeWidth: 2,
-              ),
-            ],
+                const SizedBox(height: 24),
+                // 로딩 인디케이터 
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xFF007AFF), 
+                  ),
+                  strokeWidth: 2,
+                ),
+              ],
+            ),
           ),
-        ),
+        )
       ),
     );
   }
